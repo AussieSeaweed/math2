@@ -8,7 +8,7 @@ setup(
     version='0.0.1.dev1',
     author='Juho Kim',
     author_email='juho-kim@outlook.com',
-    description='Math2 is a Python package implementing various math functions',
+    description='A Python package for various math functions',
     long_description=long_description,
     long_description_content_type='text/x-rst',
     url='https://github.com/AussieSeaweed/math2',
