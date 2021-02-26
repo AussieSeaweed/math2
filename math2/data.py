@@ -97,3 +97,40 @@ class Vector(MutableSequence[float]):
     @z.setter
     def z(self, value: float) -> None:
         self[2] = value
+
+
+def zeros(n: int) -> Vector:
+    return Vector(0 for _ in range(n))
+
+
+def full(n: int, v: float) -> Vector:
+    return Vector(v for _ in range(n))
+
+
+def copy(vector: Vector) -> Vector:
+    return Vector(x for x in vector)
+
+
+def delete(vector: Vector, i: int) -> Vector:
+    vector = copy(vector)
+    del vector[i]
+
+    return vector
+
+
+def insert(vector: Vector, i: int, v: float) -> Vector:
+    vector = copy(vector)
+    vector.insert(i, v)
+
+    return vector
+
+
+def replace(vector: Vector, i: int, v: float) -> Vector:
+    vector = copy(vector)
+    vector[i] = v
+
+    return vector
+
+
+def maximum(vector: Vector, v: float) -> Vector:
+    return Vector(max(x, v) for x in vector)
