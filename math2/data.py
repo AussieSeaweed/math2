@@ -103,6 +103,10 @@ def zeros(n: int) -> Vector:
     return Vector(0 for _ in range(n))
 
 
+def ones(n: int) -> Vector:
+    return Vector(1 for _ in range(n))
+
+
 def full(n: int, v: float) -> Vector:
     return Vector(v for _ in range(n))
 
