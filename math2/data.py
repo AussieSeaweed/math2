@@ -45,7 +45,7 @@ class Vector(MutableSequence[float]):
     def __delitem__(self, i: slice) -> None: ...
 
     def __delitem__(self, i: Union[int, slice]) -> None:
-        del self[i]
+        del self.__values[i]
 
     def __len__(self) -> int:
         return len(self.__values)
