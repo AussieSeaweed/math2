@@ -8,7 +8,7 @@ class InterestTestCase(TestCase):
     r, n, t, a = 0.1, 4, 2.5, 1.2800845441963565
     counts = range(1, 366)
 
-    def test_interests(self):
+    def test_interests(self) -> None:
         factors = [
             EffectiveInterest((1 + self.r / self.n) ** self.n - 1),
             ContinuousInterest(log((1 + self.r / self.n) ** self.n)),

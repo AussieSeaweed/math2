@@ -1,5 +1,6 @@
 auxiliary
 numpy
+mypy
 scipy
 sphinx
 sphinx-rtd-theme
