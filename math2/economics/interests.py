@@ -15,7 +15,7 @@ class Interest(ABC):
 
     @abstractmethod
     def __call__(self, t: float) -> float:
-        pass
+        ...
 
 
 class SimpleInterest(Interest):
@@ -34,7 +34,6 @@ class CompoundInterest(Interest, ABC):
 
         :return: the converted interest value
         """
-        pass
 
     @abstractmethod
     def to_continuous(self) -> ContinuousInterest:
@@ -42,7 +41,6 @@ class CompoundInterest(Interest, ABC):
 
         :return: the converted interest value
         """
-        pass
 
     @abstractmethod
     def to_nominal(self, n: float) -> NominalInterest:
@@ -50,7 +48,6 @@ class CompoundInterest(Interest, ABC):
 
         :return: the converted interest value
         """
-        pass
 
     @abstractmethod
     def to_subperiod(self, n: float) -> SubperiodInterest:
@@ -58,7 +55,6 @@ class CompoundInterest(Interest, ABC):
 
         :return: the converted interest value
         """
-        pass
 
 
 class EffectiveInterest(CompoundInterest):

@@ -1,14 +1,14 @@
 from math import log
-from unittest import main, TestCase
+from unittest import TestCase, main
 
 from math2.economics import ContinuousInterest, EffectiveInterest, NominalInterest, SubperiodInterest
 
 
 class InterestTestCase(TestCase):
     r, n, t, a = 0.1, 4, 2.5, 1.2800845441963565
-    counts = list(range(1, 366))
+    counts = range(1, 366)
 
-    def test_interests(self) -> None:
+    def test_interests(self):
         factors = [
             EffectiveInterest((1 + self.r / self.n) ** self.n - 1),
             ContinuousInterest(log((1 + self.r / self.n) ** self.n)),

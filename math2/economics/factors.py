@@ -51,7 +51,7 @@ def fp(i: float, n: float) -> float:
     return (1 + i) ** n
 
 
-def pa(i: float, n: float, *, g: Optional[float] = None) -> float:
+def pa(i: float, n: float, g: Optional[float] = None) -> float:
     """If the geometric gradient rate is supplied, calculates the geometric gradient to present worth conversion factor.
     Otherwise, calculates the series present worth factor.
 
