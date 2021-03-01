@@ -74,3 +74,22 @@ def pf(i: float, n: float) -> float:
     :return: the calculated factor
     """
     return (1 + i) ** -n
+
+
+def pp(i: float) -> float:
+    """Calculates the perpetuity to present worth factor.
+
+    :param i: the interest rate
+    :return: the calculated factor
+    """
+    return 1 / i
+
+
+def pg(i: float, n: float) -> float:
+    """Calculates the arithmetic gradient to present worth factor.
+
+    :param i: the interest rate
+    :param n: the number of periods
+    :return: the calculated factor
+    """
+    return 1 / i ** 2 * (1 - (1 + i * n) / (1 + i) ** n)

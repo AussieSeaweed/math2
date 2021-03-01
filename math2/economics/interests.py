@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from functools import cached_property
 from math import exp, inf, log
 from typing import Optional
 
@@ -10,19 +11,39 @@ from math2.economics.factors import fp
 class Interest(ABC):
     """Interest is the abstract base class for all interests."""
 
-    def __init__(self, r: float):
-        self.r = r
+    def __init__(self, rate: float):
+        self.rate = rate
 
     @abstractmethod
-    def __call__(self, t: float) -> float:
+    def to_factor(self, time: float) -> float:
+        """Converts this interest to the factor at the given time period.
+
+        :param time: the time period
+        :return: the converted factor
+        """
+        ...
+
+    @classmethod
+    @abstractmethod
+    def from_factor(cls, factor: float, time: float) -> Interest:
+        """Converts the factor at a time period to an interest value.
+
+        :param factor: the factor
+        :param time: the time period
+        :return: the converted interest value
+        """
         ...
 
 
 class SimpleInterest(Interest):
     """SimpleInterest is the class for simple interests."""
 
-    def __call__(self, t: float) -> float:
-        return 1 + self.r * t
+    def to_factor(self, time: float) -> float:
+        return 1 + self.rate * time
+
+    @classmethod
+    def from_factor(cls, factor: float, time: float) -> SimpleInterest:
+        return SimpleInterest((factor - 1) / time)
 
 
 class CompoundInterest(Interest, ABC):
@@ -45,105 +66,121 @@ class CompoundInterest(Interest, ABC):
         ...
 
     @abstractmethod
-    def to_nominal(self, n: float) -> NominalInterest:
+    def to_nominal(self, subperiod_count: float) -> NominalInterest:
         """Converts this interest value to a nominal interest value.
 
+        :param subperiod_count: the number of subperiods of the converted interest value
         :return: the converted interest value
         """
         ...
 
     @abstractmethod
-    def to_subperiod(self, n: float) -> SubperiodInterest:
+    def to_subperiod(self, subperiod_count: float) -> SubperiodInterest:
         """Converts this interest value to a subperiod interest value.
 
+        :param subperiod_count: the number of subperiods of the converted interest value
         :return: the converted interest value
         """
         ...
+
+    @staticmethod
+    def from_factor(factor: float, time: float) -> CompoundInterest:
+        return EffectiveInterest(factor ** (1 / time) - 1)
 
 
 class EffectiveInterest(CompoundInterest):
     """EffectiveInterest is the class for effective interests."""
 
-    def __call__(self, t: float) -> float:
-        return fp(self.r, t)
+    def to_factor(self, time: float) -> float:
+        return fp(self.rate, time)
 
     def to_effective(self) -> EffectiveInterest:
         return self
 
     def to_continuous(self) -> ContinuousInterest:
-        return ContinuousInterest(log(self.r + 1))
+        return ContinuousInterest(log(self.rate + 1))
 
-    def to_nominal(self, n: float) -> NominalInterest:
-        return NominalInterest(n * ((self.r + 1) ** (1 / n) - 1), n)
+    def to_nominal(self, subperiod_count: float) -> NominalInterest:
+        return NominalInterest(subperiod_count * ((self.rate + 1) ** (1 / subperiod_count) - 1), subperiod_count)
 
-    def to_subperiod(self, n: float) -> SubperiodInterest:
-        return SubperiodInterest((self.r + 1) ** (1 / n) - 1, n)
+    def to_subperiod(self, subperiod_count: float) -> SubperiodInterest:
+        return SubperiodInterest((self.rate + 1) ** (1 / subperiod_count) - 1, subperiod_count)
 
 
 class MultipleCompoundInterest(CompoundInterest, ABC):
     """MultipleCompoundInterest is the abstract base class for all multiple compounding interests."""
 
-    def __init__(self, r: float, n: float):
-        super().__init__(r)
+    def __init__(self, rate: float, subperiod_count: float):
+        super().__init__(rate)
 
-        self.n = n
+        self.subperiod_count = subperiod_count
+
+    @cached_property
+    def subperiod(self) -> float:
+        return 1 / self.subperiod_count
 
 
 class NominalInterest(MultipleCompoundInterest):
     """NominalInterest is the class for nominal interests."""
 
-    def __call__(self, t: float) -> float:
-        return fp(self.r / self.n, self.n * t)
+    def to_factor(self, time: float) -> float:
+        return fp(self.rate / self.subperiod_count, self.subperiod_count * time)
 
     def to_effective(self) -> EffectiveInterest:
-        return EffectiveInterest(fp(self.r / self.n, self.n) - 1)
+        return EffectiveInterest(fp(self.rate / self.subperiod_count, self.subperiod_count) - 1)
 
     def to_continuous(self) -> ContinuousInterest:
         return self.to_effective().to_continuous()
 
-    def to_nominal(self, n: Optional[float] = None) -> NominalInterest:
-        return self if n is None else self.to_effective().to_nominal(n)
+    def to_nominal(self, subperiod_count: Optional[float] = None) -> NominalInterest:
+        return self if subperiod_count is None else self.to_effective().to_nominal(subperiod_count)
 
-    def to_subperiod(self, n: Optional[float] = None) -> SubperiodInterest:
-        return SubperiodInterest(self.r / self.n, self.n) if n is None else self.to_effective().to_subperiod(n)
+    def to_subperiod(self, subperiod_count: Optional[float] = None) -> SubperiodInterest:
+        if subperiod_count is None:
+            return SubperiodInterest(self.rate / self.subperiod_count, self.subperiod_count)
+        else:
+            return self.to_effective().to_subperiod(subperiod_count)
 
 
 class SubperiodInterest(MultipleCompoundInterest):
     """SubperiodInterest is the class for subperiod interests."""
 
-    def __call__(self, t: float) -> float:
-        return fp(self.r, self.n * t)
+    def to_factor(self, time: float) -> float:
+        return fp(self.rate, self.subperiod_count * time)
 
     def to_effective(self) -> EffectiveInterest:
-        return EffectiveInterest(fp(self.r, self.n) - 1)
+        return EffectiveInterest(fp(self.rate, self.subperiod_count) - 1)
 
     def to_continuous(self) -> ContinuousInterest:
         return self.to_effective().to_continuous()
 
-    def to_nominal(self, n: Optional[float] = None) -> NominalInterest:
-        return NominalInterest(self.r * self.n, self.n) if n is None else self.to_effective().to_nominal(n)
+    def to_nominal(self, subperiod_count: Optional[float] = None) -> NominalInterest:
+        if subperiod_count is None:
+            return NominalInterest(self.rate * self.subperiod_count, self.subperiod_count)
+        else:
+            return self.to_effective().to_nominal(subperiod_count)
 
-    def to_subperiod(self, n: Optional[float] = None) -> SubperiodInterest:
-        return self if n is None else self.to_effective().to_subperiod(n)
+    def to_subperiod(self, subperiod_count: Optional[float] = None) -> SubperiodInterest:
+        return self if subperiod_count is None else self.to_effective().to_subperiod(subperiod_count)
 
 
 class ContinuousInterest(MultipleCompoundInterest):
     """ContinuousInterest is the class for continuous interests."""
 
-    def __init__(self, r: float):
-        super().__init__(r, inf)
+    def __init__(self, rate: float):
+        super().__init__(rate, inf)
 
-    def __call__(self, t: float) -> float:
-        return exp(self.r) ** t
+    def to_factor(self, time: float) -> float:
+        return exp(self.rate) ** time
 
     def to_effective(self) -> EffectiveInterest:
-        return EffectiveInterest(exp(self.r) - 1)
+        return EffectiveInterest(exp(self.rate) - 1)
 
     def to_continuous(self) -> ContinuousInterest:
         return self
 
-    def to_nominal(self, n: float) -> NominalInterest:
-        return self.to_effective().to_nominal(n)
+    def to_nominal(self, subperiod_count: float) -> NominalInterest:
+        return self.to_effective().to_nominal(subperiod_count)
 
-    def to_subperiod(self, n: float) -> SubperiodInterest:
-        return self.to_effective().to_subperiod(n)
+    def to_subperiod(self, subperiod_count: float) -> SubperiodInterest:
+        return self.to_effective().to_subperiod(subperiod_count)
