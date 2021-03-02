@@ -1,78 +1,72 @@
 from collections import Iterable, Iterator, Sequence
 from functools import reduce
 from itertools import chain
-from operator import add, lt, mul
+from operator import lt, mul
 from typing import Optional, TypeVar
 
 T = TypeVar('T')
 
 
-def trim(it: Iterable[T], percentage: float) -> Sequence[T]:
+def trim(values: Iterable[T], percentage: float) -> Sequence[T]:
     """Trims the iterable by the percentage.
 
-    :param it: the iterable to be trimmed
-    :param percentage: the percentage to trim
+    :param values: the values
+    :param percentage: the trimmed percentage
     :return: the trimmed sequence
     """
-    if isinstance(it, Sequence):
-        n = int(len(it) * percentage)
+    values = tuple(values)
+    n = int(len(values) * percentage)
 
-        return it[n:len(it) - n]
-    else:
-        return trim(tuple(it), percentage)
+    return values[n:len(values) - n]
 
 
-def window(it: Iterable[T], n: int) -> Iterator[Sequence[T]]:
+def window(values: Iterable[T], width: int) -> Iterator[Sequence[T]]:
     """Returns the sliding window views of the supplied iterable
 
-    :param it: the iterable to be operated on
-    :param n: the width of the sliding window
+    :param values: the values
+    :param width: the sliding window width
     :return: the window views
     """
-    if isinstance(it, Sequence):
-        return (it[i:i + n] for i in range(len(it) - n + 1))
-    else:
-        return window(tuple(it), n)
+    values = tuple(values)
+
+    return (values[i:i + width] for i in range(len(values) - width + 1))
 
 
-def rotate(it: Iterable[T], i: int) -> Iterator[T]:
+def rotate(values: Iterable[T], index: int) -> Iterator[T]:
     """Rotates the iterable by the given index.
 
-    :param it: the iterable to rotate
-    :param i: the index of rotation
+    :param values: the values
+    :param index: the index of rotation
     :return: the rotated iterable
     """
-    if isinstance(it, Sequence):
-        return chain(it[i:], it[:i])
-    else:
-        return rotate(tuple(it), i)
+    values = tuple(values)
+
+    return chain(values[index:], values[:index])
 
 
-def constant(it: Iterable[T]) -> bool:
+def constant(values: Iterable[T]) -> bool:
     """Checks if all elements inside the iterable are equal to each other.
 
     If the iterable is empty, True is returned.
 
-    :param it: the iterable
+    :param values: the values
     :return: True if all elements are equal, else False
     """
-    if isinstance(it, Sequence):
-        return not it or all(x == it[0] for x in it)
-    else:
-        return constant(tuple(it))
+    values = tuple(values)
+
+    return not values or all(v == values[0] for v in values)
 
 
-def chunk(it: Iterable[T], n: int) -> Iterator[Sequence[T]]:
-    """Chunks the iterable by the given length.
+def chunk(values: Iterable[T], width: int) -> Iterator[Sequence[T]]:
+    """Chunks the iterable by the given width.
 
-    :param it: the iterable to chunk
-    :param n: the chunk length
-    :return: the rotated iterable
+    :param values: the values
+    :param width: the chunk width
+    :return: the chunks
     """
-    if isinstance(it, Sequence):
-        return (it[i:i + n] for i in range(0, len(it), n))
-    else:
-        return chunk(tuple(it), n)
+    values = tuple(values)
+
+    return (values[i:i + width] for i in range(0, len(values), width))
 
 
 def iter_equal(it1: Iterable[T], it2: Iterable[T]) -> bool:
@@ -82,32 +76,19 @@ def iter_equal(it1: Iterable[T], it2: Iterable[T]) -> bool:
     :param it2: the second iterable
     :return: True if the equality check passes, else False
     """
-    if isinstance(it1, Sequence) and isinstance(it2, Sequence):
-        return len(it1) == len(it2) and all(x == y for x, y in zip(it1, it2))
-    else:
-        return iter_equal(tuple(it1), tuple(it2))
+    it1, it2 = tuple(it1), tuple(it2)
+
+    return len(it1) == len(it2) and all(x == y for x, y in zip(it1, it2))
 
 
-def sum_(it: Iterable[T]) -> T:
-    """Calculates the sum of the elements in the iterable.
-
-    :param it: the iterable
-    :return: the sum of the elements
-    """
-    try:
-        return reduce(add, it)
-    except TypeError:
-        raise ValueError('Invalid iterable')
-
-
-def product(it: Iterable[T]) -> T:
+def product(values: Iterable[T]) -> T:
     """Calculates the product of the elements in the iterable.
 
-    :param it: the iterable
-    :return: the product of the elements
+    :param values: the values
+    :return: the product
     """
     try:
-        return reduce(mul, it)
+        return reduce(mul, values)
     except TypeError:
         raise ValueError('Invalid iterable')
 
@@ -115,7 +96,7 @@ def product(it: Iterable[T]) -> T:
 def limit(v: T, lower: T, upper: T) -> T:
     """Binds the value by the given interval.
 
-    :param v: the value to bind
+    :param v: the value
     :param lower: the lower limit
     :param upper: the upper limit
     :return: the bound value
@@ -134,7 +115,7 @@ def limit(v: T, lower: T, upper: T) -> T:
 def next_or_none(it: Iterator[T]) -> Optional[T]:
     """Tries to get the next element of the iterator.
 
-    :param it: the iterable to consume
+    :param it: the iterator to consume
     :return: None if there is no next element, else the next element
     """
     try:
@@ -143,23 +124,23 @@ def next_or_none(it: Iterator[T]) -> Optional[T]:
         return None
 
 
-def default(t: Optional[T], d: T) -> T:
+def default(optional: Optional[T], default_: T) -> T:
     """Checks if the value is not None and returns it or the default value.
 
-    :param t: the value to check
-    :param d: the default value
+    :param optional: the optional value
+    :param default_: the default value
     :return: the default value if the value to check is None, else the checked value
     """
-    return d if t is None else t
+    return default_ if optional is None else optional
 
 
-def get(t: Optional[T]) -> T:
-    """Checks if the value is not none and returns it.
+def get(optional: Optional[T]) -> T:
+    """Checks if the optional value is not none and returns it.
 
-    :param t: the value to check
+    :param optional: the optional value
     :return: the checked value
     """
-    if t is None:
+    if optional is None:
         raise TypeError('The checked value is None')
     else:
-        return t
+        return optional

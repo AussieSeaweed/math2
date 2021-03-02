@@ -1,9 +1,9 @@
 from itertools import chain
+from typing import Optional, cast
 from unittest import main
 
-from math2.utils import (chunk, constant, default, get, iter_equal, limit, next_or_none, product, rotate, sum_, trim,
-                         window)
-from math2.utils.tests import ExtendedTestCase
+from math2.utils import (ExtendedTestCase, chunk, constant, default, get, iter_equal, limit, next_or_none, product,
+                         rotate, trim, window)
 
 
 class FunctionsTestCase(ExtendedTestCase):
@@ -43,10 +43,6 @@ class FunctionsTestCase(ExtendedTestCase):
         self.assertTrue(iter_equal([], []))
         self.assertFalse(iter_equal([], [0]))
 
-    def test_sum(self) -> None:
-        self.assertEqual(sum_(range(6)), 15)
-        self.assertRaises(ValueError, sum_, ())
-
     def test_product(self) -> None:
         self.assertEqual(product(range(6)), 0)
         self.assertEqual(product(range(1, 6)), 120)
@@ -64,7 +60,7 @@ class FunctionsTestCase(ExtendedTestCase):
 
     def test_default(self) -> None:
         self.assertEqual(default(300, 100), 300)
-        self.assertEqual(default(None, 100), 100)
+        self.assertEqual(default(cast(Optional[int], None), 100), 100)
 
     def test_get(self) -> None:
         self.assertEqual(get(300), 300)
