@@ -1,4 +1,3 @@
-auxiliary
 numpy
 mypy
 scipy
