@@ -16,7 +16,7 @@ class OrderedEnum(Enum):
     @cached_property
     def index(self) -> int:
         """
-        :return: the index of the enum element
+        :return: The index of the enum element
         """
         values: list[OrderedEnum] = list(type(self))
 

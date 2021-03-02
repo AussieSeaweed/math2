@@ -12,8 +12,8 @@ class ExtendedTestCase(TestCase):
                             it_type: Optional[Type[Iterable[T]]] = None) -> None:
         """An equality assertion for ordered iterables (like lists and tuples).
 
-        :param it1: the first iterable to compare.
-        :param it2: the second iterable to compare.
+        :param it1: The first iterable to compare.
+        :param it2: The second iterable to compare.
         :param msg: Optional message to use on failure instead of a list of differences.
         :param it_type: The expected datatype of the iterables, or None if no datatype should be enforced.
         :return: None
@@ -37,11 +37,11 @@ class ExtendedTestCase(TestCase):
 
            If the two objects compare equal then they will automatically compare almost equal.
 
-        :param seq1: the first sequence to compare.
-        :param seq2: the second sequence to compare.
-        :param places: the places to enforce
+        :param seq1: The first sequence to compare.
+        :param seq2: The second sequence to compare.
+        :param places: The places to enforce
         :param msg: Optional message to use on failure instead of a list of differences.
-        :param delta: the delta to enforce
+        :param delta: The delta to enforce
         :param seq_type: The expected datatype of the sequences, or None if no datatype should be enforced.
         :return: None
         """
@@ -67,11 +67,11 @@ class ExtendedTestCase(TestCase):
 
            If the two objects compare equal then they will automatically compare almost equal.
 
-        :param it1: the first iterable to compare.
-        :param it2: the second iterable to compare.
-        :param places: the places to enforce
+        :param it1: The first iterable to compare.
+        :param it2: The second iterable to compare.
+        :param places: The places to enforce
         :param msg: Optional message to use on failure instead of a list of differences.
-        :param delta: the delta to enforce
+        :param delta: The delta to enforce
         :param it_type: The expected datatype of the iterables, or None if no datatype should be enforced.
         :return: None
         """

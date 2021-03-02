@@ -10,9 +10,9 @@ T = TypeVar('T')
 def trim(values: Iterable[T], percentage: float) -> Sequence[T]:
     """Trims the iterable by the percentage.
 
-    :param values: the values
-    :param percentage: the trimmed percentage
-    :return: the trimmed sequence
+    :param values: The values
+    :param percentage: The trimmed percentage
+    :return: The trimmed sequence
     """
     values = tuple(values)
     n = int(len(values) * percentage)
@@ -23,9 +23,9 @@ def trim(values: Iterable[T], percentage: float) -> Sequence[T]:
 def window(values: Iterable[T], width: int) -> Iterator[Sequence[T]]:
     """Returns the sliding window views of the supplied iterable
 
-    :param values: the values
-    :param width: the sliding window width
-    :return: the window views
+    :param values: The values
+    :param width: The sliding window width
+    :return: The window views
     """
     values = tuple(values)
 
@@ -35,9 +35,9 @@ def window(values: Iterable[T], width: int) -> Iterator[Sequence[T]]:
 def rotate(values: Iterable[T], index: int) -> Iterator[T]:
     """Rotates the iterable by the given index.
 
-    :param values: the values
-    :param index: the index of rotation
-    :return: the rotated iterable
+    :param values: The values
+    :param index: The index of rotation
+    :return: The rotated iterable
     """
     values = tuple(values)
 
@@ -49,7 +49,7 @@ def constant(values: Iterable[T]) -> bool:
 
        If the iterable is empty, True is returned.
 
-    :param values: the values
+    :param values: The values
     :return: True if all elements are equal, else False
     """
     values = tuple(values)
@@ -60,9 +60,9 @@ def constant(values: Iterable[T]) -> bool:
 def chunk(values: Iterable[T], width: int) -> Iterator[Sequence[T]]:
     """Chunks the iterable by the given width.
 
-    :param values: the values
-    :param width: the chunk width
-    :return: the chunks
+    :param values: The values
+    :param width: The chunk width
+    :return: The chunks
     """
     values = tuple(values)
 
@@ -72,8 +72,8 @@ def chunk(values: Iterable[T], width: int) -> Iterator[Sequence[T]]:
 def iter_equal(it1: Iterable[T], it2: Iterable[T]) -> bool:
     """Checks if all elements in both iterables are equal to the elements in the other iterable at the same position.
 
-    :param it1: the first iterable
-    :param it2: the second iterable
+    :param it1: The first iterable
+    :param it2: The second iterable
     :return: True if the equality check passes, else False
     """
     it1, it2 = tuple(it1), tuple(it2)
@@ -84,8 +84,8 @@ def iter_equal(it1: Iterable[T], it2: Iterable[T]) -> bool:
 def product(values: Iterable[T]) -> T:
     """Calculates the product of the elements in the iterable.
 
-    :param values: the values
-    :return: the product
+    :param values: The values
+    :return: The product
     """
     try:
         return reduce(mul, values)
@@ -96,10 +96,10 @@ def product(values: Iterable[T]) -> T:
 def limit(value: T, lower: T, upper: T) -> T:
     """Binds the value by the given interval.
 
-    :param value: the value
-    :param lower: the lower limit
-    :param upper: the upper limit
-    :return: the bound value
+    :param value: The value
+    :param lower: The lower limit
+    :param upper: The upper limit
+    :return: The bound value
     """
     if lt(upper, lower):
         raise ValueError('Lower bound is greater than the upper bound')
@@ -115,7 +115,7 @@ def limit(value: T, lower: T, upper: T) -> T:
 def next_or_none(it: Iterator[T]) -> Optional[T]:
     """Tries to get the next element of the iterator.
 
-    :param it: the iterator to consume
+    :param it: The iterator to consume
     :return: None if there is no next element, else the next element
     """
     try:
@@ -127,9 +127,9 @@ def next_or_none(it: Iterator[T]) -> Optional[T]:
 def default(optional: Optional[T], default_: T) -> T:
     """Checks if the value is not None and returns it or the default value.
 
-    :param optional: the optional value
-    :param default_: the default value
-    :return: the default value if the value to check is None, else the checked value
+    :param optional: The optional value
+    :param default_: The default value
+    :return: The default value if the value to check is None, else the checked value
     """
     return default_ if optional is None else optional
 
@@ -137,10 +137,25 @@ def default(optional: Optional[T], default_: T) -> T:
 def get(optional: Optional[T]) -> T:
     """Checks if the optional value is not none and returns it.
 
-    :param optional: the optional value
-    :return: the checked value
+    :param optional: The optional value
+    :return: The checked value
     """
     if optional is None:
         raise TypeError('The checked value is None')
     else:
         return optional
+
+
+def f_range(*, start: float = 0, stop: float, step: float = 1.0) -> Iterator[float]:
+    """Generates a range of floating point values.
+
+    :param start: The start value
+    :param stop: The stop value
+    :param step: The step value
+    :return: The iterator of range values
+    """
+    while start < stop:
+        yield start
+        start += step
+    else:
+        raise StopIteration

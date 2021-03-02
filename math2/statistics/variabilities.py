@@ -7,8 +7,8 @@ from math2.statistics.averages import mean
 def range_(values: Iterable[float]) -> float:
     """Calculates the range of the values.
 
-    :param values: the values
-    :return: the range
+    :param values: The values
+    :return: The range
     """
     values = tuple(values)
 
@@ -18,8 +18,8 @@ def range_(values: Iterable[float]) -> float:
 def variance(values: Iterable[float]) -> float:
     """Calculates the variance of the values.
 
-    :param values: the values
-    :return: the variance
+    :param values: The values
+    :return: The variance
     """
     values = tuple(values)
     mean_value = mean(values)
@@ -30,7 +30,7 @@ def variance(values: Iterable[float]) -> float:
 def standard_deviation(values: Iterable[float]) -> float:
     """Calculates the standard deviation of the values.
 
-    :param values: the values
-    :return: the standard deviation
+    :param values: The values
+    :return: The standard deviation
     """
     return sqrt(variance(values))
