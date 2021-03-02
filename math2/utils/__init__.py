@@ -1,7 +1,7 @@
 from math2.utils.enums import OrderedEnum
-from math2.utils.functions import (chunk, constant, default, f_range, get, iter_equal, limit, next_or_none, product,
+from math2.utils.functions import (chunk, constant, default, frange, get, iter_equal, limit, next_or_none, product,
                                    rotate, trim, window)
 from math2.utils.tests import ExtendedTestCase
 
-__all__ = ('OrderedEnum', 'chunk', 'constant', 'default', 'f_range', 'get', 'iter_equal', 'limit', 'next_or_none',
+__all__ = ('OrderedEnum', 'chunk', 'constant', 'default', 'frange', 'get', 'iter_equal', 'limit', 'next_or_none',
            'product', 'rotate', 'trim', 'window', 'ExtendedTestCase')
