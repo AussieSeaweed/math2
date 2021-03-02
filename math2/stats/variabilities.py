@@ -1,7 +1,7 @@
 from collections import Iterable
 from math import sqrt
 
-from math2.statistics.averages import mean
+from math2.stats.averages import mean
 
 
 def range_(values: Iterable[float]) -> float:

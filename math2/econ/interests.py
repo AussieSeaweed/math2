@@ -5,7 +5,7 @@ from functools import cached_property
 from math import exp, inf, log
 from typing import Optional
 
-from math2.economics.factors import fp
+from math2.econ.factors import fp
 
 
 class Interest(ABC):

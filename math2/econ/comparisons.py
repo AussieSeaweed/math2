@@ -7,7 +7,7 @@ from typing import Optional
 import numpy as np
 from scipy.optimize import fsolve  # type: ignore
 
-from math2.economics.factors import af, ap, fp, pa, pf
+from math2.econ.factors import af, ap, fp, pa, pf
 
 
 class Relationship(Enum):

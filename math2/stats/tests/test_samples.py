@@ -1,6 +1,6 @@
 import unittest
 
-from math2.statistics import mean, median, range_, standard_deviation, trimmed_mean, variance
+from math2.stats import mean, median, range_, standard_deviation, trimmed_mean, variance
 from math2.utils import ExtendedTestCase
 
 

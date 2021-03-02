@@ -4,8 +4,8 @@ from abc import ABC
 from functools import cached_property
 from typing import Optional, overload
 
-from math2.economics.factors import ap, fa, fp, pa, pf
-from math2.economics.interests import CompoundInterest
+from math2.econ.factors import ap, fa, fp, pa, pf
+from math2.econ.interests import CompoundInterest
 
 
 class Instrument(ABC):

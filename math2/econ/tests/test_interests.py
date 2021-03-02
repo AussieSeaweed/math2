@@ -1,20 +1,20 @@
 from math import log
 from unittest import TestCase, main
 
-from math2.economics import ContinuousInterest, EffectiveInterest, NominalInterest, SimpleInterest, SubperiodInterest
+from math2.econ import ContinuousInterest, EffectiveInterest, NominalInterest, SimpleInterest, SubperiodInterest
 
 
 class InterestTestCase(TestCase):
-    def test_difference(self):
+    def test_difference(self) -> None:
         r, p, t, s, c = 0.07, 24, 2020 - 1626, 685.92, 9066082143624.828
 
         self.assertAlmostEqual(p * SimpleInterest(r).to_factor(t), s)
         self.assertAlmostEqual(p * EffectiveInterest(r).to_factor(t), c)
 
-    def test_comparison(self):
+    def test_comparison(self) -> None:
         self.assertLess(NominalInterest(0.06, 12).to_effective().rate, SubperiodInterest(0.063, 1).to_effective().rate)
 
-    def test_consistency(self):
+    def test_consistency(self) -> None:
         nr, sc, t, f = 0.1, 4, 2.5, 1.2800845441963565
         counts = range(1, 366)
 
