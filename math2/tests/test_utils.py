@@ -2,11 +2,10 @@ from itertools import chain
 from typing import Optional, cast
 from unittest import main
 
-from math2.utils import (ExtendedTestCase, chunk, constant, default, get, iter_equal, limit, next_or_none, product,
-                         rotate, trim, window)
+from math2.utils import ExtendedTestCase, chunk, constant, default, get, iter_equal, next_or_none, rotate, trim, window
 
 
-class FunctionsTestCase(ExtendedTestCase):
+class UtilsTestCase(ExtendedTestCase):
     def test_trim(self) -> None:
         self.assertIterableEqual(trim(range(10), 0), range(10))
         self.assertIterableEqual(trim(range(10), 0.1), range(1, 9))
@@ -56,17 +55,6 @@ class FunctionsTestCase(ExtendedTestCase):
     def test_get(self) -> None:
         self.assertEqual(get(300), 300)
         self.assertRaises(TypeError, get, None)
-
-    def test_product(self) -> None:
-        self.assertEqual(product(range(6)), 0)
-        self.assertEqual(product(range(1, 6)), 120)
-        self.assertRaises(ValueError, product, ())
-
-    def test_limit(self) -> None:
-        self.assertEqual(limit(1, 0, 2), 1)
-        self.assertEqual(limit(-100, 0, 2), 0)
-        self.assertEqual(limit(100, 0, 2), 2)
-        self.assertRaises(ValueError, limit, 100, 2, 0)
 
 
 if __name__ == '__main__':

@@ -16,8 +16,6 @@ class InterestTestCase(ExtendedTestCase):
     def test_projects(self) -> None:
         self.assertAlmostEqual(Project(20000, 4000, 4000, 1000, 10).present_worth(0.05), 9680.783294664216)
         self.assertAlmostEqual(Project(20000, 4000, 4000, 1000, 10).annual_worth(0.05), 727.9268005526942)
-        # self.assertAlmostEqual(Project(20000, 4000, 4000, 1000, 10).annual_worth(0.05) * pa(0.05, 10),
-        #                        Project(20000, 4000, 4000, 1000, 10).present_worth(0.05))
 
 
 if __name__ == '__main__':

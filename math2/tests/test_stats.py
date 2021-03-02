@@ -1,4 +1,4 @@
-import unittest
+from unittest import main
 
 from math2.stats import mean, median, range_, standard_deviation, trimmed_mean, variance
 from math2.utils import ExtendedTestCase
@@ -26,4 +26,4 @@ class SampleTestCase(ExtendedTestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    main()

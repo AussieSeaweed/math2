@@ -8,6 +8,8 @@ import numpy as np
 from scipy.optimize import fsolve  # type: ignore
 
 from math2.econ.factors import af, ap, fp, pa, pf
+from math2.misc import frange
+from math2.ntheory import lcm
 
 
 class Relationship(Enum):
@@ -55,7 +57,7 @@ class Project:
     def repeated_present_worth(self, marr: float, total_life: float) -> float:
         present_worth = self.present_worth(marr)
 
-        return sum(present_worth * pf(marr, n) for n in np.arange(0, total_life, self.life))
+        return sum(present_worth * pf(marr, n) for n in frange(0, total_life, self.life))
 
     def annual_worth(self, marr: float) -> float:
         return -self.first * ap(marr, self.life) + self.salvage * af(marr, self.life) + self.a_benefit - self.a_cost
@@ -72,7 +74,7 @@ class Project:
 
 def eval_mex_rpw(projects: Iterable[Project], marr: float) -> Optional[Project]:
     projects = tuple(projects)
-    total_life = reduce(np.lcm, (project.life for project in projects))
+    total_life = reduce(lcm, (project.life for project in projects))
     choice = max(projects, key=lambda project: project.repeated_present_worth(marr, total_life))
 
     return choice if choice.acceptable_repeated_present(marr, total_life) else None
@@ -130,7 +132,7 @@ class SimpleProject:
 
     @property
     def cash_flows(self) -> Iterator[float]:
-        return chain([self.fc], [self.a_savings for _ in np.arange(self.life)])
+        return chain([self.fc], [self.a_savings for _ in frange(self.life)])
 
     @property
     def irr(self) -> float:

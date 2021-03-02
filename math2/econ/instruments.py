@@ -61,7 +61,7 @@ class Mortgage(Instrument):
 
     @classmethod
     def from_down(cls, value: float, down: float, term: float, amortization: float) -> Mortgage:
-        return Mortgage(value - down, term, amortization)
+        return cls(value - down, term, amortization)
 
     @classmethod
     def from_dtv(cls, value: float, dtv: float, term: float, amortization: float) -> Mortgage:
@@ -69,4 +69,4 @@ class Mortgage(Instrument):
 
     @classmethod
     def from_ltv(cls, value: float, ltv: float, term: float, amortization: float) -> Mortgage:
-        return Mortgage(value * ltv, term, amortization)
+        return cls(value * ltv, term, amortization)

@@ -1,5 +1,5 @@
 def gcd(x: float, y: float) -> float:
-    """Calculates the greatest common denominator of the numbers using the euclidean algorithm.
+    """Calculates the greatest common denominator of the pair of numbers using the euclidean algorithm.
 
     :param x: The first number
     :param y: The second number
@@ -9,7 +9,7 @@ def gcd(x: float, y: float) -> float:
 
 
 def lcm(x: float, y: float) -> float:
-    """Calculates the least common multiple of the numbers using the euclidean algorithm.
+    """Calculates the least common multiple of the pair of numbers using the euclidean algorithm.
 
     :param x: The first number
     :param y: The second number

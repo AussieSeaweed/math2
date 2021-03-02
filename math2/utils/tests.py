@@ -2,14 +2,14 @@ from collections import Iterable, Sequence
 from typing import Any, Optional, Type, TypeVar
 from unittest import TestCase
 
-T = TypeVar('T')
+_T = TypeVar('_T')
 
 
 class ExtendedTestCase(TestCase):
     """ExtendedTestCase is the class for extended test cases"""
 
-    def assertIterableEqual(self, it1: Iterable[T], it2: Iterable[T], msg: Any = ...,
-                            it_type: Optional[Type[Iterable[T]]] = None) -> None:
+    def assertIterableEqual(self, it1: Iterable[_T], it2: Iterable[_T], msg: Any = ...,
+                            it_type: Optional[Type[Iterable[_T]]] = None) -> None:
         """An equality assertion for ordered iterables (like lists and tuples).
 
         :param it1: The first iterable to compare.
