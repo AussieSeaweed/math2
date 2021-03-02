@@ -12,36 +12,38 @@ class FunctionsTestCase(ExtendedTestCase):
         self.assertIterableEqual(trim(range(10), 0.1), range(1, 9))
         self.assertIterableEqual(trim(range(5), 0.1), range(5))
         self.assertIterableEqual(trim(range(10), 0.5), ())
-        self.assertIterableEqual(trim(iter([1, 2, 3]), 1 / 3), [2])
+        self.assertIterableEqual(trim(iter((1, 2, 3)), 1 / 3), (2,))
 
     def test_window(self) -> None:
-        self.assertIterableEqual(map(list, window(range(6), 3)), [[0, 1, 2], [1, 2, 3], [2, 3, 4], [3, 4, 5]])
-        self.assertIterableEqual(map(list, window(range(6), 6)), [[0, 1, 2, 3, 4, 5]])
-        self.assertIterableEqual(map(list, window(iter(range(6)), 7)), [])
-        self.assertIterableEqual(window([1, 2, 3, 4, 5, 6], 0), [[], [], [], [], [], [], []])
+        self.assertIterableEqual(window(range(6), 3), ((0, 1, 2), (1, 2, 3), (2, 3, 4), (3, 4, 5)))
+        self.assertIterableEqual(window(range(6), 6), ((0, 1, 2, 3, 4, 5),))
+        self.assertIterableEqual(window(range(6), 7), ())
+        self.assertIterableEqual(window(range(6), 0), ((), (), (), (), (), (), ()))
 
     def test_rotate(self) -> None:
-        self.assertIterableEqual(rotate(range(6), -1), [5, 0, 1, 2, 3, 4])
+        self.assertIterableEqual(rotate(range(6), -1), (5, 0, 1, 2, 3, 4))
         self.assertIterableEqual(rotate(range(6), 0), range(6))
-        self.assertIterableEqual(rotate(iter(range(6)), 2), chain(range(2, 6), range(2)))
+        self.assertIterableEqual(rotate(range(6), 2), chain(range(2, 6), range(2)))
 
     def test_constant(self) -> None:
-        self.assertTrue(constant([1, 1, 1]))
+        self.assertTrue(constant((1, 1, 1)))
         self.assertTrue(constant(()))
-        self.assertFalse(constant(iter(range(10))))
-        self.assertTrue(constant([[1, 1], [1, 1]]))
+        self.assertTrue(constant(((1, 1), (1, 1))))
+        self.assertFalse(constant(range(10)))
 
     def test_chunk(self) -> None:
-        self.assertIterableEqual(chunk(range(7), 3), [range(3), range(3, 6), range(6, 7)])
-        self.assertIterableEqual(chunk([1, 2, 3, 4, 5], 2), [[1, 2], [3, 4], [5]])
-        self.assertIterableEqual(chunk([1, 2, 3, 4, 5], 1), [[1], [2], [3], [4], [5]])
-        self.assertIterableEqual(map(list, chunk(iter([1, 2, 3, 4, 5]), 1)), [[1], [2], [3], [4], [5]])
+        self.assertIterableEqual(chunk(range(7), 3), ((0, 1, 2), (3, 4, 5), (6,)))
+        self.assertIterableEqual(chunk(range(5), 2), ((0, 1), (2, 3), (4,)))
+        self.assertIterableEqual(chunk(range(5), 1), ((0,), (1,), (2,), (3,), (4,)))
+        self.assertIterableEqual(chunk(range(5), 1), ((0,), (1,), (2,), (3,), (4,)))
 
     def test_iter_equal(self) -> None:
-        self.assertTrue(iter_equal(range(6), iter(range(6))))
+        self.assertTrue(iter_equal(range(6), range(6)))
         self.assertTrue(iter_equal([0, 1, 2], (0, 1, 2)))
-        self.assertTrue(iter_equal([], []))
-        self.assertFalse(iter_equal([], [0]))
+        self.assertTrue(iter_equal((), []))
+        self.assertFalse(iter_equal(range(7), range(6)))
+        self.assertFalse(iter_equal(range(1, 7), range(6)))
+        self.assertFalse(iter_equal((), (0,)))
 
     def test_product(self) -> None:
         self.assertEqual(product(range(6)), 0)
