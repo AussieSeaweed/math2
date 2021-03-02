@@ -18,8 +18,8 @@ class Interest(ABC):
     def to_factor(self, time: float) -> float:
         """Converts this interest to the factor at the given time period.
 
-        :param time: the time period
-        :return: the converted factor
+        :param time: The time period
+        :return: The converted factor
         """
         ...
 
@@ -28,9 +28,9 @@ class Interest(ABC):
     def from_factor(cls, factor: float, time: float) -> Interest:
         """Converts the factor at a time period to an interest value.
 
-        :param factor: the factor
-        :param time: the time period
-        :return: the converted interest value
+        :param factor: The factor
+        :param time: The time period
+        :return: The converted interest value
         """
         ...
 
@@ -53,7 +53,7 @@ class CompoundInterest(Interest, ABC):
     def to_effective(self) -> EffectiveInterest:
         """Converts this interest value to an effective interest value.
 
-        :return: the converted interest value
+        :return: The converted interest value
         """
         ...
 
@@ -61,7 +61,7 @@ class CompoundInterest(Interest, ABC):
     def to_continuous(self) -> ContinuousInterest:
         """Converts this interest value to a continuous interest value.
 
-        :return: the converted interest value
+        :return: The converted interest value
         """
         ...
 
@@ -69,8 +69,8 @@ class CompoundInterest(Interest, ABC):
     def to_nominal(self, subperiod_count: float) -> NominalInterest:
         """Converts this interest value to a nominal interest value.
 
-        :param subperiod_count: the number of subperiods of the converted interest value
-        :return: the converted interest value
+        :param subperiod_count: The number of subperiods of the converted interest value
+        :return: The converted interest value
         """
         ...
 
@@ -78,13 +78,13 @@ class CompoundInterest(Interest, ABC):
     def to_subperiod(self, subperiod_count: float) -> SubperiodInterest:
         """Converts this interest value to a subperiod interest value.
 
-        :param subperiod_count: the number of subperiods of the converted interest value
-        :return: the converted interest value
+        :param subperiod_count: The number of subperiods of the converted interest value
+        :return: The converted interest value
         """
         ...
 
-    @staticmethod
-    def from_factor(factor: float, time: float) -> CompoundInterest:
+    @classmethod
+    def from_factor(cls, factor: float, time: float) -> CompoundInterest:
         return EffectiveInterest(factor ** (1 / time) - 1)
 
 
