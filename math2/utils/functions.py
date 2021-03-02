@@ -1,13 +1,13 @@
 from collections import Iterable, Iterator, Sequence
 from functools import reduce
 from itertools import chain
-from operator import lt, mul
+from operator import mul
 from typing import Optional, TypeVar
 
-T = TypeVar('T')
+from math2.utils.types import SupportsLessThan, SupportsMul, _T
 
 
-def trim(values: Iterable[T], percentage: float) -> Sequence[T]:
+def trim(values: Iterable[_T], percentage: float) -> Sequence[_T]:
     """Trims the iterable by the percentage.
 
     :param values: The values
@@ -20,7 +20,7 @@ def trim(values: Iterable[T], percentage: float) -> Sequence[T]:
     return values[n:len(values) - n]
 
 
-def window(values: Iterable[T], width: int) -> Iterator[Sequence[T]]:
+def window(values: Iterable[_T], width: int) -> Iterator[Sequence[_T]]:
     """Returns the sliding window views of the supplied iterable
 
     :param values: The values
@@ -32,7 +32,7 @@ def window(values: Iterable[T], width: int) -> Iterator[Sequence[T]]:
     return (values[i:i + width] for i in range(len(values) - width + 1))
 
 
-def rotate(values: Iterable[T], index: int) -> Iterator[T]:
+def rotate(values: Iterable[_T], index: int) -> Iterator[_T]:
     """Rotates the iterable by the given index.
 
     :param values: The values
@@ -44,7 +44,7 @@ def rotate(values: Iterable[T], index: int) -> Iterator[T]:
     return chain(values[index:], values[:index])
 
 
-def constant(values: Iterable[T]) -> bool:
+def constant(values: Iterable[_T]) -> bool:
     """Checks if all elements inside the iterable are equal to each other.
 
        If the iterable is empty, True is returned.
@@ -57,7 +57,7 @@ def constant(values: Iterable[T]) -> bool:
     return not values or all(v == values[0] for v in values)
 
 
-def chunk(values: Iterable[T], width: int) -> Iterator[Sequence[T]]:
+def chunk(values: Iterable[_T], width: int) -> Iterator[Sequence[_T]]:
     """Chunks the iterable by the given width.
 
     :param values: The values
@@ -69,7 +69,7 @@ def chunk(values: Iterable[T], width: int) -> Iterator[Sequence[T]]:
     return (values[i:i + width] for i in range(0, len(values), width))
 
 
-def iter_equal(it1: Iterable[T], it2: Iterable[T]) -> bool:
+def iter_equal(it1: Iterable[_T], it2: Iterable[_T]) -> bool:
     """Checks if all elements in both iterables are equal to the elements in the other iterable at the same position.
 
     :param it1: The first iterable
@@ -81,38 +81,7 @@ def iter_equal(it1: Iterable[T], it2: Iterable[T]) -> bool:
     return len(it1) == len(it2) and all(x == y for x, y in zip(it1, it2))
 
 
-def product(values: Iterable[T]) -> T:
-    """Calculates the product of the elements in the iterable.
-
-    :param values: The values
-    :return: The product
-    """
-    try:
-        return reduce(mul, values)
-    except TypeError:
-        raise ValueError('Invalid iterable')
-
-
-def limit(value: T, lower: T, upper: T) -> T:
-    """Binds the value by the given interval.
-
-    :param value: The value
-    :param lower: The lower limit
-    :param upper: The upper limit
-    :return: The bound value
-    """
-    if lt(upper, lower):
-        raise ValueError('Lower bound is greater than the upper bound')
-
-    if lt(value, lower):
-        return lower
-    elif lt(upper, value):
-        return upper
-    else:
-        return value
-
-
-def next_or_none(it: Iterator[T]) -> Optional[T]:
+def next_or_none(it: Iterator[_T]) -> Optional[_T]:
     """Tries to get the next element of the iterator.
 
     :param it: The iterator to consume
@@ -124,7 +93,7 @@ def next_or_none(it: Iterator[T]) -> Optional[T]:
         return None
 
 
-def default(optional: Optional[T], default_: T) -> T:
+def default(optional: Optional[_T], default_: _T) -> _T:
     """Checks if the value is not None and returns it or the default value.
 
     :param optional: The optional value
@@ -134,7 +103,7 @@ def default(optional: Optional[T], default_: T) -> T:
     return default_ if optional is None else optional
 
 
-def get(optional: Optional[T]) -> T:
+def get(optional: Optional[_T]) -> _T:
     """Checks if the optional value is not none and returns it.
 
     :param optional: The optional value
@@ -144,6 +113,43 @@ def get(optional: Optional[T]) -> T:
         raise TypeError('The checked value is None')
     else:
         return optional
+
+
+_SLT = TypeVar('_SLT', bound=SupportsLessThan)
+
+
+def limit(value: _SLT, lower: _SLT, upper: _SLT) -> _SLT:
+    """Binds the value by the given interval.
+
+    :param value: The value
+    :param lower: The lower limit
+    :param upper: The upper limit
+    :return: The bound value
+    """
+    if upper < lower:
+        raise ValueError('Lower bound is greater than the upper bound')
+
+    if value < lower:
+        return lower
+    elif upper < value:
+        return upper
+    else:
+        return value
+
+
+_SM = TypeVar('_SM', bound=SupportsMul)
+
+
+def product(values: Iterable[_SM]) -> _SM:
+    """Calculates the product of the elements in the iterable.
+
+    :param values: The values
+    :return: The product
+    """
+    try:
+        return reduce(mul, values)
+    except TypeError:
+        raise ValueError('Invalid iterable')
 
 
 def frange(start: float, stop: Optional[float] = None, step: Optional[float] = None) -> Iterator[float]:

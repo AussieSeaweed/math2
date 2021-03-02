@@ -1,6 +1,7 @@
+from abc import abstractmethod
 from enum import Enum
 from functools import cached_property, total_ordering
-from typing import Any
+from typing import Any, Protocol, TypeVar
 
 
 @total_ordering
@@ -21,3 +22,20 @@ class OrderedEnum(Enum):
         values: list[OrderedEnum] = list(type(self))
 
         return values.index(self)
+
+
+_T = TypeVar('_T')
+
+
+class SupportsLessThan(Protocol):
+    """SupportsLessThan is the protocol for types that support less than comparison operators."""
+
+    @abstractmethod
+    def __lt__(self: _T, other: _T) -> bool: ...
+
+
+class SupportsMul(Protocol):
+    """SupportsMul is the protocol for types that support multiplication operators."""
+
+    @abstractmethod
+    def __mul__(self: _T, other: _T) -> _T: ...
