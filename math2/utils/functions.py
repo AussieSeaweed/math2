@@ -146,7 +146,7 @@ def get(optional: Optional[T]) -> T:
         return optional
 
 
-def frange(start: float, stop: float, step: float) -> Iterator[float]:
+def frange(start: float, stop: Optional[float] = None, step: Optional[float] = None) -> Iterator[float]:
     """Generates a range of floating point values.
 
     :param start: The start value
@@ -154,6 +154,11 @@ def frange(start: float, stop: float, step: float) -> Iterator[float]:
     :param step: The step value
     :return: The iterator of range values
     """
-    while start < stop:
-        yield start
-        start += step
+    if stop is None:
+        yield from frange(0, start, step)
+    elif step is None:
+        yield from frange(start, stop, 1)
+    else:
+        while start < stop:
+            yield start
+            start += step
