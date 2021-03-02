@@ -5,7 +5,7 @@ from auxiliary.tests import ExtendedTestCase
 from scipy.optimize import fsolve
 
 from math2.economics import (Bond, CompoundInterest, ContinuousInterest, EffectiveInterest, Mortgage, NominalInterest,
-                             SubperiodInterest, fp, pa, pf, pg)
+                             SimpleProject, SubperiodInterest, fp, from_table, pa, pf, pg)
 
 
 class PS1TestCase(TestCase):
@@ -173,7 +173,7 @@ class PS3TestCase(TestCase):
         self.assertTrue(np.isclose(fsolve(lambda c: Bond.from_rate(100, c, 2, 2.25).present_worth(0.03) - 114,
                                           np.array(0.1)), np.array(0.09481118)))
 
-    def test_4(self): # TODO
+    def test_4(self):  # TODO
         ...
 
     def test_5(self):
@@ -194,6 +194,122 @@ class PS3TestCase(TestCase):
             NominalInterest(0.060755, 2)), 3490.3113416458878)
         self.assertLess(Mortgage.from_down(500000, 50000, 3, 25).pay(NominalInterest(0.060755, 2)).principal,
                         Mortgage.from_down(500000, 50000, 3, 25).pay(NominalInterest(0.060755, 2), 700).principal)
+
+
+class PS6TestCase(ExtendedTestCase):
+    def test_1(self):
+        data = [
+            (-41000, 6100, 7),
+            (-32000, 6700, 7),
+            (-28000, 5700, 5),
+            (-28000, 12600, 5),
+            (-36000, 9000, 7),
+            (-27000, 10600, 6),
+            (-53000, 6700, 5),
+            (-50000, 15000, 6),
+            (-32000, 6900, 7),
+            (-42000, 14600, 5),
+        ]
+
+        irrs = list(map(lambda d: SimpleProject(*d).irr, data))
+
+        self.assertSequenceAlmostEqual(irrs, [
+            0.010261108929599895,
+            0.10584583010815002,
+            0.005929015028005828,
+            0.3494328573992243,
+            0.16326709023510008,
+            0.31754169406374866,
+            - 0.13571830650187303,
+            0.1990541470961173,
+            0.114956469240095,
+            0.2178733729868983,
+        ])
+
+        points = sorted(range(len(data)), key=lambda pt: -irrs[pt])
+
+        cost = 0
+        marr = 0
+
+        for pt in points:
+            cost -= data[pt][0]
+
+            if cost > 100000:
+                break
+
+            marr = irrs[pt]
+
+        self.assertAlmostEqual(marr, 0.2178733729868983)
+
+    def test_2(self):
+        self.assertEqual(from_table(
+            [[],
+             [0.17],
+             [0.14, 0.075],
+             [0.19, 0.209, 0.286],
+             [0.2, 0.127, 0.257, 0.229],
+             [0.18, 0.177, 0.192, 0.158, 0.117],
+             [0.13, 0.128, 0.132, 0.106, 0.081, 0.062]],
+            0.12,
+        ), 4)
+
+        self.assertEqual(from_table(
+            [[],
+             [0.14],
+             [0.20, 0.29],
+             [0.24, 0.32, 0.36],
+             [0.21, 0.24, 0.22, 0.11],
+             [0.17, 0.18, 0.15, 0.08, 0.06],
+             [0.17, 0.18, 0.16, 0.12, 0.13, 0.19]],
+            0.12,
+        ), 3)
+
+    def test_3(self):
+        table = [[],
+                 [0.1096],
+                 [0.132, 0.286],
+                 [0.1205, 0.17, -0.058],
+                 [0.1293, 0.189, 0.112, 0.228],
+                 [0.1286, 0.177, 0.112, 0.187, 0.113],
+                 [0.1113, 0.113, 0.079, 0.094, 0.069, 0.063]]
+
+        self.assertEqual(from_table(table, 0.04), 6)
+        self.assertEqual(from_table(table, 0.06), 6)
+        self.assertEqual(from_table(table, 0.08), 5)
+        self.assertEqual(from_table(table, 0.10), 5)
+        self.assertEqual(from_table(table, 0.12), 2)
+        self.assertEqual(from_table(table, 0.14), 0)
+
+    def test_4(self):
+        """
+
+        :return:
+        """
+        ...
+
+    def test_5(self):
+        """
+        A startup pharmaceutical company, Lexcol Pharma, has passed all but the last stage of regulatory
+approval for its patented drug that has been in development for 8 years. Lexcol will know in two
+years if their drug passes the last regulatory approval stage. An unsuccessful approval would
+essentially close the company, resulting in little measurable value. If successful, however, to
+manufacture the drug, Lexcol will need to invest $500 million in a unique facility (consider this cost
+to be a one-time investment cost to be paid as soon as the design of the facility is to begin) and the
+time to design and construct the facility is 4 years (i.e. if the investment were made now and the
+regulatory approval were successful, then cash-flows will start in the 5th year as per regular
+convention). The cash-flows for the company are estimated to be $200 million per year until the
+patent expires, after which, the cash-flows will likely drop substantially, and for valuations
+purposes, can be estimated as $10 million per year perpetually. The patent is expected to expire
+12 years from now. Assume that Lexcol is fully equity financed (and will remain so) by wealthy,
+well diversified “angel” investors. A financial research analyst who specializes in the pharma
+industry has estimated an 8% hurdle rate (MARR) to value the cash-flows, assuming successful
+regulatory approval. Clearly, Lexcol has a choice to start the development of the manufacturing
+facility now, or after regulatory approval (recall that the $500 million will need to be invested as
+soon as the decision is made to design and construct the facility). How confident would Lexcol
+have to be to pass the last stage regulatory approval to be indifferent to building the facility now
+or waiting until after the approval?
+        :return:
+        """
 
 
 if __name__ == '__main__':

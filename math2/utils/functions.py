@@ -47,7 +47,7 @@ def rotate(values: Iterable[T], index: int) -> Iterator[T]:
 def constant(values: Iterable[T]) -> bool:
     """Checks if all elements inside the iterable are equal to each other.
 
-    If the iterable is empty, True is returned.
+       If the iterable is empty, True is returned.
 
     :param values: the values
     :return: True if all elements are equal, else False
@@ -93,10 +93,10 @@ def product(values: Iterable[T]) -> T:
         raise ValueError('Invalid iterable')
 
 
-def limit(v: T, lower: T, upper: T) -> T:
+def limit(value: T, lower: T, upper: T) -> T:
     """Binds the value by the given interval.
 
-    :param v: the value
+    :param value: the value
     :param lower: the lower limit
     :param upper: the upper limit
     :return: the bound value
@@ -104,12 +104,12 @@ def limit(v: T, lower: T, upper: T) -> T:
     if lt(upper, lower):
         raise ValueError('Lower bound is greater than the upper bound')
 
-    if lt(v, lower):
+    if lt(value, lower):
         return lower
-    elif lt(upper, v):
+    elif lt(upper, value):
         return upper
     else:
-        return v
+        return value
 
 
 def next_or_none(it: Iterator[T]) -> Optional[T]:
