@@ -18,8 +18,7 @@ def limit(value: _SLT, lower: _SLT, upper: _SLT) -> _SLT:
     """
     if upper < lower:
         raise ValueError('Lower bound is greater than the upper bound')
-
-    if value < lower:
+    elif value < lower:
         return lower
     elif upper < value:
         return upper

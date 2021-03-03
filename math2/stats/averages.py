@@ -1,17 +1,16 @@
 from collections import Iterable
 
-from math2.utils import trim
+from math2.utils import ilen, retain_iter, trim
 
 
+@retain_iter
 def mean(values: Iterable[float]) -> float:
     """Calculates the mean of the values.
 
     :param values: The values.
     :return: The mean.
     """
-    values = tuple(values)
-
-    return sum(values) / len(values)
+    return sum(values) / ilen(values)
 
 
 def trimmed_mean(values: Iterable[float], percentage: float) -> float:
@@ -30,9 +29,7 @@ def median(values: Iterable[float]) -> float:
     :param values: The values.
     :return: The median.
     """
-    values = sorted(values)
-
-    if len(values) % 2:
+    if len(values := sorted(values)) % 2:
         return values[len(values) // 2]
     else:
         return (values[len(values) // 2 - 1] + values[len(values) // 2]) / 2
