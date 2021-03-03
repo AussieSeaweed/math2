@@ -1,7 +1,7 @@
 from collections import Callable
 
 
-def derivative(func: Callable[[float], float], x: float, eps: float = 1e-8) -> float:
+def derivative(func: Callable[[float], float], x: float, eps: float = 1e-7) -> float:
     """Perform numerical differentiation on the supplied function.
 
     :param func: The function to be differentiated
@@ -12,7 +12,7 @@ def derivative(func: Callable[[float], float], x: float, eps: float = 1e-8) -> f
     return (func(x + eps) - func(x - eps)) / (2 * eps)
 
 
-def newton(func: Callable[[float], float], x: float, eps: float = 1e-8) -> float:
+def newton(func: Callable[[float], float], x: float, eps: float = 1e-7) -> float:
     """Solves the root of the supplied function with Newton's method.
 
     :param func: The function to solve

@@ -101,12 +101,12 @@ class PS2TestCase(ExtendedTestCase):
         r[10] = interpolate(10, 9, 12, r[9], r[12])
 
         self.assertAlmostEqual(100 * ContinuousInterest(r[2]).to_factor(-1. / 12), 99.55400544428134)
-        self.assertAlmostEqual(100 * ContinuousInterest(r[4]).to_factor(-4. / 12), 98.68531348348684)
+        self.assertAlmostEqual(100 * ContinuousInterest(r[4]).to_factor(-4. / 12), 98.68531340424114)
         self.assertAlmostEqual(100 * ContinuousInterest(r[5.5]).to_factor(-5.5 / 12), 98.66834503291024)
         self.assertAlmostEqual(100 * ContinuousInterest(r[7]).to_factor(-7 / 12), 98.18488742486127)
         self.assertAlmostEqual(100 * ContinuousInterest(r[10]).to_factor(-10 / 12), 96.54750684004732)
         self.assertAlmostEqual(2000 * pf(r[2], 1. / 12) + 500 * pf(r[4], 4. / 12) - 1200 * pf(r[7], 7. / 12) - 1000
-                               * pf(r[10], 10. / 12) + 500 * pf(r[12], 1), 820.3872419304298)
+                               * pf(r[10], 10. / 12) + 500 * pf(r[12], 1), 820.3872407904064)
 
     def test_5(self) -> None:
         i = 0.02
@@ -172,10 +172,10 @@ class PS3TestCase(TestCase):
         b = lambda c: Bond.from_rate(1000, c, 2, 9).present_worth(y)
         c = ceil(newton(lambda c: 9500000 / 2 - (4400 * b(c)), 0.1) / 0.0025) * 0.0025
         self.assertAlmostEqual(c, 0.0725)
-        self.assertAlmostEqual(4400 * b(c), 4802235.185695928)
+        self.assertAlmostEqual(4400 * b(c), 4802235.185695931)
         c = ceil(newton(lambda c: 9500000 / 2 / (1 - 0.008) - (4400 * b(c)), (0.1)) / 0.0025) * 0.0025
         self.assertAlmostEqual(c, 0.0725)
-        self.assertAlmostEqual(4400 * b(c) * (1 - 0.008), 4763817.30421036)
+        self.assertAlmostEqual(4400 * b(c) * (1 - 0.008), 4763817.304210364)
 
     def test_6(self) -> None:
         self.assertAlmostEqual(Mortgage.from_down(500000, 50000, 5, 25).payment(NominalInterest(0.060755, 2)),
