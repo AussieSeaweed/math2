@@ -4,11 +4,9 @@ from functools import reduce
 from itertools import chain
 from typing import Optional
 
-import numpy as np
-from scipy.optimize import fsolve  # type: ignore
-
+from math2.calc import newton
 from math2.econ.factors import af, ap, fp, pa, pf
-from math2.misc import frange
+from math2.misc import frange, interpolate
 from math2.ntheory import lcm
 
 
@@ -99,7 +97,7 @@ def npv(cash_flows: Iterable[float], i: float) -> float:
 def irr(cash_flows: Iterable[float], guess: float) -> float:
     cash_flows = tuple(cash_flows)
 
-    return fsolve(lambda i: npv(cash_flows, i), np.array(guess)).item()  # type: ignore
+    return newton(lambda i: npv(cash_flows, i), guess)
 
 
 def acceptable_irr(cash_flows: Iterable[float], guess: float, marr: float) -> bool:
@@ -115,7 +113,7 @@ def payback_period(fc: float, cash_flows: Iterable[float]) -> float:
         if i == 0:
             return i
         else:
-            return np.interp(fc, [cash_flows[i - 1], cash_flows[i]], [i - 1, i])  # type: ignore
+            return interpolate(fc, cash_flows[i - 1], cash_flows[i], i - 1, i)
     except StopIteration:
         raise ValueError('Cannot pay back')
 
