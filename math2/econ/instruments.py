@@ -123,10 +123,13 @@ class Mortgage(Instrument):
         :return: The next mortgage instance.
         """
         if payment is None:
-            return self.pay(interest, self.payment(interest))
+            return self.pay(interest, term, self.payment(interest))
         else:
-            return Mortgage(self.principal * interest.to_factor(term) - payment * fa(
-                interest.to_subperiod(self.frequency).rate, term * self.frequency), self.amortization - term)
+            return Mortgage(
+                self.principal * interest.to_factor(term) - payment
+                * fa(interest.to_subperiod(self.frequency).rate, term * self.frequency),
+                self.frequency, self.amortization - term,
+            )
 
     @classmethod
     def from_down(cls, value: float, down: float, frequency: float = 12, amortization: float = 25) -> Mortgage:
