@@ -1,6 +1,6 @@
 from unittest import main
 
-from math2.misc import frange, limit, product
+from math2.misc import frange, interpolate, limit, product
 from math2.utils import ExtendedTestCase
 
 
@@ -20,6 +20,11 @@ class MiscTestCase(ExtendedTestCase):
         self.assertIterableAlmostEqual(frange(5), (0, 1, 2, 3, 4))
         self.assertIterableAlmostEqual(frange(1, 5), (1, 2, 3, 4))
         self.assertIterableAlmostEqual(frange(1, 5, 0.5), (1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5))
+
+    def test_interpolate(self) -> None:
+        self.assertAlmostEqual(interpolate(1, 0, 2, 0, 3), 1.5)
+        self.assertAlmostEqual(interpolate(1, 0, 1, 0, 3), 3)
+        self.assertAlmostEqual(interpolate(2, 0, 1, 0, 6), 12)
 
 
 if __name__ == '__main__':

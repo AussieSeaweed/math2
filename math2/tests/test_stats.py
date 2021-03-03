@@ -4,7 +4,7 @@ from math2.stats import mean, median, range_, standard_deviation, trimmed_mean, 
 from math2.utils import ExtendedTestCase
 
 
-class SampleTestCase(ExtendedTestCase):
+class StatsTestCase(ExtendedTestCase):
     value_sets = ((0.32, 0.53, 0.28, 0.37, 0.47, 0.43, 0.36, 0.42, 0.38, 0.43),
                   (0.26, 0.43, 0.47, 0.49, 0.52, 0.75, 0.79, 0.86, 0.62, 0.46),
                   (7.07, 7.00, 7.10, 6.97, 7.00, 7.03, 7.01, 7.01, 6.98, 7.08),
@@ -16,7 +16,7 @@ class SampleTestCase(ExtendedTestCase):
                                        (0.39750, 0.56625, 7.0225, 3))
         self.assertIterableAlmostEqual(map(median, self.value_sets), (0.400, 0.505, 7.01, 3))
 
-    def test_variances(self) -> None:
+    def test_vars(self) -> None:
         self.assertIterableAlmostEqual(map(range_, self.value_sets), (0.25, 0.6, 0.13, 4))
         self.assertIterableAlmostEqual(map(variance, self.value_sets),
                                        (0.00529888888888889, 0.03487222222222222, 0.0019388888888888889, 2.5))

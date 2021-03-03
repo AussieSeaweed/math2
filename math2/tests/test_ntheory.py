@@ -4,7 +4,7 @@ from math2.ntheory import gcd, lcm
 from math2.utils import ExtendedTestCase
 
 
-class MiscTestCase(ExtendedTestCase):
+class NTheoryTestCase(ExtendedTestCase):
     def test_gcd(self) -> None:
         self.assertAlmostEqual(gcd(0.75, 0.5), 0.25)
         self.assertAlmostEqual(gcd(9, 15), 3)
