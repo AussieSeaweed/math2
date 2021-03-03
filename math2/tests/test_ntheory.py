@@ -1,7 +1,8 @@
 from unittest import main
 
+from auxiliary import ExtendedTestCase
+
 from math2.ntheory import gcd, lcm
-from math2.utils import ExtendedTestCase
 
 
 class NTheoryTestCase(ExtendedTestCase):

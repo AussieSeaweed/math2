@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections import Iterable, Iterator
+from collections import Iterable, Iterator, Sequence
+from enum import Enum
 from functools import reduce
 from itertools import chain
 from typing import Optional
+
+from auxiliary import retain_iter
 
 from math2.econ.cashflows import CashFlow
 from math2.econ.factors import af, ap, fa, fp, pa
@@ -195,6 +198,29 @@ class Project(Instrument):
         return sum(present_worth * interest.to_factor(t) for t in frange(0, total_life, self.life))
 
 
+class Relationship(Enum):
+    """Relationship is the enum class for all relationships of alternative projects."""
+    INDEPENDENT = 0
+    MUTUALLY_EXCLUSIVE = 1
+    RELATED = 2
+
+
+@retain_iter
+def relationship(values: Iterable[float], budget: float) -> Relationship:
+    """Determines the relationship of values with respect to the budget.
+
+    :param values: The values.
+    :param budget: The budget.
+    :return: The relationship.
+    """
+    if sum(values) <= budget:
+        return Relationship.INDEPENDENT
+    elif sum(sorted(values)[:2]) <= budget:
+        return Relationship.RELATED
+    else:
+        return Relationship.MUTUALLY_EXCLUSIVE
+
+
 def combinations(values: Iterable[float], budget: float) -> Iterator[Iterator[int]]:
     """Gets the combinations of the related values given their values and the budget.
 
@@ -202,13 +228,12 @@ def combinations(values: Iterable[float], budget: float) -> Iterator[Iterator[in
     :param budget: The budget.
     :return: The combinations of possible projects that can be chosen.
     """
-    values = tuple(values)
-
-    if values:
+    if values := tuple(values):
         i = len(values) - 1
-        sub_combinations = combinations(values[:i], budget - values[i]), combinations(values[:i], budget)
+        chosen = combinations(values[:i], budget - values[i]) if values[i] <= budget else ()
+        skipped = combinations(values[:i], budget)
 
-        return chain((chain(sub_combination, [i]) for sub_combination in sub_combinations[0]), sub_combinations[1])
+        return chain((chain(sub_combination, [i]) for sub_combination in chosen), skipped)
     else:
         return iter((iter(()),))
 
@@ -252,18 +277,17 @@ def max_repeated_present_worth(projects: Iterable[Project], marr: CompoundIntere
     return choice if choice.repeated_present_worth(marr, total_life) > 0 else None
 
 
-# def from_table(table: Iterable[Iterable[float]], marr: float) -> int:
-#     """Selects the project with respect to the given table of internal rate of returns and marr.
-#
-#     :param table: The table of internal rate of returns.
-#     :param marr: The minimum acceptable rate of return.
-#     :return: The best project.
-#     """
-#     table = tuple(map(tuple, table))
-#     x = 0
-#
-#     for i in range(1, len(table)):
-#         if table[i][x] > marr:
-#             x = i
-#
-#     return x
+def from_table(table: Sequence[Sequence[float]], marr: float) -> int:
+    """Selects the project with respect to the given table of internal rate of returns and marr.
+
+    :param table: The table of internal rate of returns.
+    :param marr: The minimum acceptable rate of return.
+    :return: The best project.
+    """
+    x = 0
+
+    for i in range(1, len(table)):
+        if table[i][x] > marr:
+            x = i
+
+    return x

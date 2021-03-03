@@ -3,9 +3,10 @@ from functools import reduce
 from operator import mul
 from typing import Optional, TypeVar
 
-from math2.utils import SupportsLessThan, SupportsMul
+from auxiliary import SupportsLessThan, SupportsMul
 
 _SLT = TypeVar('_SLT', bound=SupportsLessThan)
+_SM = TypeVar('_SM', bound=SupportsMul)
 
 
 def limit(value: _SLT, lower: _SLT, upper: _SLT) -> _SLT:
@@ -24,9 +25,6 @@ def limit(value: _SLT, lower: _SLT, upper: _SLT) -> _SLT:
         return upper
     else:
         return value
-
-
-_SM = TypeVar('_SM', bound=SupportsMul)
 
 
 def product(values: Iterable[_SM]) -> _SM:

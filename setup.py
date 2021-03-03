@@ -5,7 +5,7 @@ with open('README.rst', 'r') as long_description_file:
 
 setup(
     name='math2',
-    version='0.0.1.dev5',
+    version='0.0.1.dev6',
     author='Juho Kim',
     author_email='juho-kim@outlook.com',
     description='A Python package for various math functions',
@@ -13,14 +13,15 @@ setup(
     long_description_content_type='text/x-rst',
     url='https://github.com/AussieSeaweed/math2',
     packages=find_packages(),
-    package_data={'math2': ['py.typed']},
-    classifiers=[
+    package_data={'math2': ('py.typed',)},
+    classifiers=(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3 :: Only',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
-    ],
+    ),
     python_requires='>=3.9',
+    install_requires='auxiliary',
 )

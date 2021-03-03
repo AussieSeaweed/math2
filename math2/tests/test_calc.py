@@ -1,8 +1,9 @@
 from math import cos, exp, log, sin
 from unittest import main
 
+from auxiliary import ExtendedTestCase
+
 from math2.calc import derivative, newton
-from math2.utils import ExtendedTestCase
 
 
 class CalcTestCase(ExtendedTestCase):

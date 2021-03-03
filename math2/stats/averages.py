@@ -1,6 +1,6 @@
 from collections import Iterable
 
-from math2.utils import ilen, retain_iter, trim
+from auxiliary import ilen, retain_iter, trim
 
 
 @retain_iter

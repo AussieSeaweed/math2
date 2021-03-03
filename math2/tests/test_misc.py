@@ -1,7 +1,8 @@
 from unittest import main
 
+from auxiliary import ExtendedTestCase
+
 from math2.misc import frange, interpolate, limit, product
-from math2.utils import ExtendedTestCase
 
 
 class MiscTestCase(ExtendedTestCase):

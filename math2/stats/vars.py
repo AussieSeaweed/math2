@@ -1,8 +1,9 @@
 from collections import Iterable
 from math import sqrt
 
+from auxiliary import ilen, retain_iter
+
 from math2.stats.averages import mean
-from math2.utils import ilen, retain_iter
 
 
 @retain_iter
