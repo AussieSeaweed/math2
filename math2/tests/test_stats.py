@@ -17,6 +17,7 @@ class StatsTestCase(ExtendedTestCase):
         self.assertIterableAlmostEqual(map(median, self.value_sets), (0.400, 0.505, 7.01, 3))
 
     def test_vars(self) -> None:
+        self.assertAlmostEqual(range_(map(float, range(5))), 4)
         self.assertIterableAlmostEqual(map(range_, self.value_sets), (0.25, 0.6, 0.13, 4))
         self.assertIterableAlmostEqual(map(variance, self.value_sets),
                                        (0.00529888888888889, 0.03487222222222222, 0.0019388888888888889, 2.5))

@@ -13,10 +13,10 @@ def derivative(func: Callable[[float], float], x: float, eps: float = 1e-7) -> f
 
 
 def newton(func: Callable[[float], float], x: float, eps: float = 1e-7) -> float:
-    """Solves the root of the supplied function with Newton's method.
+    """Solves the root of the supplied function with the Newton's method.
 .
     :param func: The function to solve
-    :param x: The initial argument.
+    :param x: The initial guess.
     :param eps: The accuracy.
     :return: The root coordinate.
     """

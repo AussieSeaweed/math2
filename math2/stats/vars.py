@@ -2,16 +2,16 @@ from collections import Iterable
 from math import sqrt
 
 from math2.stats.averages import mean
+from math2.utils import retain_iter
 
 
+@retain_iter
 def range_(values: Iterable[float]) -> float:
     """Calculates the range of the values.
 
     :param values: The values.
     :return: The range.
     """
-    values = tuple(values)
-
     return max(values) - min(values)
 
 

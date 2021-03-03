@@ -1,72 +1,98 @@
-from collections import Iterable, Iterator, Sequence
-from itertools import chain
-from typing import Optional
+from collections import Iterable, Iterator, Sized
+from itertools import chain, islice
+from typing import Any, Optional, cast
 
-from math2.utils.types import _T
+from math2.utils.types import _F, _T
 
 
-def trim(values: Iterable[_T], percentage: float) -> Sequence[_T]:
-    """Trims the iterable by the percentage.
+def const_len(func: _F) -> _F:
+    """Decorates a function to make sure all sized arguments are of the same length.
 
-    :param values: The values.
-    :param percentage: The trimmed percentage.
-    :return: The trimmed sequence.
+    :param func: The function to decorate.
+    :return: The decorated function.
     """
-    values = tuple(values)
-    n = int(len(values) * percentage)
 
-    return values[n:len(values) - n]
+    def checked_func(*args: Any, **kwargs: Any) -> Any:
+        if const(len(arg) for arg in chain(args, kwargs.values()) if isinstance(arg, Sized)):
+            return func(*args, **kwargs)
+        else:
+            raise ValueError('Collection arguments are not of constant length')
+
+    return cast(_F, checked_func)
 
 
-def window(values: Iterable[_T], width: int) -> Iterator[Sequence[_T]]:
-    """Returns the sliding window views of the supplied iterable
+def retain_iter(func: _F) -> _F:
+    """Decorates a function to make sure all iterators are converted to sequences to persist after iterations.
 
-    :param values: The values.
-    :param width: The sliding window width.
-    :return: The window views.
+    :param func: The function to decorate.
+    :return: The decorated function.
     """
-    values = tuple(values)
 
-    return (values[i:i + width] for i in range(len(values) - width + 1))
+    def retained_func(*args: Any, **kwargs: Any) -> Any:
+        args = tuple(tuple(arg) if isinstance(arg, Iterator) else arg for arg in args)
+        kwargs = {key: value if isinstance(value, Iterator) else tuple(value) for key, value in kwargs.items()}
+
+        return func(*args, **kwargs)
+
+    return cast(_F, retained_func)
 
 
-def rotate(values: Iterable[_T], index: int) -> Iterator[_T]:
-    """Rotates the iterable by the given index.
+def ilen(it: Iterable[Any]) -> int:
+    """Gets the length of the given iterator.
 
-    :param values: The values.
-    :param index: The index of rotation.
-    :return: The rotated iterable.
+    :param it: The iterator.
+    :return: The length of the iterator.
     """
-    values = tuple(values)
-
-    return chain(values[index:], values[:index])
+    return len(it) if isinstance(it, Sized) else len(tuple(it))
 
 
-def constant(values: Iterable[_T]) -> bool:
-    """Checks if all elements inside the iterable are equal to each other.
-
-       If the iterable is empty, True is returned.
-
-    :param values: The values.
-    :return: True if all elements are equal, else False.
-    """
-    values = tuple(values)
-
-    return not values or all(v == values[0] for v in values)
-
-
-def chunk(values: Iterable[_T], width: int) -> Iterator[Sequence[_T]]:
+@retain_iter
+def chunk(values: Iterable[_T], width: int) -> Iterator[Iterator[_T]]:
     """Chunks the iterable by the given width.
 
-    :param values: The values.
+    :param values: The values to chunk.
     :param width: The chunk width.
     :return: The chunks.
     """
-    values = tuple(values)
-
-    return (values[i:i + width] for i in range(0, len(values), width))
+    return (islice(values, i, i + width) for i in range(0, ilen(values), width))
 
 
+@retain_iter
+def window(values: Iterable[_T], width: int) -> Iterator[Iterator[_T]]:
+    """Returns the sliding window views of the supplied iterable.
+
+    :param values: The values to generate the views on.
+    :param width: The sliding window width.
+    :return: The window views.
+    """
+    return (islice(values, i, i + width) for i in range(ilen(values) - width + 1))
+
+
+@retain_iter
+def trim(values: Iterable[_T], percentage: float) -> Iterator[_T]:
+    """Trims the iterable by the percentage.
+
+    :param values: The values to trim.
+    :param percentage: The trimmed percentage.
+    :return: The trimmed sequence.
+    """
+    n = int(ilen(values) * percentage)
+
+    return islice(values, n, ilen(values) - n)
+
+
+@retain_iter
+def rotate(values: Iterable[_T], index: int) -> Iterator[_T]:
+    """Rotates the iterable by the given index.
+
+    :param values: The values to rotate.
+    :param index: The index of rotation.
+    :return: The rotated iterator.
+    """
+    return chain(islice(values, index % ilen(values), None), islice(values, index % ilen(values)))
+
+
+@retain_iter
 def iter_equal(it1: Iterable[_T], it2: Iterable[_T]) -> bool:
     """Checks if all elements in both iterables are equal to the elements in the other iterable at the same position.
 
@@ -74,9 +100,18 @@ def iter_equal(it1: Iterable[_T], it2: Iterable[_T]) -> bool:
     :param it2: The second iterable.
     :return: True if the equality check passes, else False.
     """
-    it1, it2 = tuple(it1), tuple(it2)
+    return ilen(it1) == ilen(it2) and all(x == y for x, y in zip(it1, it2))
 
-    return len(it1) == len(it2) and all(x == y for x, y in zip(it1, it2))
+
+def const(values: Iterable[_T]) -> bool:
+    """Checks if all elements inside the iterable are equal to each other.
+
+       If the iterable is empty, True is returned.
+
+    :param values: The values.
+    :return: True if all elements are equal, else False.
+    """
+    return all(x == y for x, y in window(values, 2))
 
 
 def next_or_none(it: Iterator[_T]) -> Optional[_T]:
@@ -108,6 +143,6 @@ def get(optional: Optional[_T]) -> _T:
     :return: The checked value.
     """
     if optional is None:
-        raise TypeError('The checked value is None')
+        raise ValueError('The checked value is None')
     else:
         return optional

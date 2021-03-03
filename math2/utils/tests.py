@@ -80,3 +80,22 @@ class ExtendedTestCase(TestCase):
             self.assertIsInstance(it2, it_type, msg)
 
         self.assertSequenceAlmostEqual(tuple(it1), tuple(it2), places, msg, delta)
+
+    def assert2DIterableEqual(self, it1: Iterable[Iterable[_T]], it2: Iterable[Iterable[_T]], msg: Any = ...,
+                              it_type: Optional[Type[Iterable[Iterable[_T]]]] = None,
+                              sub_it_type: Optional[Type[Iterable[_T]]] = None, ) -> None:
+        """An equality assertion for ordered iterables of iterables (like lists and tuples).
+
+        :param it1: The first iterable to compare.
+        :param it2: The second iterable to compare.
+        :param msg: Optional message to use on failure instead of a list of differences.
+        :param it_type: The expected datatype of the iterables, or None if no datatype should be enforced.
+        :param sub_it_type: The expected datatype of the sub-iterables, or None if no datatype should be enforced.
+        :return: None
+        """
+        if it_type is not None:
+            self.assertIsInstance(it1, it_type, msg)
+            self.assertIsInstance(it2, it_type, msg)
+
+        for sub_it1, sub_it2 in zip(it1, it2):
+            self.assertIterableEqual(sub_it1, sub_it2, msg, sub_it_type)

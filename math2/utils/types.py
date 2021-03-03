@@ -1,9 +1,11 @@
 from abc import abstractmethod
+from collections import Callable
 from enum import Enum
 from functools import cached_property, total_ordering
-from typing import Any, Protocol, TypeVar
+from typing import Any, Protocol, TypeVar, runtime_checkable
 
 _T = TypeVar('_T')
+_F = TypeVar('_F', bound=Callable[..., Any])
 
 
 @total_ordering
@@ -26,6 +28,7 @@ class OrderedEnum(Enum):
         return values.index(self)
 
 
+@runtime_checkable
 class SupportsLessThan(Protocol):
     """SupportsLessThan is the protocol for types that support less than comparison operators."""
 
@@ -34,6 +37,7 @@ class SupportsLessThan(Protocol):
         ...
 
 
+@runtime_checkable
 class SupportsMul(Protocol):
     """SupportsMul is the protocol for types that support multiplication operators."""
 
