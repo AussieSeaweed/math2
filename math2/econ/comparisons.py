@@ -5,8 +5,8 @@ from itertools import chain
 from typing import Optional
 
 from math2.calc import newton
-from math2.econ.factors import af, ap, fp, pa, pf
-from math2.misc import frange, interpolate
+from math2.econ.factors import pf
+from math2.misc import interpolate
 from math2.ntheory import lcm
 
 
@@ -39,35 +39,6 @@ def combinations(values: Iterable[float], budget: float) -> Iterator[Iterator[in
             return iter([iter(())])
     else:
         return combinations(tuple(values), budget)
-
-
-class Project:
-    def __init__(self, first: float, salvage: float, a_benefit: float, a_cost: float, life: float):
-        self.first = first
-        self.salvage = salvage
-        self.a_benefit = a_benefit
-        self.a_cost = a_cost
-        self.life = life
-
-    def present_worth(self, marr: float) -> float:
-        return -self.first + self.salvage * fp(marr, self.life) + (self.a_benefit - self.a_cost) * pa(marr, self.life)
-
-    def repeated_present_worth(self, marr: float, total_life: float) -> float:
-        present_worth = self.present_worth(marr)
-
-        return sum(present_worth * pf(marr, n) for n in frange(0, total_life, self.life))
-
-    def annual_worth(self, marr: float) -> float:
-        return -self.first * ap(marr, self.life) + self.salvage * af(marr, self.life) + self.a_benefit - self.a_cost
-
-    def acceptable_present(self, marr: float) -> bool:
-        return self.present_worth(marr) > 0
-
-    def acceptable_repeated_present(self, marr: float, total_life: float) -> bool:
-        return self.repeated_present_worth(marr, total_life) > 0
-
-    def acceptable_annual(self, marr: float) -> bool:
-        return self.annual_worth(marr) > 0
 
 
 def eval_mex_rpw(projects: Iterable[Project], marr: float) -> Optional[Project]:
@@ -120,21 +91,6 @@ def payback_period(fc: float, cash_flows: Iterable[float]) -> float:
 
 def disc_payback_period(fc: float, cash_flows: Iterable[float], marr: float) -> float:
     return payback_period(fc, (cash_flow * pf(marr, n) for n, cash_flow in enumerate(cash_flows)))
-
-
-class SimpleProject:
-    def __init__(self, fc: float, a_savings: float, life: float):
-        self.fc = fc
-        self.a_savings = a_savings
-        self.life = life
-
-    @property
-    def cash_flows(self) -> Iterator[float]:
-        return chain([self.fc], [self.a_savings for _ in frange(self.life)])
-
-    @property
-    def irr(self) -> float:
-        return irr(self.cash_flows, 0.1)
 
 
 def from_table(tbl: Iterable[Sequence[float]], marr: float) -> int:

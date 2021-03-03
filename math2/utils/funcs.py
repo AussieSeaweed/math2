@@ -8,9 +8,9 @@ from math2.utils.types import _T
 def trim(values: Iterable[_T], percentage: float) -> Sequence[_T]:
     """Trims the iterable by the percentage.
 
-    :param values: The values
-    :param percentage: The trimmed percentage
-    :return: The trimmed sequence
+    :param values: The values.
+    :param percentage: The trimmed percentage.
+    :return: The trimmed sequence.
     """
     values = tuple(values)
     n = int(len(values) * percentage)
@@ -21,9 +21,9 @@ def trim(values: Iterable[_T], percentage: float) -> Sequence[_T]:
 def window(values: Iterable[_T], width: int) -> Iterator[Sequence[_T]]:
     """Returns the sliding window views of the supplied iterable
 
-    :param values: The values
-    :param width: The sliding window width
-    :return: The window views
+    :param values: The values.
+    :param width: The sliding window width.
+    :return: The window views.
     """
     values = tuple(values)
 
@@ -33,9 +33,9 @@ def window(values: Iterable[_T], width: int) -> Iterator[Sequence[_T]]:
 def rotate(values: Iterable[_T], index: int) -> Iterator[_T]:
     """Rotates the iterable by the given index.
 
-    :param values: The values
-    :param index: The index of rotation
-    :return: The rotated iterable
+    :param values: The values.
+    :param index: The index of rotation.
+    :return: The rotated iterable.
     """
     values = tuple(values)
 
@@ -47,8 +47,8 @@ def constant(values: Iterable[_T]) -> bool:
 
        If the iterable is empty, True is returned.
 
-    :param values: The values
-    :return: True if all elements are equal, else False
+    :param values: The values.
+    :return: True if all elements are equal, else False.
     """
     values = tuple(values)
 
@@ -58,9 +58,9 @@ def constant(values: Iterable[_T]) -> bool:
 def chunk(values: Iterable[_T], width: int) -> Iterator[Sequence[_T]]:
     """Chunks the iterable by the given width.
 
-    :param values: The values
-    :param width: The chunk width
-    :return: The chunks
+    :param values: The values.
+    :param width: The chunk width.
+    :return: The chunks.
     """
     values = tuple(values)
 
@@ -70,9 +70,9 @@ def chunk(values: Iterable[_T], width: int) -> Iterator[Sequence[_T]]:
 def iter_equal(it1: Iterable[_T], it2: Iterable[_T]) -> bool:
     """Checks if all elements in both iterables are equal to the elements in the other iterable at the same position.
 
-    :param it1: The first iterable
-    :param it2: The second iterable
-    :return: True if the equality check passes, else False
+    :param it1: The first iterable.
+    :param it2: The second iterable.
+    :return: True if the equality check passes, else False.
     """
     it1, it2 = tuple(it1), tuple(it2)
 
@@ -82,8 +82,8 @@ def iter_equal(it1: Iterable[_T], it2: Iterable[_T]) -> bool:
 def next_or_none(it: Iterator[_T]) -> Optional[_T]:
     """Tries to get the next element of the iterator.
 
-    :param it: The iterator to consume
-    :return: None if there is no next element, else the next element
+    :param it: The iterator to consume.
+    :return: None if there is no next element, else the next element.
     """
     try:
         return next(it)
@@ -94,9 +94,9 @@ def next_or_none(it: Iterator[_T]) -> Optional[_T]:
 def default(optional: Optional[_T], default_: _T) -> _T:
     """Checks if the value is not None and returns it or the default value.
 
-    :param optional: The optional value
-    :param default_: The default value
-    :return: The default value if the value to check is None, else the checked value
+    :param optional: The optional value.
+    :param default_: The default value.
+    :return: The default value if the value to check is None, else the checked value.
     """
     return default_ if optional is None else optional
 
@@ -104,8 +104,8 @@ def default(optional: Optional[_T], default_: _T) -> _T:
 def get(optional: Optional[_T]) -> _T:
     """Checks if the optional value is not none and returns it.
 
-    :param optional: The optional value
-    :return: The checked value
+    :param optional: The optional value.
+    :return: The checked value.
     """
     if optional is None:
         raise TypeError('The checked value is None')

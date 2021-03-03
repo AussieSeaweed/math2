@@ -11,10 +11,10 @@ _SLT = TypeVar('_SLT', bound=SupportsLessThan)
 def limit(value: _SLT, lower: _SLT, upper: _SLT) -> _SLT:
     """Binds the value by the given interval.
 
-    :param value: The value
-    :param lower: The lower limit
-    :param upper: The upper limit
-    :return: The bound value
+    :param value: The value.
+    :param lower: The lower limit.
+    :param upper: The upper limit.
+    :return: The bound value.
     """
     if upper < lower:
         raise ValueError('Lower bound is greater than the upper bound')
@@ -33,8 +33,8 @@ _SM = TypeVar('_SM', bound=SupportsMul)
 def product(values: Iterable[_SM]) -> _SM:
     """Calculates the product of the elements in the iterable.
 
-    :param values: The values
-    :return: The product
+    :param values: The values.
+    :return: The product.
     """
     try:
         return reduce(mul, values)
@@ -45,10 +45,10 @@ def product(values: Iterable[_SM]) -> _SM:
 def frange(start: float, stop: Optional[float] = None, step: Optional[float] = None) -> Iterator[float]:
     """Generates a range of floating point values.
 
-    :param start: The start value
-    :param stop: The stop value
-    :param step: The step value
-    :return: The iterator of range values
+    :param start: The start value.
+    :param stop: The stop value.
+    :param step: The step value.
+    :return: The iterator of range values.
     """
     if stop is None:
         yield from frange(0, start, step)
@@ -63,11 +63,11 @@ def frange(start: float, stop: Optional[float] = None, step: Optional[float] = N
 def interpolate(x: float, x0: float, x1: float, y0: float, y1: float) -> float:
     """Interpolates the point between two given points.
 
-    :param x: The point to interpolate
-    :param x0: The x coordinate of the first point
-    :param x1: The x coordinate of the second point
-    :param y0: The y coordinate of the first point
-    :param y1: The y coordinate of the second point
-    :return: The interpolated value
+    :param x: The point to interpolate.
+    :param x0: The x coordinate of the first point.
+    :param x1: The x coordinate of the second point.
+    :param y0: The y coordinate of the first point.
+    :param y1: The y coordinate of the second point.
+    :return: The interpolated value.
     """
     return (x - x0) / (x1 - x0) * (y1 - y0) + y0

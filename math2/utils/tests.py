@@ -39,9 +39,9 @@ class ExtendedTestCase(TestCase):
 
         :param seq1: The first sequence to compare.
         :param seq2: The second sequence to compare.
-        :param places: The places to enforce
+        :param places: The places to enforce.
         :param msg: Optional message to use on failure instead of a list of differences.
-        :param delta: The delta to enforce
+        :param delta: The delta to enforce.
         :param seq_type: The expected datatype of the sequences, or None if no datatype should be enforced.
         :return: None
         """
@@ -69,9 +69,9 @@ class ExtendedTestCase(TestCase):
 
         :param it1: The first iterable to compare.
         :param it2: The second iterable to compare.
-        :param places: The places to enforce
+        :param places: The places to enforce.
         :param msg: Optional message to use on failure instead of a list of differences.
-        :param delta: The delta to enforce
+        :param delta: The delta to enforce.
         :param it_type: The expected datatype of the iterables, or None if no datatype should be enforced.
         :return: None
         """

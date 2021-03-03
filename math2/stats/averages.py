@@ -6,8 +6,8 @@ from math2.utils import trim
 def mean(values: Iterable[float]) -> float:
     """Calculates the mean of the values.
 
-    :param values: The values
-    :return: The mean
+    :param values: The values.
+    :return: The mean.
     """
     values = tuple(values)
 
@@ -17,9 +17,9 @@ def mean(values: Iterable[float]) -> float:
 def trimmed_mean(values: Iterable[float], percentage: float) -> float:
     """Calculates the trimmed mean of the values.
 
-    :param values: The values
-    :param percentage: The percentage value
-    :return: The trimmed mean
+    :param values: The values.
+    :param percentage: The percentage value.
+    :return: The trimmed mean.
     """
     return mean(trim(sorted(values), percentage))
 
@@ -27,8 +27,8 @@ def trimmed_mean(values: Iterable[float], percentage: float) -> float:
 def median(values: Iterable[float]) -> float:
     """Calculates the median of the values.
 
-    :param values: The values
-    :return: The median
+    :param values: The values.
+    :return: The median.
     """
     values = sorted(values)
 
