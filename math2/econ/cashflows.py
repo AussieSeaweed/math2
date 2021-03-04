@@ -59,11 +59,11 @@ def irr(cash_flows: Iterable[CashFlow], initial_guess: float) -> EffectiveIntere
     return EffectiveInterest(newton(lambda i: npv(cash_flows, EffectiveInterest(i)), initial_guess))
 
 
-def payback_period(cost: float, cash_flows: Iterable[CashFlow]) -> float:
+def payback_period(cash_flows: Iterable[CashFlow], cost: float) -> float:
     """Calculates the payback period of the cash flows.
 
-    :param cost: The cost to pay back.
     :param cash_flows: The cash flows.
+    :param cost: The cost to pay back.
     :return: The payback period.
     """
     for i, acc in enumerate(accumulate(cash_flow.amount for cash_flow in sorted(cash_flows))):
@@ -73,12 +73,12 @@ def payback_period(cost: float, cash_flows: Iterable[CashFlow]) -> float:
         return inf
 
 
-def discounted_payback_period(cost: float, cash_flows: Iterable[CashFlow], interest: Interest) -> float:
+def discounted_payback_period(cash_flows: Iterable[CashFlow], cost: float, interest: Interest) -> float:
     """Calculates the discounted payback period of the cash flows at the given interest value.
 
-    :param cost: The cost to pay back.
     :param cash_flows: The cash flows.
+    :param cost: The cost to pay back.
     :param interest: The interest at which the cash flows are discounted.
     :return: The payback period.
     """
-    return payback_period(cost, map(lambda cash_flow: discounted(cash_flow, interest), cash_flows))
+    return payback_period(map(lambda cash_flow: discounted(cash_flow, interest), cash_flows), cost)

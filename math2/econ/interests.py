@@ -20,7 +20,7 @@ class Interest(ABC):
         :param time: The time period.
         :return: The converted factor.
         """
-        ...
+        pass
 
     @classmethod
     @abstractmethod
@@ -31,7 +31,7 @@ class Interest(ABC):
         :param time: The time period.
         :return: The converted interest value.
         """
-        ...
+        pass
 
 
 class SimpleInterest(Interest):
@@ -54,7 +54,7 @@ class CompoundInterest(Interest, ABC):
 
         :return: The converted interest value.
         """
-        ...
+        pass
 
     @abstractmethod
     def to_continuous(self) -> ContinuousInterest:
@@ -62,7 +62,7 @@ class CompoundInterest(Interest, ABC):
 
         :return: The converted interest value.
         """
-        ...
+        pass
 
     @abstractmethod
     def to_nominal(self, subperiod_count: float) -> NominalInterest:
@@ -71,7 +71,7 @@ class CompoundInterest(Interest, ABC):
         :param subperiod_count: The number of subperiods of the converted interest value.
         :return: The converted interest value.
         """
-        ...
+        pass
 
     @abstractmethod
     def to_subperiod(self, subperiod_count: float) -> SubperiodInterest:
@@ -80,7 +80,7 @@ class CompoundInterest(Interest, ABC):
         :param subperiod_count: The number of subperiods of the converted interest value.
         :return: The converted interest value.
         """
-        ...
+        pass
 
     @classmethod
     def from_factor(cls, factor: float, time: float) -> CompoundInterest:

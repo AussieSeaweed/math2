@@ -140,60 +140,62 @@ class PS2TestCase(ExtendedTestCase):
         self.assertAlmostEqual(option, 112086.97925088322)
 
 
-# class PS3TestCase(TestCase):
-#     def test_1(self) -> None:
-#         m = Mortgage.from_dtv(2995000, 0.2)
-#         i1 = NominalInterest(0.02, 2)
-#         i2 = NominalInterest(0.04, 2)
-#         p = m.payment(i1)
-#
-#         self.assertAlmostEqual(p, 10145.891129693951)
-#         self.assertAlmostEqual(p * 12 * 3, 365252.08066898223)
-#         self.assertAlmostEqual(m.pay(i1, 5).payment(i2), 12128.043601452593)
-#
-#     def test_2(self) -> None:
-#         self.assertAlmostEqual(Bond(100, 0, 2, 3 / 12).present_worth(EffectiveInterest(0.07)), 98.32275876142123)
-#         self.assertAlmostEqual(Bond(100, 0, 2, 5 / 12).present_worth(EffectiveInterest(0.07)), 97.17391685967232)
-#         self.assertAlmostEqual(Bond(100, 0, 2, 3).present_worth(EffectiveInterest(0.07)), 81.35006443077528)
-#         self.assertAlmostEqual(Bond.from_rate(100, 0.04, 2, 3).present_worth(EffectiveInterest(0.07)),
-#                                92.00717047033226)
-#         self.assertAlmostEqual(Bond.from_rate(100, 0.06, 2, 3.25).present_worth(EffectiveInterest(0.07)),
-#                                97.13753584095278)
-#
-#     def test_3(self) -> None:
-#         self.assertAlmostEqual(
-#             newton(lambda y: Bond.from_rate(100, 0.07, 2, 3).present_worth(EffectiveInterest(y)) - 100, 0.1), 0.07)
-#         self.assertAlmostEqual(Bond.from_rate(100, 0.04, 2, 3).present_worth(EffectiveInterest(0.05)) + 100 * 0.04 / 2,
-#                                99.24593731921009)
-#         self.assertAlmostEqual(
-#             newton(lambda y: Bond.from_rate(100, 0.03, 2, 2.25).present_worth(EffectiveInterest(y)) - 100, 0.1), 0.03)
-#         self.assertAlmostEqual(Bond.from_rate(100, 0.07, 2, 2.25).present_worth(EffectiveInterest(0.05)),
-#                                104.20662940110009)
-#         self.assertAlmostEqual(
-#             newton(lambda c: Bond.from_rate(100, c, 2, 2.25).present_worth(EffectiveInterest(0.03)) - 114, 0.1),
-#             0.09481118)
-#
-#     def test_4(self) -> None:  # TODO
-#         ...
-#
-#     def test_5(self) -> None:
-#         y = newton(lambda y: Bond.from_rate(100, 0.07, 2, 7.5).present_worth(EffectiveInterest(y)) * fp(y / 2, 0.5) - 108, 0.1)
-#
-#         b: Callable[[float], float] = lambda c: Bond.from_rate(1000, c, 2, 9).present_worth(EffectiveInterest(y))
-#         c = ceil(newton(lambda c: 9500000 / 2 - (4400 * b(c)), 0.1) / 0.0025) * 0.0025
-#         self.assertAlmostEqual(c, 0.0725)
-#         self.assertAlmostEqual(4400 * b(c), 4802235.185695931)
-#         c = ceil(newton(lambda c: 9500000 / 2 / (1 - 0.008) - (4400 * b(c)), (0.1)) / 0.0025) * 0.0025
-#         self.assertAlmostEqual(c, 0.0725)
-#         self.assertAlmostEqual(4400 * b(c) * (1 - 0.008), 4763817.304210364)
-#
-#     def test_6(self) -> None:
-#         self.assertAlmostEqual(Mortgage.from_down(500000, 50000).payment(NominalInterest(0.060755, 2)),
-#                                2899.3558026129626)
-#         self.assertAlmostEqual(Mortgage.from_down(500000, 50000).pay(NominalInterest(0.060755, 2), 5, 700).payment(
-#             NominalInterest(0.060755, 2)), 3490.3113416458878)
-#         self.assertLess(Mortgage.from_down(500000, 50000, 25).pay(NominalInterest(0.060755, 2), 3).principal,
-#                         Mortgage.from_down(500000, 50000, 25).pay(NominalInterest(0.060755, 2), 3, 700).principal)
+class PS3TestCase(TestCase):
+    def test_1(self) -> None:
+        m = Mortgage.from_dtv(2995000, 0.2)
+        i1 = NominalInterest(0.02, 2)
+        i2 = NominalInterest(0.04, 2)
+        p = m.payment(i1)
+
+        self.assertAlmostEqual(p, 10145.891129693951)
+        self.assertAlmostEqual(p * 12 * 3, 365252.08066898223)
+        self.assertAlmostEqual(m.pay(i1, 5).payment(i2), 12128.043601452593)
+
+    def test_2(self) -> None:
+        i = NominalInterest(0.07, 2)
+
+        self.assertAlmostEqual(Bond(100, 0, 2, 3 / 12).present_worth(i), 98.2946374365981)
+        self.assertAlmostEqual(Bond(100, 0, 2, 5 / 12).present_worth(i), 97.17391685967232)
+        self.assertAlmostEqual(Bond(100, 0, 2, 3).present_worth(i), 81.35006443077528)
+        self.assertAlmostEqual(Bond.from_rate(100, 0.04, 2, 3).present_worth(i), 92.00717047033226)
+        self.assertAlmostEqual(Bond.from_rate(100, 0.06, 2, 3.25).present_worth(i), 97.13753584095278)
+
+    def test_3(self) -> None:
+        self.assertAlmostEqual(
+            newton(lambda y: Bond.from_rate(100, 0.07, 2, 3).present_worth(NominalInterest(y, 2)) - 100, 0.1), 0.07)
+        self.assertAlmostEqual(
+            Bond.from_rate(100, 0.04, 2, 3).present_worth(NominalInterest(0.05, 2)) + 100 * 0.04 / 2, 99.24593731921009)
+        self.assertAlmostEqual(
+            newton(lambda y: Bond.from_rate(100, 0.03, 2, 2.25).present_worth(NominalInterest(y, 2)) - 100, 0.1), 0.03)
+        self.assertAlmostEqual(
+            Bond.from_rate(100, 0.07, 2, 2.25).present_worth(NominalInterest(0.05, 2)), 104.20662940110009)
+        self.assertAlmostEqual(newton(
+            lambda c: Bond.from_rate(100, c, 2, 2.25).present_worth(NominalInterest(0.03, 2)) - 114, 0.1), 0.09481118)
+
+    def test_4(self) -> None:  # TODO
+        pass
+
+    def test_5(self) -> None:
+        y = newton(
+            lambda y: Bond.from_rate(100, 0.07, 2, 7.5).present_worth(NominalInterest(y, 2)) * fp(y / 2, 0.5) - 108,
+            0.1,
+        )
+
+        b: Callable[[float], float] = lambda c: Bond.from_rate(1000, c, 2, 9).present_worth(NominalInterest(y, 2))
+        c = ceil(newton(lambda c: 9500000 / 2 - (4400 * b(c)), 0.1) / 0.0025) * 0.0025
+        self.assertAlmostEqual(c, 0.0725)
+        self.assertAlmostEqual(4400 * b(c), 4802235.185695931)
+        c = ceil(newton(lambda c: 9500000 / 2 / (1 - 0.008) - (4400 * b(c)), (0.1)) / 0.0025) * 0.0025
+        self.assertAlmostEqual(c, 0.0725)
+        self.assertAlmostEqual(4400 * b(c) * (1 - 0.008), 4763817.304210364)
+
+    def test_6(self) -> None:
+        i = NominalInterest(0.060755, 2)
+
+        self.assertAlmostEqual(Mortgage.from_down(500000, 50000).payment(i), 2899.3558026129626)
+        self.assertAlmostEqual(Mortgage.from_down(500000, 50000).pay(i, 3, 700).payment(i), 3490.3113416458878)
+        self.assertLess(Mortgage.from_down(500000, 50000, 25).pay(i, 3).principal,
+                        Mortgage.from_down(500000, 50000, 25).pay(i, 3, 700).principal)
 
 # class PS6TestCase(ExtendedTestCase):
 #     def test_1(self) -> None:
@@ -208,7 +210,7 @@ class PS2TestCase(ExtendedTestCase):
 #                 (-32000, 6900, 7),
 #                 (-42000, 14600, 5))
 #
-#         irrs = list(map(lambda d: SimpleProject(*d).irr, data))
+#         irrs = list(map(lambda d: irr(Project(d[0], d[1], 0, d[2]).cash_flows(), 1).rate, data))
 #
 #         self.assertSequenceAlmostEqual(irrs, (
 #             0.010261108929599895,
@@ -217,7 +219,7 @@ class PS2TestCase(ExtendedTestCase):
 #             0.3494328573992243,
 #             0.16326709023510008,
 #             0.31754169406374866,
-#             - 0.13571830650187303,
+#             -0.13571830650187303,
 #             0.1990541470961173,
 #             0.114956469240095,
 #             0.2178733729868983,
@@ -226,7 +228,7 @@ class PS2TestCase(ExtendedTestCase):
 #         points = sorted(range(len(data)), key=lambda pt: -irrs[pt])
 #
 #         cost = 0
-#         marr = 0
+#         marr = 0.0
 #
 #         for pt in points:
 #             cost -= data[pt][0]
@@ -282,7 +284,7 @@ class PS2TestCase(ExtendedTestCase):
 #
 #         :return:
 #         """
-#         ...
+#         pass
 #
 #     def test_5(self) -> None:
 #         """

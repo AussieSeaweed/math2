@@ -26,7 +26,7 @@ class Instrument(ABC):
         :param interest: The interest value.
         :return: The cash flows.
         """
-        ...
+        pass
 
     @abstractmethod
     def present_worth(self, interest: CompoundInterest) -> float:
@@ -35,7 +35,7 @@ class Instrument(ABC):
         :param interest: The interest value.
         :return: The present worth.
         """
-        ...
+        pass
 
     @abstractmethod
     def annual_worth(self, interest: CompoundInterest) -> float:
@@ -44,7 +44,7 @@ class Instrument(ABC):
         :param interest: The interest value.
         :return: The annual worth.
         """
-        ...
+        pass
 
 
 class Bond(Instrument):
@@ -141,7 +141,7 @@ class Mortgage(Instrument):
         :param amortization: The amortization of the mortgage, defaults to 25.
         :return: The constructed mortgage instance.
         """
-        return cls(value - down, amortization, frequency)
+        return cls(value - down, frequency, amortization)
 
     @classmethod
     def from_dtv(cls, value: float, dtv: float, frequency: float = 12, amortization: float = 25) -> Mortgage:
@@ -153,7 +153,7 @@ class Mortgage(Instrument):
         :param amortization: The amortization of the mortgage, defaults to 25.
         :return: The constructed mortgage instance.
         """
-        return cls.from_down(value, value * dtv, amortization, frequency)
+        return cls.from_down(value, value * dtv, frequency, amortization)
 
     @classmethod
     def from_ltv(cls, value: float, ltv: float, frequency: float = 12, amortization: float = 25) -> Mortgage:
@@ -165,7 +165,7 @@ class Mortgage(Instrument):
         :param amortization: The amortization of the mortgage, defaults to 25.
         :return: The constructed mortgage instance.
         """
-        return cls(value * ltv, amortization, frequency)
+        return cls(value * ltv, frequency, amortization)
 
 
 class Project(Instrument):
@@ -175,7 +175,7 @@ class Project(Instrument):
         self.final = final
         self.life = life
 
-    def cash_flows(self, interest: CompoundInterest) -> Iterator[CashFlow]:
+    def cash_flows(self, interest: Optional[CompoundInterest] = None) -> Iterator[CashFlow]:
         return chain((CashFlow(0, self.initial),), (CashFlow(t + 1, self.annuity) for t in frange(self.life)),
                      (CashFlow(self.life, self.final),))
 
