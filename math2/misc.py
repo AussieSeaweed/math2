@@ -3,13 +3,13 @@ from functools import reduce
 from operator import mul
 from typing import Optional, TypeVar
 
-from auxiliary import SupportsLessThan, SupportsMul
+from auxiliary import SupportsLessThan
 
 _SLT = TypeVar('_SLT', bound=SupportsLessThan)
-_SM = TypeVar('_SM', bound=SupportsMul)
+_T = TypeVar('_T')
 
 
-def limit(value: _SLT, lower: _SLT, upper: _SLT) -> _SLT:
+def bind(value: _SLT, lower: _SLT, upper: _SLT) -> _SLT:
     """Binds the value by the given interval.
 
     :param value: The value.
@@ -27,7 +27,7 @@ def limit(value: _SLT, lower: _SLT, upper: _SLT) -> _SLT:
         return value
 
 
-def product(values: Iterable[_SM]) -> _SM:
+def product(values: Iterable[_T]) -> _T:
     """Calculates the product of the elements in the iterable.
 
     :param values: The values.
@@ -55,6 +55,17 @@ def frange(start: float, stop: Optional[float] = None, step: Optional[float] = N
         while start < stop:
             yield start
             start += step
+
+
+def linspace(start: float, stop: float, n: float) -> Iterator[float]:
+    """Generates an iterator of values from start to stop with length of n.
+
+    :param start: The start value.
+    :param stop: The stop value.
+    :param n: The number of values.
+    :return: The linspace of arguments.
+    """
+    return frange(start, stop, (stop - start) / n)
 
 
 def interpolate(x: float, x0: float, x1: float, y0: float, y1: float) -> float:

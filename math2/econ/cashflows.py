@@ -4,6 +4,8 @@ from itertools import accumulate
 from math import inf
 from typing import Any
 
+from auxiliary import retain_iter
+
 from math2.calc import newton
 from math2.econ.interests import EffectiveInterest, Interest
 
@@ -49,6 +51,7 @@ def npv(cash_flows: Iterable[CashFlow], interest: Interest) -> float:
     return sum(discounted(cash_flow, interest).amount for cash_flow in cash_flows)
 
 
+@retain_iter
 def irr(cash_flows: Iterable[CashFlow], initial_guess: float) -> EffectiveInterest:
     """Calculates the internal rate of return using the initial guess.
 

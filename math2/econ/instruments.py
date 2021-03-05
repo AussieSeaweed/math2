@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections import Iterable, Iterator, Sequence
+from collections import Iterable, Iterator
 from enum import Enum
 from functools import reduce
 from itertools import chain
 from typing import Optional
 
-from auxiliary import retain_iter
+from auxiliary import iget, retain_iter
 
 from math2.econ.cashflows import CashFlow
 from math2.econ.factors import af, ap, fa, fp, pa
@@ -265,6 +265,7 @@ def max_annual_worth(projects: Iterable[Project], marr: CompoundInterest) -> Opt
     return choice if choice.annual_worth(marr) > 0 else None
 
 
+@retain_iter
 def max_repeated_present_worth(projects: Iterable[Project], marr: CompoundInterest) -> Optional[Project]:
     """Selects the project with the max repeated present worth.
 
@@ -272,15 +273,13 @@ def max_repeated_present_worth(projects: Iterable[Project], marr: CompoundIntere
     :param marr: The minimum acceptable rate of return.
     :return: The project with the max repeated present worth.
     """
-    projects = tuple(projects)
-
     total_life = reduce(lcm, (project.life for project in projects))
     choice = max(projects, key=lambda project: project.repeated_present_worth(marr, total_life))
 
     return choice if choice.repeated_present_worth(marr, total_life) > 0 else None
 
 
-def from_table(table: Sequence[Sequence[float]], marr: float) -> int:
+def from_table(table: Iterable[Iterable[float]], marr: float) -> int:
     """Selects the project with respect to the given table of internal rate of returns and marr.
 
     :param table: The table of internal rate of returns.
@@ -289,8 +288,8 @@ def from_table(table: Sequence[Sequence[float]], marr: float) -> int:
     """
     x = 0
 
-    for i in range(1, len(table)):
-        if table[i][x] > marr:
+    for i, row in enumerate(table):
+        if i and iget(row, x) > marr:
             x = i
 
     return x
