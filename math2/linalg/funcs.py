@@ -1,4 +1,4 @@
-from math2.structs.data import Vector
+from math2.linalg.data import Vector
 
 
 def zeros(size: int) -> Vector:

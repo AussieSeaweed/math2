@@ -2,8 +2,8 @@ from unittest import main
 
 from auxiliary import ExtendedTestCase
 
-from math2.structs import Vector, ones, zeros
-from math2.structs.funcs import full, replaced
+from math2.linalg import Vector, ones, zeros
+from math2.linalg.funcs import full, replaced
 
 
 class VectorTestCase(ExtendedTestCase):
