@@ -1,6 +1,6 @@
 from collections import Iterable, Iterator
 from functools import reduce
-from operator import mul
+from operator import add, mul
 from typing import Optional, TypeVar
 
 from auxiliary import SupportsLessThan
@@ -25,6 +25,18 @@ def bind(value: _SLT, lower: _SLT, upper: _SLT) -> _SLT:
         return upper
     else:
         return value
+
+
+def sum_(values: Iterable[_T]) -> _T:
+    """Calculates the sum of the elements in the iterable.
+
+    :param values: The values.
+    :return: The sum.
+    """
+    try:
+        return reduce(add, values)
+    except TypeError:
+        raise ValueError('Invalid iterable')
 
 
 def product(values: Iterable[_T]) -> _T:
