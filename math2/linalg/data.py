@@ -15,11 +15,14 @@ class Vector(MutableSequence[float]):
         ...
 
     @overload
-    def __getitem__(self, s: slice) -> MutableSequence[float]:
+    def __getitem__(self, s: slice) -> Vector:
         ...
 
-    def __getitem__(self, i: Union[int, slice]) -> Union[float, MutableSequence[float]]:
-        return self.__values[i]
+    def __getitem__(self, i: Union[int, slice]) -> Union[float, Vector]:
+        if isinstance(i, int):
+            return self.__values[i]
+        else:
+            return Vector(self.__values[i])
 
     @overload
     def __setitem__(self, i: int, o: float) -> None:
