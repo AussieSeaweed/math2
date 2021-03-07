@@ -1,6 +1,6 @@
 from collections.abc import Iterable
 
-from auxiliary import ilen, retain_iter, trim
+from auxiliary import ilen, retain_iter, trimmed
 
 
 @retain_iter
@@ -20,7 +20,7 @@ def trimmed_mean(values: Iterable[float], percentage: float) -> float:
     :param percentage: The percentage value.
     :return: The trimmed mean.
     """
-    return mean(trim(sorted(values), percentage))
+    return mean(trimmed(sorted(values), percentage))
 
 
 def median(values: Iterable[float]) -> float:
