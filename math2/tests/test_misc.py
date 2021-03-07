@@ -15,6 +15,8 @@ class MiscTestCase(ExtendedTestCase):
     def test_product(self) -> None:
         self.assertEqual(product(range(6)), 0)
         self.assertEqual(product(range(1, 6)), 120)
+        self.assertEqual(product(range(1, 6), 1), 120)
+        self.assertEqual(product((), 1), 1)
         self.assertRaises(ValueError, product, ())
 
     def test_frange(self) -> None:
