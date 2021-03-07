@@ -1,4 +1,4 @@
-from collections import Callable
+from collections.abc import Callable
 
 from math2.misc import frange
 

@@ -1,4 +1,4 @@
-from collections import Iterable
+from collections.abc import Iterable
 from functools import total_ordering
 from itertools import accumulate
 from math import inf

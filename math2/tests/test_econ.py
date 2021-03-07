@@ -1,4 +1,4 @@
-from collections import Callable
+from collections.abc import Callable
 from math import ceil, exp, log
 from unittest import TestCase, main
 

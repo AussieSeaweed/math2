@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections import Iterable, Iterator
+from collections.abc import Iterable, Iterator
 from enum import Enum
 from functools import reduce
 from itertools import chain

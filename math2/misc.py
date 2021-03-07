@@ -1,4 +1,4 @@
-from collections import Iterable, Iterator
+from collections.abc import Iterable, Iterator
 from functools import reduce
 from itertools import chain
 from operator import add, mul

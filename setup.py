@@ -5,7 +5,7 @@ with open('README.rst', 'r') as long_description_file:
 
 setup(
     name='math2',
-    version='0.0.1.dev14',
+    version='0.0.1a1',
     author='Juho Kim',
     author_email='juho-kim@outlook.com',
     description='A Python package for various math functions',

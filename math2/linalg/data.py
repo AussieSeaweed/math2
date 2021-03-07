@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from collections import MutableSequence
-from typing import Iterable, Union, overload
+from collections.abc import Iterable, MutableSequence
+from typing import Union, overload
 
 from auxiliary import const_len
 

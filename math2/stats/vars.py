@@ -1,4 +1,4 @@
-from collections import Iterable
+from collections.abc import Iterable
 from math import sqrt
 
 from auxiliary import ilen, retain_iter
