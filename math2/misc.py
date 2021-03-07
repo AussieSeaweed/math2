@@ -1,5 +1,6 @@
 from collections import Iterable, Iterator
 from functools import reduce
+from itertools import chain
 from operator import add, mul
 from typing import Optional, TypeVar
 
@@ -27,26 +28,28 @@ def bind(value: _SLT, lower: _SLT, upper: _SLT) -> _SLT:
         return value
 
 
-def sum_(values: Iterable[_T]) -> _T:
+def sum_(values: Iterable[_T], start: Optional[_T] = None) -> _T:
     """Calculates the sum of the elements in the iterable.
 
     :param values: The values.
+    :param start: The optional start value.
     :return: The sum.
     """
     try:
-        return reduce(add, values)
+        return reduce(add, values if start is None else chain((start,), values))
     except TypeError:
         raise ValueError('Invalid iterable')
 
 
-def product(values: Iterable[_T]) -> _T:
+def product(values: Iterable[_T], start: Optional[_T] = None) -> _T:
     """Calculates the product of the elements in the iterable.
 
     :param values: The values.
+    :param start: The optional start value.
     :return: The product.
     """
     try:
-        return reduce(mul, values)
+        return reduce(mul, values if start is None else chain((start,), values))
     except TypeError:
         raise ValueError('Invalid iterable')
 
