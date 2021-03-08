@@ -8,7 +8,7 @@ from math2.calc import newton
 from math2.econ import (Bond, CompoundInterest, ContinuousInterest, EffectiveInterest, Mortgage, NominalInterest,
                         Project, Relationship, SimpleInterest, SubperiodInterest, combinations, fp, from_table, irr, pa,
                         pf, pg, relationship)
-from math2.misc import interpolate
+from math2.misc import interp
 
 
 class InterestTestCase(TestCase):
@@ -131,8 +131,8 @@ class PS2TestCase(ExtendedTestCase):
             self.assertAlmostEqual(newton(lambda y: p * EffectiveInterest(y).to_factor(m / 12) - 100, 0), a)
             self.assertAlmostEqual(newton(lambda y: p * ContinuousInterest(y).to_factor(m / 12) - 100, 0), b)
 
-        self.assertAlmostEqual(interpolate(7, 4, 8, 0.03029791, 0.03647384), 0.0349298575)
-        self.assertAlmostEqual(interpolate(7, 4, 8, 0.02984799, 0.03582441), 0.034330305)
+        self.assertAlmostEqual(interp(7, 4, 8, 0.03029791, 0.03647384), 0.0349298575)
+        self.assertAlmostEqual(interp(7, 4, 8, 0.02984799, 0.03582441), 0.034330305)
 
         self.assertAlmostEqual(newton(lambda y: 1.03029791 ** (4. / 12) * (1 + y) ** (8. / 12) - 1.04329682, 0),
                                0.04985765)
@@ -150,10 +150,10 @@ class PS2TestCase(ExtendedTestCase):
             for t, p in data.items()
         }
 
-        r[4] = interpolate(4, 2, 6, r[2], r[6])
-        r[5.5] = interpolate(5.5, 2, 6, r[2], r[6])
-        r[7] = interpolate(7, 6, 9, r[6], r[9])
-        r[10] = interpolate(10, 9, 12, r[9], r[12])
+        r[4] = interp(4, 2, 6, r[2], r[6])
+        r[5.5] = interp(5.5, 2, 6, r[2], r[6])
+        r[7] = interp(7, 6, 9, r[6], r[9])
+        r[10] = interp(10, 9, 12, r[9], r[12])
 
         self.assertAlmostEqual(100 * ContinuousInterest(r[2]).to_factor(-1. / 12), 99.55400544428134)
         self.assertAlmostEqual(100 * ContinuousInterest(r[4]).to_factor(-4. / 12), 98.68531340424114)

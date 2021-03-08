@@ -3,13 +3,13 @@ from unittest import main
 
 from auxiliary import ExtendedTestCase
 
-from math2.calc import derivative, euler, newton
+from math2.calc import diff, euler, newton
 
 
 class CalcTestCase(ExtendedTestCase):
-    def test_derivative(self) -> None:
-        self.assertAlmostEqual(derivative(lambda x: x ** 3 - 2 * x ** 2, 3), 3 * 3 ** 2 - 4 * 3)
-        self.assertAlmostEqual(derivative(lambda x: -3 * sin(2 * x), 5), -6 * cos(2 * 5))
+    def test_diff(self) -> None:
+        self.assertAlmostEqual(diff(lambda x: x ** 3 - 2 * x ** 2, 3), 3 * 3 ** 2 - 4 * 3)
+        self.assertAlmostEqual(diff(lambda x: -3 * sin(2 * x), 5), -6 * cos(2 * 5))
 
     def test_newton(self) -> None:
         self.assertAlmostEqual(newton(lambda x: (x - 1) * (x + 5), 4), 1)

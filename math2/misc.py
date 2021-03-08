@@ -41,7 +41,7 @@ def sum_(values: Iterable[_T], start: Optional[_T] = None) -> _T:
         raise ValueError('Invalid iterable')
 
 
-def product(values: Iterable[_T], start: Optional[_T] = None) -> _T:
+def prod(values: Iterable[_T], start: Optional[_T] = None) -> _T:
     """Calculates the product of the elements in the iterable.
 
     :param values: The values.
@@ -83,7 +83,7 @@ def linspace(start: float, stop: float, n: float) -> Iterator[float]:
     return frange(start, stop, (stop - start) / n)
 
 
-def interpolate(x: float, x0: float, x1: float, y0: float, y1: float) -> float:
+def interp(x: float, x0: float, x1: float, y0: float, y1: float) -> float:
     """Interpolates the point between two given points.
 
     :param x: The point to interpolate.
