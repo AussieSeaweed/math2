@@ -3,7 +3,6 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections.abc import Iterable, Iterator
 from enum import Enum
-from functools import reduce
 from itertools import chain
 from typing import Optional
 
@@ -13,7 +12,6 @@ from math2.econ.cashflows import CashFlow
 from math2.econ.factors import af, ap, fa, fp, pa
 from math2.econ.interests import CompoundInterest
 from math2.misc import frange
-from math2.ntheory import lcm
 
 
 class Instrument(ABC):
@@ -169,6 +167,8 @@ class Mortgage(Instrument):
 
 
 class Project(Instrument):
+    """Project is the class for projects."""
+
     def __init__(self, initial: float, annuity: float, final: float, life: float):
         self.initial = initial
         self.annuity = annuity
@@ -189,7 +189,7 @@ class Project(Instrument):
 
         return self.initial * ap(rate, self.life) + self.annuity + self.final * af(rate, self.life)
 
-    def repeated_present_worth(self, interest: CompoundInterest, total_life: float) -> float:
+    def rep_present_worth(self, interest: CompoundInterest, total_life: float) -> float:
         """Calculates the repeated present worth of this project given total life.
 
         :param interest: The interest value.
@@ -224,7 +224,7 @@ def relationship(values: Iterable[float], budget: float) -> Relationship:
         return Relationship.MUTUALLY_EXCLUSIVE
 
 
-def combinations(values: Iterable[float], budget: float) -> Iterator[Iterator[int]]:
+def related_combinations(values: Iterable[float], budget: float) -> Iterator[Iterator[int]]:
     """Gets the combinations of the related values given their values and the budget.
 
     :param values: The values of the projects.
@@ -233,53 +233,15 @@ def combinations(values: Iterable[float], budget: float) -> Iterator[Iterator[in
     """
     if values := tuple(values):
         i = len(values) - 1
-        chosen = combinations(values[:i], budget - values[i]) if values[i] <= budget else ()
-        skipped = combinations(values[:i], budget)
+        chosen = related_combinations(values[:i], budget - values[i]) if values[i] <= budget else ()
+        skipped = related_combinations(values[:i], budget)
 
         return chain((chain(sub_combination, [i]) for sub_combination in chosen), skipped)
     else:
         return iter((iter(()),))
 
 
-def max_present_worth(projects: Iterable[Project], marr: CompoundInterest) -> Optional[Project]:
-    """Selects the project with the max present worth.
-
-    :param projects: The projects to evaluate.
-    :param marr: The minimum acceptable rate of return.
-    :return: The project with the max present worth.
-    """
-    choice = max(projects, key=lambda project: project.present_worth(marr))
-
-    return choice if choice.present_worth(marr) > 0 else None
-
-
-def max_annual_worth(projects: Iterable[Project], marr: CompoundInterest) -> Optional[Project]:
-    """Selects the project with the max annual worth.
-
-    :param projects: The projects to evaluate.
-    :param marr: The minimum acceptable rate of return.
-    :return: The project with the max annual worth.
-    """
-    choice = max(projects, key=lambda project: project.annual_worth(marr))
-
-    return choice if choice.annual_worth(marr) > 0 else None
-
-
-@retain_iter
-def max_repeated_present_worth(projects: Iterable[Project], marr: CompoundInterest) -> Optional[Project]:
-    """Selects the project with the max repeated present worth.
-
-    :param projects: The projects to evaluate.
-    :param marr: The minimum acceptable rate of return.
-    :return: The project with the max repeated present worth.
-    """
-    total_life = reduce(lcm, (project.life for project in projects))
-    choice = max(projects, key=lambda project: project.repeated_present_worth(marr, total_life))
-
-    return choice if choice.repeated_present_worth(marr, total_life) > 0 else None
-
-
-def from_table(table: Iterable[Iterable[float]], marr: float) -> int:
+def from_table(table: Iterable[Iterable[float]], marr: float) -> int:  # TODO ACCEPT irrs
     """Selects the project with respect to the given table of internal rate of returns and marr.
 
     :param table: The table of internal rate of returns.

@@ -19,10 +19,7 @@ class Vector(MutableSequence[float]):
         ...
 
     def __getitem__(self, i: Union[int, slice]) -> Union[float, Vector]:
-        if isinstance(i, int):
-            return self.__values[i]
-        else:
-            return Vector(self.__values[i])
+        return self.__values[i] if isinstance(i, int) else Vector(self.__values[i])
 
     @overload
     def __setitem__(self, i: int, o: float) -> None:

@@ -4,10 +4,11 @@ from itertools import accumulate
 from math import inf
 from typing import Any
 
-from auxiliary import retain_iter
+from auxiliary import retain_iter, windowed
 
 from math2.calc import newton
 from math2.econ.interests import EffectiveInterest, Interest
+from math2.misc import interp
 
 
 @total_ordering
@@ -31,7 +32,7 @@ class CashFlow:
             return NotImplemented
 
 
-def discounted(cash_flow: CashFlow, interest: Interest) -> CashFlow:
+def disc(cash_flow: CashFlow, interest: Interest) -> CashFlow:
     """Discounts the cash flow from a copied value.
 
     :param cash_flow: The cash flow.
@@ -48,7 +49,7 @@ def npv(cash_flows: Iterable[CashFlow], interest: Interest) -> float:
     :param interest: The interest.
     :return: The net present value.
     """
-    return sum(discounted(cash_flow, interest).amount for cash_flow in cash_flows)
+    return sum(disc(cash_flow, interest).amount for cash_flow in cash_flows)
 
 
 @retain_iter
@@ -69,14 +70,19 @@ def payback_period(cash_flows: Iterable[CashFlow], cost: float) -> float:
     :param cost: The cost to pay back.
     :return: The payback period.
     """
-    for i, acc in enumerate(accumulate(cash_flow.amount for cash_flow in sorted(cash_flows))):
-        if acc >= cost:
-            return i
+    prefix_sums = tuple(accumulate(cash_flow.amount for cash_flow in sorted(cash_flows)))
+
+    if cost <= 0 or prefix_sums and cost <= prefix_sums[0]:
+        return 0
     else:
-        return inf
+        for i, (x, y) in enumerate(windowed(prefix_sums, 2)):
+            if y >= cost:
+                return interp(cost, x, y, i, i + 1)
+        else:
+            return inf
 
 
-def discounted_payback_period(cash_flows: Iterable[CashFlow], cost: float, interest: Interest) -> float:
+def disc_payback_period(cash_flows: Iterable[CashFlow], cost: float, interest: Interest) -> float:
     """Calculates the discounted payback period of the cash flows at the given interest value.
 
     :param cash_flows: The cash flows.
@@ -84,4 +90,4 @@ def discounted_payback_period(cash_flows: Iterable[CashFlow], cost: float, inter
     :param interest: The interest at which the cash flows are discounted.
     :return: The payback period.
     """
-    return payback_period(map(lambda cash_flow: discounted(cash_flow, interest), cash_flows), cost)
+    return payback_period(map(lambda cash_flow: disc(cash_flow, interest), cash_flows), cost)

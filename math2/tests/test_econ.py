@@ -1,13 +1,14 @@
 from collections.abc import Callable
-from math import ceil, exp, log
+from math import ceil, exp, inf, log
 from unittest import TestCase, main
 
 from auxiliary import ExtendedTestCase
 
 from math2.calc import newton
-from math2.econ import (Bond, CompoundInterest, ContinuousInterest, EffectiveInterest, Mortgage, NominalInterest,
-                        Project, Relationship, SimpleInterest, SubperiodInterest, combinations, fp, from_table, irr, pa,
-                        pf, pg, relationship)
+from math2.econ import (Bond, CashFlow, CompoundInterest, ContinuousInterest, DblDeclBalDeprec, DeclBalDeprec,
+                        EffectiveInterest, Mortgage, NominalInterest, Project, Relationship, SYDDeprec, SimpleInterest,
+                        StrLineDeprec, SubperiodInterest, UPDeprec, fp, from_table, irr, pa, payback_period, pf, pg,
+                        related_combinations, relationship)
 from math2.misc import interp
 
 
@@ -54,13 +55,20 @@ class InstrumentTestCase(ExtendedTestCase):
         self.assertEqual(relationship([5000, 7000, 6000, 3000], 10000), Relationship.RELATED)
 
     def test_combinations(self) -> None:
-        self.assertLen(tuple(combinations([5000, 7000, 6000, 3000], 10000)), 8)
+        self.assertLen(tuple(related_combinations([5000, 7000, 6000, 3000], 10000)), 8)
 
     def test_projects(self) -> None:
         self.assertAlmostEqual(Project(-20000, 4000 - 1000, 4000, 10).present_worth(EffectiveInterest(0.05)),
                                9680.783294664216)
         self.assertAlmostEqual(Project(-20000, 4000 - 1000, 4000, 10).annual_worth(EffectiveInterest(0.05)),
                                727.9268005526942)
+
+
+class CashFlowTestCase(TestCase):
+    def test_payback_period(self) -> None:
+        self.assertAlmostEqual(payback_period([], 0), 0)
+        self.assertAlmostEqual(payback_period([], 10), inf)
+        self.assertAlmostEqual(payback_period([CashFlow(0, 100), CashFlow(1, 200), CashFlow(2, 300)], 450), 1.5)
 
 
 class PS1TestCase(TestCase):
@@ -336,6 +344,96 @@ class PS6TestCase(ExtendedTestCase):
 
     def test_5(self) -> None:
         pass
+
+
+class PS7TestCase(ExtendedTestCase):
+    def test_1(self) -> None:
+        basis, salvage, life = 92000, 19000, 4
+
+        self.assertIterableAlmostEqual(StrLineDeprec(basis, salvage, life).books, (92000, 73750, 55500, 37250, 19000))
+        self.assertIterableAlmostEqual(DeclBalDeprec(basis, salvage, life).books,
+                                       (92000, 62019.64424847585, 41809.08992073374, 28184.618296048306, 19000))
+        self.assertIterableAlmostEqual(DeclBalDeprec.from_rate(basis, life, 0.25).books,
+                                       (92000, 69000, 51750, 38812.5, 29109.375))
+        self.assertIterableAlmostEqual(DblDeclBalDeprec(basis, salvage, life).books,
+                                       (92000, 46000, 23000, 11500, 5750))
+        self.assertIterableAlmostEqual(SYDDeprec(basis, salvage, life).books, (92000, 62800, 40900, 26300, 19000))
+        self.assertIterableAlmostEqual(UPDeprec(basis, salvage, (37000, 37000, 32000, 30000)).books,
+                                       (92000, 72139.70588235295, 52279.41176470589, 35102.94117647059, 19000))
+
+    def test_2(self) -> None:
+        basis, salvage, life, t = 210000, 10000, 20, 6
+
+        self.assertAlmostEqual(StrLineDeprec(basis, salvage, life).book(t), 150000)
+        self.assertAlmostEqual(DeclBalDeprec(basis, salvage, life).book(t), 84246.81795174461)
+        self.assertAlmostEqual(DeclBalDeprec.from_rate(basis, life, 0.2).book(t), 55050.24)
+        self.assertAlmostEqual(DblDeclBalDeprec(basis, salvage, life).book(t), 111602.61)
+
+        self.assertAlmostEqual(StrLineDeprec(basis, salvage, life).amount(t), 10000)
+        self.assertAlmostEqual(DeclBalDeprec(basis, salvage, life).amount(t), 13852.157371177402)
+        self.assertAlmostEqual(DeclBalDeprec.from_rate(basis, life, 0.2).amount(t), 13762.56)
+        self.assertAlmostEqual(DblDeclBalDeprec(basis, salvage, life).amount(t), 12400.29)
+
+    def test_3(self) -> None:
+        basis, life, t, book = 145000, 8, 6, 57000
+
+        self.assertAlmostEqual(newton(lambda x: StrLineDeprec(basis, x, life).book(6) - book, 0), 27666.66666666667)
+        self.assertAlmostEqual(newton(lambda x: DeclBalDeprec(basis, x, life).book(6) - book, 0), 41755.1908917986)
+
+    def test_4(self) -> None:
+        basis, salvage, life = 110000, 25000, 4
+
+        self.assertIterableAlmostEqual(StrLineDeprec(basis, salvage, life).books, (110000, 88750, 67500, 46250, 25000))
+        self.assertIterableAlmostEqual(DeclBalDeprec(basis, salvage, life).books,
+                                       (110000, 75950.3039160202, 52440.44240850757, 36207.88671287913, 25000))
+        self.assertIterableAlmostEqual(DeclBalDeprec.from_rate(basis, life, 0.35).books,
+                                       (110000, 71500, 46475, 30208.75, 19635.6875))
+        self.assertIterableAlmostEqual(DblDeclBalDeprec(basis, salvage, life).books,
+                                       (110000, 55000, 27500, 13750, 6875))
+        self.assertIterableAlmostEqual(SYDDeprec(basis, salvage, life).books, (110000, 76000, 50500, 33500, 25000))
+        self.assertIterableAlmostEqual(UPDeprec(basis, salvage, (80000, 65000, 50000, 35000)).books,
+                                       (110000, 80434.78260869565, 56413.043478260865, 37934.78260869565, 25000))
+
+    def test_5(self) -> None:
+        basis, salvage, life, t1, t2 = 23000, 4000, 7, 4, 5
+
+        self.assertAlmostEqual(StrLineDeprec(basis, salvage, life).book(t1), 12142.857142857143)
+        self.assertAlmostEqual(DeclBalDeprec(basis, salvage, life).book(t1), 8465.096723059049)
+        self.assertAlmostEqual(SYDDeprec(basis, salvage, life).book(t1), 8071.4285714285725)
+        self.assertAlmostEqual(UPDeprec(basis, salvage, (50, 60, 40, 20, 10, 15, 5)).book(t1), 6850)
+
+        self.assertAlmostEqual(StrLineDeprec(basis, salvage, life).amount(t2), 2714.285714285714)
+        self.assertAlmostEqual(DeclBalDeprec(basis, salvage, life).amount(t2), 1871.7191438152927)
+        self.assertAlmostEqual(SYDDeprec(basis, salvage, life).amount(t2), 2035.7142857142856)
+        self.assertAlmostEqual(UPDeprec(basis, salvage, (50, 60, 40, 20, 10, 15, 5)).amount(t2), 950)
+
+    def test_6(self) -> None:
+        basis, salvage, life, t = 2500000, 200000, 10, 4
+
+        self.assertAlmostEqual(StrLineDeprec(basis, salvage, life).book(t), 1580000)
+        self.assertAlmostEqual(DeclBalDeprec(basis, salvage, life).book(t), 910282.1015130404)
+        self.assertAlmostEqual(DblDeclBalDeprec(basis, salvage, life).book(t), 1024000)
+        self.assertAlmostEqual(SYDDeprec(basis, salvage, life).book(t), 1078181.8181818182)
+
+        self.assertAlmostEqual(StrLineDeprec(basis, salvage, life).amount(t), 230000)
+        self.assertAlmostEqual(DeclBalDeprec(basis, salvage, life).amount(t), 261554.3542830096)
+        self.assertAlmostEqual(DblDeclBalDeprec(basis, salvage, life).amount(t), 256000)
+        self.assertAlmostEqual(SYDDeprec(basis, salvage, life).amount(t), 292727.2727272727)
+
+    def test_7(self) -> None:
+        deprec = DeclBalDeprec.from_rate(5000, 5, 0.15)
+
+        self.assertAlmostEqual(deprec.cap_gain(3000), 0)
+        self.assertAlmostEqual(deprec.recap_deprec(3000), 781.4734375)
+        self.assertAlmostEqual(deprec.loss_on_disp(3000), 0)
+
+        self.assertAlmostEqual(deprec.cap_gain(2000), 0)
+        self.assertAlmostEqual(deprec.recap_deprec(2000), 0)
+        self.assertAlmostEqual(deprec.loss_on_disp(2000), 218.5265625)
+
+        self.assertAlmostEqual(deprec.cap_gain(6000), 1000)
+        self.assertAlmostEqual(deprec.recap_deprec(6000), 2781.4734375)
+        self.assertAlmostEqual(deprec.loss_on_disp(6000), 0)
 
 
 if __name__ == '__main__':

@@ -36,8 +36,8 @@ class VectorTestCase(ExtendedTestCase):
         a /= 3
         self.assertIterableAlmostEqual(a, range(10))
 
-        self.assertRaises(ValueError, a.__add__, Vector(range(5)))
-        self.assertRaises(ValueError, a.__sub__, Vector(range(5)))
+        self.assertRaises(ValueError, a.__add__, range(5))
+        self.assertRaises(ValueError, a.__sub__, range(5))
 
 
 if __name__ == '__main__':

@@ -2,12 +2,11 @@ from collections.abc import Iterable, Iterator
 from functools import reduce
 from itertools import chain
 from operator import add, mul
-from typing import Optional, TypeVar
+from typing import Optional
 
-from auxiliary import SupportsLessThan
+from auxiliary import default
 
-_SLT = TypeVar('_SLT', bound=SupportsLessThan)
-_T = TypeVar('_T')
+from math2.types import _SLT, _T
 
 
 def bind(value: _SLT, lower: _SLT, upper: _SLT) -> _SLT:
@@ -72,7 +71,7 @@ def frange(start: float, stop: Optional[float] = None, step: Optional[float] = N
             start += step
 
 
-def linspace(start: float, stop: float, n: float) -> Iterator[float]:
+def linspace(start: float, stop: float, n: int = 100) -> Iterator[float]:
     """Generates an iterator of values from start to stop with length of n.
 
     :param start: The start value.
@@ -94,3 +93,14 @@ def interp(x: float, x0: float, x1: float, y0: float, y1: float) -> float:
     :return: The interpolated value.
     """
     return (x - x0) / (x1 - x0) * (y1 - y0) + y0
+
+
+def series_sum(lo: int, hi: Optional[int] = None, n: Optional[int] = None) -> int:
+    """Calculates the series sum of the interval.
+
+    :param lo: The start value.
+    :param hi: The optional end value.
+    :param n: The number of elements, defaults to (end - start) + 1.
+    :return: the series sum.
+    """
+    return (lo + default(hi, 0)) * default(n, abs(default(hi, 0) - lo) + 1) // 2
