@@ -7,7 +7,7 @@ from functools import reduce
 from itertools import chain
 from typing import Optional
 
-from auxiliary import iget, retain_iter
+from auxiliary import iindex, retain_iter
 
 from math2.econ.cashflows import CashFlow
 from math2.econ.factors import af, ap, fa, fp, pa
@@ -289,7 +289,7 @@ def from_table(table: Iterable[Iterable[float]], marr: float) -> int:
     x = 0
 
     for i, row in enumerate(table):
-        if i and iget(row, x) > marr:
+        if i and iindex(row, x) > marr:
             x = i
 
     return x
