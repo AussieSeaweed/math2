@@ -2,7 +2,7 @@ from unittest import main
 
 from auxiliary import ExtendedTestCase
 
-from math2.stats import range_, trimmed_mean
+from math2.stats import range_, sampled, shuffled, trimmed_mean
 
 
 class StatsTestCase(ExtendedTestCase):
@@ -18,6 +18,17 @@ class StatsTestCase(ExtendedTestCase):
     def test_range(self) -> None:
         self.assertAlmostEqual(range_(map(float, range(5))), 4)
         self.assertIterableAlmostEqual(map(range_, self.value_sets), (0.25, 0.6, 0.13, 4))
+
+    def test_shuffled(self) -> None:
+        a = list(range(1000))
+
+        self.assertNotEqual(shuffled(a), a)
+
+    def test_samples(self) -> None:
+        a = range(100)
+
+        for i in range(100):
+            self.assertLen(set(sampled(a, 50)), 50)
 
 
 if __name__ == '__main__':
