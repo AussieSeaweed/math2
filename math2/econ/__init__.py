@@ -3,11 +3,11 @@ from math2.econ.depreciations import DblDeclBalDeprec, DeclBalDeprec, Deprec, SY
 from math2.econ.factors import af, ag, ap, fa, fp, pa, pf, pg, pp
 from math2.econ.instruments import (Bond, Instrument, Mortgage, Project, Relationship, from_table, related_combinations,
                                     relationship)
-from math2.econ.interests import (CompoundInterest, ContinuousInterest, EffectiveInterest, Interest,
-                                  MultipleCompoundInterest, NominalInterest, SimpleInterest, SubperiodInterest)
+from math2.econ.ints import (CompInt, ContInt, EfInt, Int,
+                             MulCompInt, NomInt, SimpleInt, SPInt)
 
 __all__ = ('CashFlow', 'disc', 'disc_payback_period', 'irr', 'npv', 'payback_period', 'DblDeclBalDeprec',
            'DeclBalDeprec', 'Deprec', 'SYDDeprec', 'StrLineDeprec', 'UPDeprec', 'af', 'ag', 'ap', 'fa', 'fp', 'pa',
            'pf', 'pg', 'pp', 'Bond', 'Instrument', 'Mortgage', 'Project', 'Relationship', 'from_table',
-           'related_combinations', 'relationship', 'CompoundInterest', 'ContinuousInterest', 'EffectiveInterest',
-           'Interest', 'MultipleCompoundInterest', 'NominalInterest', 'SimpleInterest', 'SubperiodInterest')
+           'related_combinations', 'relationship', 'CompInt', 'ContInt', 'EfInt',
+           'Int', 'MulCompInt', 'NomInt', 'SimpleInt', 'SPInt')

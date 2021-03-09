@@ -5,9 +5,9 @@ from unittest import TestCase, main
 from auxiliary import ExtTestCase
 
 from math2.calc import newton
-from math2.econ import (Bond, CashFlow, CompoundInterest, ContinuousInterest, DblDeclBalDeprec, DeclBalDeprec,
-                        EffectiveInterest, Mortgage, NominalInterest, Project, Relationship, SYDDeprec, SimpleInterest,
-                        StrLineDeprec, SubperiodInterest, UPDeprec, fp, from_table, irr, pa, payback_period, pf, pg,
+from math2.econ import (Bond, CashFlow, CompInt, ContInt, DblDeclBalDeprec, DeclBalDeprec,
+                        EfInt, Mortgage, NomInt, Project, Relationship, SYDDeprec, SimpleInt,
+                        StrLineDeprec, SPInt, UPDeprec, fp, from_table, irr, pa, payback_period, pf, pg,
                         related_combinations, relationship)
 from math2.misc import interp
 
@@ -16,36 +16,36 @@ class InterestTestCase(TestCase):
     def test_difference(self) -> None:
         r, p, t, s, c = 0.07, 24, 2020 - 1626, 685.92, 9066082143624.828
 
-        self.assertAlmostEqual(p * SimpleInterest(r).to_factor(t), s)
-        self.assertAlmostEqual(p * EffectiveInterest(r).to_factor(t), c)
+        self.assertAlmostEqual(p * SimpleInt(r).to_factor(t), s)
+        self.assertAlmostEqual(p * EfInt(r).to_factor(t), c)
 
     def test_comparison(self) -> None:
-        self.assertLess(NominalInterest(0.06, 12).to_effective().rate, SubperiodInterest(0.063, 1).to_effective().rate)
+        self.assertLess(NomInt(0.06, 12).to_ef().rate, SPInt(0.063, 1).to_ef().rate)
 
     def test_consistency(self) -> None:
         nr, sc, t, f = 0.1, 4, 2.5, 1.2800845441963565
         counts = range(1, 366)
 
         interests = [
-            EffectiveInterest((1 + nr / sc) ** sc - 1),
-            ContinuousInterest(log((1 + nr / sc) ** sc)),
-            NominalInterest(nr, sc),
-            SubperiodInterest(nr / sc, sc),
+            EfInt((1 + nr / sc) ** sc - 1),
+            ContInt(log((1 + nr / sc) ** sc)),
+            NomInt(nr, sc),
+            SPInt(nr / sc, sc),
         ]
 
         for interest in interests:
             self.assertAlmostEqual(interest.to_factor(t), f)
-            self.assertAlmostEqual(interest.to_effective().to_factor(t), f)
-            self.assertAlmostEqual(interest.to_continuous().to_factor(t), f)
+            self.assertAlmostEqual(interest.to_ef().to_factor(t), f)
+            self.assertAlmostEqual(interest.to_cont().to_factor(t), f)
 
             for count in counts:
-                self.assertAlmostEqual(interest.to_nominal(count).to_factor(t), f)
-                self.assertAlmostEqual(interest.to_subperiod(count).to_factor(t), f)
+                self.assertAlmostEqual(interest.to_nom(count).to_factor(t), f)
+                self.assertAlmostEqual(interest.to_sp(count).to_factor(t), f)
 
-        self.assertAlmostEqual(NominalInterest(nr, sc).to_nominal().to_factor(t), f)
-        self.assertAlmostEqual(NominalInterest(nr, sc).to_subperiod().to_factor(t), f)
-        self.assertAlmostEqual(SubperiodInterest(nr / sc, sc).to_nominal().to_factor(t), f)
-        self.assertAlmostEqual(SubperiodInterest(nr / sc, sc).to_subperiod().to_factor(t), f)
+        self.assertAlmostEqual(NomInt(nr, sc).to_nom().to_factor(t), f)
+        self.assertAlmostEqual(NomInt(nr, sc).to_sp().to_factor(t), f)
+        self.assertAlmostEqual(SPInt(nr / sc, sc).to_nom().to_factor(t), f)
+        self.assertAlmostEqual(SPInt(nr / sc, sc).to_sp().to_factor(t), f)
 
 
 class InstrumentTestCase(ExtTestCase):
@@ -58,9 +58,9 @@ class InstrumentTestCase(ExtTestCase):
         self.assertEqual(len(tuple(related_combinations([5000, 7000, 6000, 3000], 10000))), 8)
 
     def test_projects(self) -> None:
-        self.assertAlmostEqual(Project(-20000, 4000 - 1000, 4000, 10).present_worth(EffectiveInterest(0.05)),
+        self.assertAlmostEqual(Project(-20000, 4000 - 1000, 4000, 10).present_worth(EfInt(0.05)),
                                9680.783294664216)
-        self.assertAlmostEqual(Project(-20000, 4000 - 1000, 4000, 10).annual_worth(EffectiveInterest(0.05)),
+        self.assertAlmostEqual(Project(-20000, 4000 - 1000, 4000, 10).annual_worth(EfInt(0.05)),
                                727.9268005526942)
 
 
@@ -84,43 +84,43 @@ class PS1TestCase(TestCase):
         self.assertAlmostEqual((1 + 0.05 / 1000000) ** 1000000, exp(0.05))
 
     def test_4(self) -> None:
-        e = EffectiveInterest(0.034)
+        e = EfInt(0.034)
         p, t = 100000, 4
 
-        self.assertAlmostEqual(e.to_nominal(2).rate, 0.03371581102178567)
-        self.assertAlmostEqual(e.to_nominal(12).rate, 0.033481397886386155)
-        self.assertAlmostEqual(e.to_nominal(365).rate, 0.03343630748129267)
-        self.assertAlmostEqual(e.to_continuous().rate, 0.03343477608623742)
+        self.assertAlmostEqual(e.to_nom(2).rate, 0.03371581102178567)
+        self.assertAlmostEqual(e.to_nom(12).rate, 0.033481397886386155)
+        self.assertAlmostEqual(e.to_nom(365).rate, 0.03343630748129267)
+        self.assertAlmostEqual(e.to_cont().rate, 0.03343477608623742)
 
-        self.assertAlmostEqual(p * e.to_nominal(2).to_factor(t), p * e.to_nominal(12).to_factor(t))
-        self.assertAlmostEqual(p * e.to_nominal(12).to_factor(t), p * e.to_nominal(365).to_factor(t))
-        self.assertAlmostEqual(p * e.to_nominal(365).to_factor(t), p * e.to_continuous().to_factor(t))
-        self.assertAlmostEqual(p * e.to_continuous().to_factor(t), 114309.4552336)
+        self.assertAlmostEqual(p * e.to_nom(2).to_factor(t), p * e.to_nom(12).to_factor(t))
+        self.assertAlmostEqual(p * e.to_nom(12).to_factor(t), p * e.to_nom(365).to_factor(t))
+        self.assertAlmostEqual(p * e.to_nom(365).to_factor(t), p * e.to_cont().to_factor(t))
+        self.assertAlmostEqual(p * e.to_cont().to_factor(t), 114309.4552336)
 
     def test_5(self) -> None:
         fv, c, cd = 100, 0.023, 0.02
 
-        self.assertAlmostEqual(ContinuousInterest(c).to_effective().rate, 0.02326653954721758)
-        self.assertAlmostEqual(fv / ContinuousInterest(c).to_factor(0.5), 98.8565872247913)
-        self.assertAlmostEqual(fv / ContinuousInterest(c).to_factor(0.75), 98.28979294344309)
-        self.assertAlmostEqual(fv / ContinuousInterest(cd).to_factor(0.5), 99.0049833749168)
-        self.assertAlmostEqual(fv / ContinuousInterest(cd).to_factor(0.75), 98.51119396030627)
+        self.assertAlmostEqual(ContInt(c).to_ef().rate, 0.02326653954721758)
+        self.assertAlmostEqual(fv / ContInt(c).to_factor(0.5), 98.8565872247913)
+        self.assertAlmostEqual(fv / ContInt(c).to_factor(0.75), 98.28979294344309)
+        self.assertAlmostEqual(fv / ContInt(cd).to_factor(0.5), 99.0049833749168)
+        self.assertAlmostEqual(fv / ContInt(cd).to_factor(0.75), 98.51119396030627)
 
     def test_6(self) -> None:
-        self.assertAlmostEqual(EffectiveInterest(0.08).to_subperiod(12).rate, 0.00643403011000343)
-        self.assertAlmostEqual(NominalInterest(0.035, 252).to_effective().rate, 0.03561719190449408)
-        self.assertAlmostEqual(NominalInterest(0.04, 4).to_continuous().rate, 0.039801323412672354)
-        self.assertAlmostEqual(CompoundInterest.from_factor(SubperiodInterest(0.015, 12).to_factor(1), 4)
-                               .to_continuous().rate, 0.04466583748125169)
-        self.assertAlmostEqual(CompoundInterest.from_factor(CompoundInterest.from_factor(
-            NominalInterest(0.012, 3).to_factor(1), 1 / 4).to_factor(3), 1).to_nominal(6).rate, 0.1454477030768886)
+        self.assertAlmostEqual(EfInt(0.08).to_sp(12).rate, 0.00643403011000343)
+        self.assertAlmostEqual(NomInt(0.035, 252).to_ef().rate, 0.03561719190449408)
+        self.assertAlmostEqual(NomInt(0.04, 4).to_cont().rate, 0.039801323412672354)
+        self.assertAlmostEqual(CompInt.from_factor(SPInt(0.015, 12).to_factor(1), 4)
+                               .to_cont().rate, 0.04466583748125169)
+        self.assertAlmostEqual(CompInt.from_factor(CompInt.from_factor(
+            NomInt(0.012, 3).to_factor(1), 1 / 4).to_factor(3), 1).to_nom(6).rate, 0.1454477030768886)
 
 
 class PS2TestCase(ExtTestCase):
     def test_1(self) -> None:
-        factor = NominalInterest(0.15, 4).to_factor(4 / 12) * ContinuousInterest(0.11).to_factor(5 / 12)
+        factor = NomInt(0.15, 4).to_factor(4 / 12) * ContInt(0.11).to_factor(5 / 12)
 
-        self.assertAlmostEqual(CompoundInterest.from_factor(factor, 9 / 12).rate, 0.134915472328168)
+        self.assertAlmostEqual(CompInt.from_factor(factor, 9 / 12).rate, 0.134915472328168)
 
     def test_2(self) -> None:
         p, i, n = 100, 0.05, 10
@@ -136,8 +136,8 @@ class PS2TestCase(ExtTestCase):
         ]
 
         for m, p, a, b in cases:
-            self.assertAlmostEqual(newton(lambda y: p * EffectiveInterest(y).to_factor(m / 12) - 100, 0), a)
-            self.assertAlmostEqual(newton(lambda y: p * ContinuousInterest(y).to_factor(m / 12) - 100, 0), b)
+            self.assertAlmostEqual(newton(lambda y: p * EfInt(y).to_factor(m / 12) - 100, 0), a)
+            self.assertAlmostEqual(newton(lambda y: p * ContInt(y).to_factor(m / 12) - 100, 0), b)
 
         self.assertAlmostEqual(interp(7, 4, 8, 0.03029791, 0.03647384), 0.0349298575)
         self.assertAlmostEqual(interp(7, 4, 8, 0.02984799, 0.03582441), 0.034330305)
@@ -154,7 +154,7 @@ class PS2TestCase(ExtTestCase):
         }
 
         r: dict[float, float] = {
-            t: newton(lambda y: p * ContinuousInterest(y).to_factor(t / 12) - 100, 0)
+            t: newton(lambda y: p * ContInt(y).to_factor(t / 12) - 100, 0)
             for t, p in data.items()
         }
 
@@ -163,11 +163,11 @@ class PS2TestCase(ExtTestCase):
         r[7] = interp(7, 6, 9, r[6], r[9])
         r[10] = interp(10, 9, 12, r[9], r[12])
 
-        self.assertAlmostEqual(100 * ContinuousInterest(r[2]).to_factor(-1. / 12), 99.55400544428134)
-        self.assertAlmostEqual(100 * ContinuousInterest(r[4]).to_factor(-4. / 12), 98.68531340424114)
-        self.assertAlmostEqual(100 * ContinuousInterest(r[5.5]).to_factor(-5.5 / 12), 98.66834503291024)
-        self.assertAlmostEqual(100 * ContinuousInterest(r[7]).to_factor(-7 / 12), 98.18488742486127)
-        self.assertAlmostEqual(100 * ContinuousInterest(r[10]).to_factor(-10 / 12), 96.54750684004732)
+        self.assertAlmostEqual(100 * ContInt(r[2]).to_factor(-1. / 12), 99.55400544428134)
+        self.assertAlmostEqual(100 * ContInt(r[4]).to_factor(-4. / 12), 98.68531340424114)
+        self.assertAlmostEqual(100 * ContInt(r[5.5]).to_factor(-5.5 / 12), 98.66834503291024)
+        self.assertAlmostEqual(100 * ContInt(r[7]).to_factor(-7 / 12), 98.18488742486127)
+        self.assertAlmostEqual(100 * ContInt(r[10]).to_factor(-10 / 12), 96.54750684004732)
         self.assertAlmostEqual(2000 * pf(r[2], 1. / 12) + 500 * pf(r[4], 4. / 12) - 1200 * pf(r[7], 7. / 12) - 1000
                                * pf(r[10], 10. / 12) + 500 * pf(r[12], 1), 820.3872407904064)
 
@@ -203,8 +203,8 @@ class PS2TestCase(ExtTestCase):
 class PS3TestCase(TestCase):
     def test_1(self) -> None:
         m = Mortgage.from_dtv(2995000, 0.2)
-        i1 = NominalInterest(0.02, 2)
-        i2 = NominalInterest(0.04, 2)
+        i1 = NomInt(0.02, 2)
+        i2 = NomInt(0.04, 2)
         p = m.payment(i1)
 
         self.assertAlmostEqual(p, 10145.891129693951)
@@ -212,7 +212,7 @@ class PS3TestCase(TestCase):
         self.assertAlmostEqual(m.pay(i1, 5).payment(i2), 12128.043601452593)
 
     def test_2(self) -> None:
-        i = NominalInterest(0.07, 2)
+        i = NomInt(0.07, 2)
 
         self.assertAlmostEqual(Bond(100, 0, 2, 3 / 12).present_worth(i), 98.2946374365981)
         self.assertAlmostEqual(Bond(100, 0, 2, 5 / 12).present_worth(i), 97.17391685967232)
@@ -222,25 +222,25 @@ class PS3TestCase(TestCase):
 
     def test_3(self) -> None:
         self.assertAlmostEqual(
-            newton(lambda y: Bond.from_rate(100, 0.07, 2, 3).present_worth(NominalInterest(y, 2)) - 100, 0.1), 0.07)
+            newton(lambda y: Bond.from_rate(100, 0.07, 2, 3).present_worth(NomInt(y, 2)) - 100, 0.1), 0.07)
         self.assertAlmostEqual(
-            Bond.from_rate(100, 0.04, 2, 3).present_worth(NominalInterest(0.05, 2)) + 100 * 0.04 / 2, 99.24593731921009)
+            Bond.from_rate(100, 0.04, 2, 3).present_worth(NomInt(0.05, 2)) + 100 * 0.04 / 2, 99.24593731921009)
         self.assertAlmostEqual(
-            newton(lambda y: Bond.from_rate(100, 0.03, 2, 2.25).present_worth(NominalInterest(y, 2)) - 100, 0.1), 0.03)
+            newton(lambda y: Bond.from_rate(100, 0.03, 2, 2.25).present_worth(NomInt(y, 2)) - 100, 0.1), 0.03)
         self.assertAlmostEqual(
-            Bond.from_rate(100, 0.07, 2, 2.25).present_worth(NominalInterest(0.05, 2)), 104.20662940110009)
+            Bond.from_rate(100, 0.07, 2, 2.25).present_worth(NomInt(0.05, 2)), 104.20662940110009)
         self.assertAlmostEqual(newton(
-            lambda c: Bond.from_rate(100, c, 2, 2.25).present_worth(NominalInterest(0.03, 2)) - 114, 0.1), 0.09481118)
+            lambda c: Bond.from_rate(100, c, 2, 2.25).present_worth(NomInt(0.03, 2)) - 114, 0.1), 0.09481118)
 
     def test_4(self) -> None:
         pass
 
     def test_5(self) -> None:
         y = newton(
-            lambda y_: Bond.from_rate(100, 0.07, 2, 7.5).present_worth(NominalInterest(y_, 2)) * fp(y_ / 2, 0.5) - 108,
+            lambda y_: Bond.from_rate(100, 0.07, 2, 7.5).present_worth(NomInt(y_, 2)) * fp(y_ / 2, 0.5) - 108,
             0.1)
 
-        b: Callable[[float], float] = lambda c_: Bond.from_rate(1000, c_, 2, 9).present_worth(NominalInterest(y, 2))
+        b: Callable[[float], float] = lambda c_: Bond.from_rate(1000, c_, 2, 9).present_worth(NomInt(y, 2))
         c = ceil(newton(lambda c_: 9500000 / 2 - (4400 * b(c_)), 0.1) / 0.0025) * 0.0025
         self.assertAlmostEqual(c, 0.0725)
         self.assertAlmostEqual(4400 * b(c), 4802235.185695931)
@@ -249,7 +249,7 @@ class PS3TestCase(TestCase):
         self.assertAlmostEqual(4400 * b(c) * (1 - 0.008), 4763817.304210364)
 
     def test_6(self) -> None:
-        i = NominalInterest(0.060755, 2)
+        i = NomInt(0.060755, 2)
 
         self.assertAlmostEqual(Mortgage.from_down(500000, 50000).payment(i), 2899.3558026129626)
         self.assertAlmostEqual(Mortgage.from_down(500000, 50000).pay(i, 3, 700).payment(i), 3490.3113416458878)

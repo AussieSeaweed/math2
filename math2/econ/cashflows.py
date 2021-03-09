@@ -7,7 +7,7 @@ from typing import Any
 from auxiliary import retain_iter, windowed
 
 from math2.calc import newton
-from math2.econ.interests import EffectiveInterest, Interest
+from math2.econ.ints import EfInt, Int
 from math2.misc import interp
 
 
@@ -32,7 +32,7 @@ class CashFlow:
             return NotImplemented
 
 
-def disc(cash_flow: CashFlow, interest: Interest) -> CashFlow:
+def disc(cash_flow: CashFlow, interest: Int) -> CashFlow:
     """Discounts the cash flow from a copied value.
 
     :param cash_flow: The cash flow.
@@ -42,7 +42,7 @@ def disc(cash_flow: CashFlow, interest: Interest) -> CashFlow:
     return CashFlow(cash_flow.time, cash_flow.amount / interest.to_factor(cash_flow.time))
 
 
-def npv(cash_flows: Iterable[CashFlow], interest: Interest) -> float:
+def npv(cash_flows: Iterable[CashFlow], interest: Int) -> float:
     """Calculates the net present value of the supplied cash flows at the interest.
 
     :param cash_flows: The cash flows.
@@ -53,14 +53,14 @@ def npv(cash_flows: Iterable[CashFlow], interest: Interest) -> float:
 
 
 @retain_iter
-def irr(cash_flows: Iterable[CashFlow], initial_guess: float) -> EffectiveInterest:
+def irr(cash_flows: Iterable[CashFlow], initial_guess: float) -> EfInt:
     """Calculates the internal rate of return using the initial guess.
 
     :param cash_flows: The cash flows.
     :param initial_guess: The initial guess.
     :return: The internal rate of return.
     """
-    return EffectiveInterest(newton(lambda i: npv(cash_flows, EffectiveInterest(i)), initial_guess))
+    return EfInt(newton(lambda i: npv(cash_flows, EfInt(i)), initial_guess))
 
 
 def payback_period(cash_flows: Iterable[CashFlow], cost: float) -> float:
@@ -82,7 +82,7 @@ def payback_period(cash_flows: Iterable[CashFlow], cost: float) -> float:
             return inf
 
 
-def disc_payback_period(cash_flows: Iterable[CashFlow], cost: float, interest: Interest) -> float:
+def disc_payback_period(cash_flows: Iterable[CashFlow], cost: float, interest: Int) -> float:
     """Calculates the discounted payback period of the cash flows at the given interest value.
 
     :param cash_flows: The cash flows.

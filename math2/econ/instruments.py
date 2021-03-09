@@ -10,7 +10,7 @@ from auxiliary import iindex, retain_iter
 
 from math2.econ.cashflows import CashFlow
 from math2.econ.factors import af, ap, fa, fp, pa
-from math2.econ.interests import CompoundInterest
+from math2.econ.ints import CompInt
 from math2.misc import frange
 
 
@@ -18,7 +18,7 @@ class Instrument(ABC):
     """Instrument is the abstract base class for all financial instruments."""
 
     @abstractmethod
-    def cash_flows(self, interest: CompoundInterest) -> Iterator[CashFlow]:
+    def cash_flows(self, interest: CompInt) -> Iterator[CashFlow]:
         """Calculates the cash flows of this instrument at the given interest value.
 
         :param interest: The interest value.
@@ -27,7 +27,7 @@ class Instrument(ABC):
         pass
 
     @abstractmethod
-    def present_worth(self, interest: CompoundInterest) -> float:
+    def present_worth(self, interest: CompInt) -> float:
         """Calculates the present worth of this instrument at the given interest value.
 
         :param interest: The interest value.
@@ -36,7 +36,7 @@ class Instrument(ABC):
         pass
 
     @abstractmethod
-    def annual_worth(self, interest: CompoundInterest) -> float:
+    def annual_worth(self, interest: CompInt) -> float:
         """Calculates the annual worth of this instrument at the given interest value.
 
         :param interest: The interest value.
@@ -61,16 +61,16 @@ class Bond(Instrument):
         """
         return 1 / self.period_count
 
-    def cash_flows(self, interest: Optional[CompoundInterest] = None) -> Iterator[CashFlow]:
+    def cash_flows(self, interest: Optional[CompInt] = None) -> Iterator[CashFlow]:
         return chain((CashFlow(t, self.coupon) for t in frange(self.period, self.maturity + self.period, self.period)),
                      (CashFlow(self.maturity, self.face),))
 
-    def present_worth(self, interest: CompoundInterest) -> float:
-        return self.coupon * pa(interest.to_subperiod(self.period_count).rate, self.maturity * self.period_count) \
+    def present_worth(self, interest: CompInt) -> float:
+        return self.coupon * pa(interest.to_sp(self.period_count).rate, self.maturity * self.period_count) \
                + self.face / interest.to_factor(self.maturity)
 
-    def annual_worth(self, interest: CompoundInterest) -> float:
-        return self.present_worth(interest) * ap(interest.to_effective().rate, self.maturity)
+    def annual_worth(self, interest: CompInt) -> float:
+        return self.present_worth(interest) * ap(interest.to_ef().rate, self.maturity)
 
     @classmethod
     def from_rate(cls, face: float, rate: float, period_count: float, maturity: float) -> Bond:
@@ -93,26 +93,26 @@ class Mortgage(Instrument):
         self.frequency = frequency
         self.amortization = amortization
 
-    def cash_flows(self, interest: CompoundInterest) -> Iterator[CashFlow]:
+    def cash_flows(self, interest: CompInt) -> Iterator[CashFlow]:
         payment = self.payment(interest)
 
         return (CashFlow(t, payment) for t in frange(0, self.amortization, 1 / self.frequency))
 
-    def present_worth(self, interest: Optional[CompoundInterest] = None) -> float:
+    def present_worth(self, interest: Optional[CompInt] = None) -> float:
         return 0
 
-    def annual_worth(self, interest: Optional[CompoundInterest] = None) -> float:
+    def annual_worth(self, interest: Optional[CompInt] = None) -> float:
         return 0
 
-    def payment(self, interest: CompoundInterest) -> float:
+    def payment(self, interest: CompInt) -> float:
         """Calculates the payment value with respect to the given interest value.
 
         :param interest: The interest value.
         :return: The payment.
         """
-        return self.principal * ap(interest.to_subperiod(self.frequency).rate, self.frequency * self.amortization)
+        return self.principal * ap(interest.to_sp(self.frequency).rate, self.frequency * self.amortization)
 
-    def pay(self, interest: CompoundInterest, term: float, payment: Optional[float] = None) -> Mortgage:
+    def pay(self, interest: CompInt, term: float, payment: Optional[float] = None) -> Mortgage:
         """Creates a new mortgage instance assuming payments were made.
 
         :param interest: The interest value.
@@ -125,7 +125,7 @@ class Mortgage(Instrument):
         else:
             return Mortgage(
                 self.principal * interest.to_factor(term) - payment
-                * fa(interest.to_subperiod(self.frequency).rate, term * self.frequency),
+                * fa(interest.to_sp(self.frequency).rate, term * self.frequency),
                 self.frequency, self.amortization - term,
             )
 
@@ -175,21 +175,21 @@ class Project(Instrument):
         self.final = final
         self.life = life
 
-    def cash_flows(self, interest: Optional[CompoundInterest] = None) -> Iterator[CashFlow]:
+    def cash_flows(self, interest: Optional[CompInt] = None) -> Iterator[CashFlow]:
         return chain((CashFlow(0, self.initial),), (CashFlow(t + 1, self.annuity) for t in frange(self.life)),
                      (CashFlow(self.life, self.final),))
 
-    def present_worth(self, interest: CompoundInterest) -> float:
-        rate = interest.to_effective().rate
+    def present_worth(self, interest: CompInt) -> float:
+        rate = interest.to_ef().rate
 
         return self.initial + self.annuity * pa(rate, self.life) + self.final * fp(rate, self.life)
 
-    def annual_worth(self, interest: CompoundInterest) -> float:
-        rate = interest.to_effective().rate
+    def annual_worth(self, interest: CompInt) -> float:
+        rate = interest.to_ef().rate
 
         return self.initial * ap(rate, self.life) + self.annuity + self.final * af(rate, self.life)
 
-    def rep_present_worth(self, interest: CompoundInterest, total_life: float) -> float:
+    def rep_present_worth(self, interest: CompInt, total_life: float) -> float:
         """Calculates the repeated present worth of this project given total life.
 
         :param interest: The interest value.
