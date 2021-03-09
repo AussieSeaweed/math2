@@ -7,5 +7,5 @@ from math2.econ.ints import CompInt, ContInt, EfInt, Int, MulCompInt, NomInt, Si
 __all__ = ('CashFlow', 'aw', 'de_facto_marr', 'disc', 'disc_payback', 'irr', 'pw', 'rpw', 'select', 'payback',
            'DblDeclBalDeprec', 'DeclBalDeprec', 'Deprec', 'SYDDeprec', 'StrLineDeprec', 'UPDeprec', 'af', 'ag', 'ap',
            'fa', 'fp', 'pa', 'perp', 'pf', 'pg', 'Bond', 'Instrument', 'Mortgage', 'Project', 'Rel', 'irr_table', 'rel',
-           'rel_combinations', 'CompInt', 'ContInt', 'EfInt', 'Int', 'MulCompInt', 'NomInt', 'SubperiodInt',
-           'SimpleInt')
+           'rel_combinations', 'CompInt', 'ContInt', 'EfInt', 'Int', 'MulCompInt', 'NomInt', 'SimpleInt',
+           'SubperiodInt')
