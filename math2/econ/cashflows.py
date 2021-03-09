@@ -4,7 +4,7 @@ from itertools import accumulate
 from math import inf
 from typing import Any
 
-from auxiliary import retain_iter, windowed
+from auxiliary import SupportsLessThan, retain_iter, windowed
 
 from math2.calc import newton
 from math2.econ.ints import EfInt, Int
@@ -12,7 +12,7 @@ from math2.misc import interp
 
 
 @total_ordering
-class CashFlow:
+class CashFlow(SupportsLessThan):
     """CashFlow is the class for cash flows."""
 
     def __init__(self, time: float, amount: float):
@@ -63,7 +63,7 @@ def irr(cash_flows: Iterable[CashFlow], initial_guess: float) -> EfInt:
     return EfInt(newton(lambda i: npv(cash_flows, EfInt(i)), initial_guess))
 
 
-def payback_period(cash_flows: Iterable[CashFlow], cost: float) -> float:
+def payback(cash_flows: Iterable[CashFlow], cost: float) -> float:
     """Calculates the payback period of the cash flows.
 
     :param cash_flows: The cash flows.
@@ -82,7 +82,7 @@ def payback_period(cash_flows: Iterable[CashFlow], cost: float) -> float:
             return inf
 
 
-def disc_payback_period(cash_flows: Iterable[CashFlow], cost: float, interest: Int) -> float:
+def disc_payback(cash_flows: Iterable[CashFlow], cost: float, interest: Int) -> float:
     """Calculates the discounted payback period of the cash flows at the given interest value.
 
     :param cash_flows: The cash flows.
@@ -90,4 +90,4 @@ def disc_payback_period(cash_flows: Iterable[CashFlow], cost: float, interest: I
     :param interest: The interest at which the cash flows are discounted.
     :return: The payback period.
     """
-    return payback_period(map(lambda cash_flow: disc(cash_flow, interest), cash_flows), cost)
+    return payback(map(lambda cash_flow: disc(cash_flow, interest), cash_flows), cost)

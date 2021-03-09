@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from collections.abc import Iterable, Iterator
-from functools import cached_property
 from typing import Optional
 
 from auxiliary import ilen, retain_iter
@@ -42,7 +41,7 @@ class Deprec(ABC):
         """
         return max(0.0, self.salvage - market)
 
-    @cached_property
+    @property
     def books(self) -> Iterator[float]:
         """Calculates the book values throughout its life.
 
@@ -82,7 +81,7 @@ class StrLineDeprec(Deprec):
 class DeclBalDeprec(Deprec):
     """DeclBalDeprec is the class for declining balance depreciations."""
 
-    @cached_property
+    @property
     def rate(self) -> float:
         return 1 - (self.salvage / self.basis) ** (1 / self.life)
 
@@ -112,7 +111,7 @@ class DblDeclBalDeprec(Deprec):
 
         self.floor = floor
 
-    @cached_property
+    @property
     def rate(self) -> float:
         return 2 / self.life
 
@@ -128,7 +127,7 @@ class DblDeclBalDeprec(Deprec):
 class SYDDeprec(Deprec):
     """SYDDeprec is the class for sum-of-years'-digits depreciations."""
 
-    @cached_property
+    @property
     def syd(self) -> int:
         """
         :return: The sum of the years' digits.
@@ -151,7 +150,7 @@ class UPDeprec(Deprec):
 
         self.prods = list(prods)
 
-    @cached_property
+    @property
     def lifetime_prod(self) -> float:
         """
         :return: The lifetime production.

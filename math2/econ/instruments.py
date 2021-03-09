@@ -201,15 +201,15 @@ class Project(Instrument):
         return sum(present_worth * interest.to_factor(t) for t in frange(0, total_life, self.life))
 
 
-class Relationship(Enum):
+class Rel(Enum):
     """Relationship is the enum class for all relationships of alternative projects."""
-    INDEPENDENT = 0
-    MUTUALLY_EXCLUSIVE = 1
-    RELATED = 2
+    INDEP = 0
+    MEX = 1
+    REL = 2
 
 
 @retain_iter
-def relationship(values: Iterable[float], budget: float) -> Relationship:
+def rel(values: Iterable[float], budget: float) -> Rel:
     """Determines the relationship of values with respect to the budget.
 
     :param values: The values.
@@ -217,14 +217,14 @@ def relationship(values: Iterable[float], budget: float) -> Relationship:
     :return: The relationship.
     """
     if sum(values) <= budget:
-        return Relationship.INDEPENDENT
+        return Rel.INDEP
     elif sum(sorted(values)[:2]) <= budget:
-        return Relationship.RELATED
+        return Rel.REL
     else:
-        return Relationship.MUTUALLY_EXCLUSIVE
+        return Rel.MEX
 
 
-def related_combinations(values: Iterable[float], budget: float) -> Iterator[Iterator[int]]:
+def rel_combinations(values: Iterable[float], budget: float) -> Iterator[Iterator[int]]:
     """Gets the combinations of the related values given their values and the budget.
 
     :param values: The values of the projects.
@@ -233,8 +233,8 @@ def related_combinations(values: Iterable[float], budget: float) -> Iterator[Ite
     """
     if values := tuple(values):
         i = len(values) - 1
-        chosen = related_combinations(values[:i], budget - values[i]) if values[i] <= budget else ()
-        skipped = related_combinations(values[:i], budget)
+        chosen = rel_combinations(values[:i], budget - values[i]) if values[i] <= budget else ()
+        skipped = rel_combinations(values[:i], budget)
 
         return chain((chain(sub_combination, [i]) for sub_combination in chosen), skipped)
     else:
