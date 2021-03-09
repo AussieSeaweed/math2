@@ -6,10 +6,11 @@ from enum import Enum
 from itertools import chain
 from typing import Optional
 
-from auxiliary import iindex, retain_iter
+from auxiliary import iindex, ilen, retain_iter
 
-from math2.econ.cashflows import CashFlow
-from math2.econ.factors import af, ap, fa, fp, pa
+from math2.consts import EPS
+from math2.econ.cashflows import CashFlow, pw
+from math2.econ.factors import ap, fa
 from math2.econ.ints import CompInt
 from math2.misc import frange
 
@@ -26,63 +27,35 @@ class Instrument(ABC):
         """
         pass
 
-    @abstractmethod
-    def present_worth(self, interest: CompInt) -> float:
-        """Calculates the present worth of this instrument at the given interest value.
-
-        :param interest: The interest value.
-        :return: The present worth.
-        """
-        pass
-
-    @abstractmethod
-    def annual_worth(self, interest: CompInt) -> float:
-        """Calculates the annual worth of this instrument at the given interest value.
-
-        :param interest: The interest value.
-        :return: The annual worth.
-        """
-        pass
-
 
 class Bond(Instrument):
     """Bond is the class for bonds."""
 
-    def __init__(self, face: float, coupon: float, period_count: float, maturity: float):
+    def __init__(self, face: float, coupon: float, frequency: float, maturity: float):
         self.face = face
         self.coupon = coupon
-        self.period_count = period_count
+        self.frequency = frequency
         self.maturity = maturity
 
-    @property
-    def period(self) -> float:
-        """
-        :return: The period of this bond.
-        """
-        return 1 / self.period_count
-
     def cash_flows(self, interest: Optional[CompInt] = None) -> Iterator[CashFlow]:
-        return chain((CashFlow(t, self.coupon) for t in frange(self.period, self.maturity + self.period, self.period)),
-                     (CashFlow(self.maturity, self.face),))
+        period = 1 / self.frequency
 
-    def present_worth(self, interest: CompInt) -> float:
-        return self.coupon * pa(interest.to_subperiod(self.period_count).rate, self.maturity * self.period_count) \
-               + self.face / interest.to_factor(self.maturity)
-
-    def annual_worth(self, interest: CompInt) -> float:
-        return self.present_worth(interest) * ap(interest.to_ef().rate, self.maturity)
+        return chain(
+            (CashFlow(t, self.coupon) for t in frange(period, self.maturity + EPS, period)),
+            (CashFlow(self.maturity, self.face),),
+        )
 
     @classmethod
-    def from_rate(cls, face: float, rate: float, period_count: float, maturity: float) -> Bond:
+    def from_rate(cls, face: float, rate: float, frequency: float, maturity: float) -> Bond:
         """Creates the bond from the coupon rate.
 
         :param face: The face value.
         :param rate: The coupon rate.
-        :param period_count: The period count.
+        :param frequency: The period count.
         :param maturity: The maturity of the bond.
         :return: The created bond.
         """
-        return Bond(face, face * rate / period_count, period_count, maturity)
+        return Bond(face, face * rate / frequency, frequency, maturity)
 
 
 class Mortgage(Instrument):
@@ -95,14 +68,10 @@ class Mortgage(Instrument):
 
     def cash_flows(self, interest: CompInt) -> Iterator[CashFlow]:
         payment = self.payment(interest)
+        subperiod = 1 / self.frequency
 
-        return (CashFlow(t, payment) for t in frange(0, self.amortization, 1 / self.frequency))
-
-    def present_worth(self, interest: Optional[CompInt] = None) -> float:
-        return 0
-
-    def annual_worth(self, interest: Optional[CompInt] = None) -> float:
-        return 0
+        return chain((CashFlow(0, -self.principal),),
+                     (CashFlow(t, payment) for t in frange(subperiod, self.amortization + EPS, subperiod)))
 
     def payment(self, interest: CompInt) -> float:
         """Calculates the payment value with respect to the given interest value.
@@ -112,7 +81,7 @@ class Mortgage(Instrument):
         """
         return self.principal * ap(interest.to_subperiod(self.frequency).rate, self.frequency * self.amortization)
 
-    def pay(self, interest: CompInt, term: float, payment: Optional[float] = None) -> Mortgage:
+    def pay(self, term: int, interest: CompInt, payment: Optional[float] = None) -> Mortgage:
         """Creates a new mortgage instance assuming payments were made.
 
         :param interest: The interest value.
@@ -120,14 +89,11 @@ class Mortgage(Instrument):
         :param payment: The optional payment made, defaults to payment with respect to the interest.
         :return: The next mortgage instance.
         """
-        if payment is None:
-            return self.pay(interest, term, self.payment(interest))
-        else:
-            return Mortgage(
-                self.principal * interest.to_factor(term) - payment
-                * fa(interest.to_subperiod(self.frequency).rate, term * self.frequency),
-                self.frequency, self.amortization - term,
-            )
+        return self.pay(term, interest, self.payment(interest)) if payment is None else Mortgage(
+            self.principal * interest.to_factor(term) - payment
+            * fa(interest.to_subperiod(self.frequency).rate, term * self.frequency),
+            self.frequency, self.amortization - term,
+        )
 
     @classmethod
     def from_down(cls, value: float, down: float, frequency: float = 12, amortization: float = 25) -> Mortgage:
@@ -169,36 +135,15 @@ class Mortgage(Instrument):
 class Project(Instrument):
     """Project is the class for projects."""
 
-    def __init__(self, initial: float, annuity: float, final: float, life: float):
+    def __init__(self, initial: float, final: float, annuity: float, life: float):
         self.initial = initial
-        self.annuity = annuity
         self.final = final
+        self.annuity = annuity
         self.life = life
 
     def cash_flows(self, interest: Optional[CompInt] = None) -> Iterator[CashFlow]:
-        return chain((CashFlow(0, self.initial),), (CashFlow(t + 1, self.annuity) for t in frange(self.life)),
+        return chain((CashFlow(0, self.initial),), (CashFlow(t, self.annuity) for t in frange(1, self.life + EPS)),
                      (CashFlow(self.life, self.final),))
-
-    def present_worth(self, interest: CompInt) -> float:
-        rate = interest.to_ef().rate
-
-        return self.initial + self.annuity * pa(rate, self.life) + self.final * fp(rate, self.life)
-
-    def annual_worth(self, interest: CompInt) -> float:
-        rate = interest.to_ef().rate
-
-        return self.initial * ap(rate, self.life) + self.annuity + self.final * af(rate, self.life)
-
-    def rep_present_worth(self, interest: CompInt, total_life: float) -> float:
-        """Calculates the repeated present worth of this project given total life.
-
-        :param interest: The interest value.
-        :param total_life: The total life during which the project is repeated.
-        :return: The repeated present worth of this project.
-        """
-        present_worth = self.present_worth(interest)
-
-        return sum(present_worth * interest.to_factor(t) for t in frange(0, total_life, self.life))
 
 
 class Rel(Enum):
@@ -239,6 +184,32 @@ def rel_combinations(values: Iterable[float], budget: float) -> Iterator[Iterato
         return chain((chain(sub_combination, [i]) for sub_combination in chosen), skipped)
     else:
         return iter((iter(()),))
+
+
+def de_facto_marr(costs: Iterable[float], irrs: Iterable[float], budget: float) -> float:
+    """Calculates the de factor marr of the given projects based on costs and irrs.
+
+    :param costs: The costs.
+    :param irrs: The internal rate of returns.
+    :param budget: The budget.
+    :return: The de factor marr.
+    """
+    costs = tuple(costs)
+    irrs = tuple(irrs)
+    indices = sorted(range(ilen(costs)), key=irrs.__getitem__, reverse=True)
+
+    cost_sum = 0.0
+    marr = 0.0
+
+    for i in indices:
+        cost_sum += costs[i]
+
+        if cost_sum > budget:
+            break
+
+        marr = irrs[i]
+
+    return marr
 
 
 def from_table(table: Iterable[Iterable[float]], marr: float) -> int:  # TODO ACCEPT irrs

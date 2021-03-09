@@ -7,7 +7,8 @@ from typing import Any
 from auxiliary import SupportsLessThan, retain_iter, windowed
 
 from math2.calc import newton
-from math2.econ.ints import EfInt, Int
+from math2.econ.factors import ap
+from math2.econ.ints import CompInt, EfInt, Int
 from math2.misc import interp
 
 
@@ -42,27 +43,6 @@ def disc(cash_flow: CashFlow, interest: Int) -> CashFlow:
     return CashFlow(0, cash_flow.amount / interest.to_factor(cash_flow.time))
 
 
-def pw(cash_flows: Iterable[CashFlow], interest: Int) -> float:
-    """Calculates the net present value of the supplied cash flows at the interest.
-
-    :param cash_flows: The cash flows.
-    :param interest: The interest.
-    :return: The net present value.
-    """
-    return sum(disc(cash_flow, interest).amount for cash_flow in cash_flows)
-
-
-@retain_iter
-def irr(cash_flows: Iterable[CashFlow], initial_guess: float) -> EfInt:
-    """Calculates the internal rate of return using the initial guess.
-
-    :param cash_flows: The cash flows.
-    :param initial_guess: The initial guess.
-    :return: The internal rate of return.
-    """
-    return EfInt(newton(lambda i: pw(cash_flows, EfInt(i)), initial_guess))
-
-
 def payback(cash_flows: Iterable[CashFlow], cost: float) -> float:
     """Calculates the payback period of the cash flows.
 
@@ -91,3 +71,58 @@ def disc_payback(cash_flows: Iterable[CashFlow], cost: float, interest: Int) -> 
     :return: The payback period.
     """
     return payback(map(lambda cash_flow: disc(cash_flow, interest), cash_flows), cost)
+
+
+def pw(cash_flows: Iterable[CashFlow], i: CompInt) -> float:
+    """Calculates the present worth of the supplied cash flows at the interest.
+
+    :param cash_flows: The cash flows.
+    :param i: The interest.
+    :return: The present worth.
+    """
+    return sum(disc(cash_flow, i).amount for cash_flow in cash_flows)
+
+
+@retain_iter
+def rpw(cash_flows: Iterable[CashFlow], i: CompInt, total_life: float) -> float:
+    """Calculates the repeated present worth of the supplied cash flows at the interest and at the total life.
+
+    :param cash_flows: The cash flows.
+    :param i: The interest.
+    :param total_life: The total life.
+    :return: The repeated present worth.
+    """
+    life = max(cash_flow.time for cash_flow in cash_flows)
+    ret = 0.0
+
+    while max(cash_flow.time for cash_flow in cash_flows) <= total_life:
+        ret += pw(cash_flows, i)
+
+        for cash_flow in cash_flows:
+            cash_flow.time += life
+    else:
+        ret += pw((cash_flow for cash_flow in cash_flows if cash_flow.time <= total_life), i)
+
+    return ret
+
+
+@retain_iter
+def aw(cash_flows: Iterable[CashFlow], i: CompInt) -> float:
+    """Calculates the annual worth of the supplied cash flows at the interest.
+
+    :param cash_flows: The cash flows.
+    :param i: The interest.
+    :return: The annual worth.
+    """
+    return pw(cash_flows, i) * ap(i.to_ef().rate, max(cash_flow.time for cash_flow in cash_flows))
+
+
+@retain_iter
+def irr(cash_flows: Iterable[CashFlow], init_guess: CompInt) -> EfInt:
+    """Calculates the internal rate of return using the initial guess.
+
+    :param cash_flows: The cash flows.
+    :param init_guess: The initial guess.
+    :return: The internal rate of return.
+    """
+    return EfInt(newton(lambda i: pw(cash_flows, EfInt(i)), init_guess.to_ef().rate))
