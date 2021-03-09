@@ -2,7 +2,7 @@ from collections.abc import Callable
 from math import ceil, exp, inf, log
 from unittest import TestCase, main
 
-from auxiliary import ExtendedTestCase
+from auxiliary import ExtTestCase
 
 from math2.calc import newton
 from math2.econ import (Bond, CashFlow, CompoundInterest, ContinuousInterest, DblDeclBalDeprec, DeclBalDeprec,
@@ -48,7 +48,7 @@ class InterestTestCase(TestCase):
         self.assertAlmostEqual(SubperiodInterest(nr / sc, sc).to_subperiod().to_factor(t), f)
 
 
-class InstrumentTestCase(ExtendedTestCase):
+class InstrumentTestCase(ExtTestCase):
     def test_relationships(self) -> None:
         self.assertEqual(relationship([5000, 7000, 6000, 3000], 1000000), Relationship.INDEPENDENT)
         self.assertEqual(relationship([5000, 7000, 6000, 3000], 7000), Relationship.MUTUALLY_EXCLUSIVE)
@@ -116,7 +116,7 @@ class PS1TestCase(TestCase):
             NominalInterest(0.012, 3).to_factor(1), 1 / 4).to_factor(3), 1).to_nominal(6).rate, 0.1454477030768886)
 
 
-class PS2TestCase(ExtendedTestCase):
+class PS2TestCase(ExtTestCase):
     def test_1(self) -> None:
         factor = NominalInterest(0.15, 4).to_factor(4 / 12) * ContinuousInterest(0.11).to_factor(5 / 12)
 
@@ -257,7 +257,7 @@ class PS3TestCase(TestCase):
                         Mortgage.from_down(500000, 50000, 25).pay(i, 3, 700).principal)
 
 
-class PS6TestCase(ExtendedTestCase):
+class PS6TestCase(ExtTestCase):
     def test_1(self) -> None:
         data = ((-41000, 6100, 7),
                 (-32000, 6700, 7),
@@ -346,7 +346,7 @@ class PS6TestCase(ExtendedTestCase):
         pass
 
 
-class PS7TestCase(ExtendedTestCase):
+class PS7TestCase(ExtTestCase):
     def test_1(self) -> None:
         basis, salvage, life = 92000, 19000, 4
 

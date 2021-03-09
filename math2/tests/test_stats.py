@@ -1,11 +1,11 @@
 from unittest import main
 
-from auxiliary import ExtendedTestCase
+from auxiliary import ExtTestCase
 
 from math2.stats import range_, shuffled, trimmed_mean
 
 
-class StatsTestCase(ExtendedTestCase):
+class StatsTestCase(ExtTestCase):
     value_sets = ((0.32, 0.53, 0.28, 0.37, 0.47, 0.43, 0.36, 0.42, 0.38, 0.43),
                   (0.26, 0.43, 0.47, 0.49, 0.52, 0.75, 0.79, 0.86, 0.62, 0.46),
                   (7.07, 7.00, 7.10, 6.97, 7.00, 7.03, 7.01, 7.01, 6.98, 7.08),

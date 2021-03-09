@@ -1,11 +1,11 @@
 from unittest import main
 
-from auxiliary import ExtendedTestCase
+from auxiliary import ExtTestCase
 
 from math2.misc import bind, frange, interp, linspace, prod, series_sum, sum_
 
 
-class MiscTestCase(ExtendedTestCase):
+class MiscTestCase(ExtTestCase):
     def test_bind(self) -> None:
         self.assertEqual(bind(1, 0, 2), 1)
         self.assertEqual(bind(-100, 0, 2), 0)

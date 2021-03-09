@@ -1,11 +1,11 @@
 from unittest import main
 
-from auxiliary import ExtendedTestCase
+from auxiliary import ExtTestCase
 
 from math2.linalg import Vector, full, ones, replaced, zeros
 
 
-class VectorTestCase(ExtendedTestCase):
+class VectorTestCase(ExtTestCase):
     def test_init(self) -> None:
         self.assertIterableAlmostEqual(Vector(range(10)), range(10))
 
