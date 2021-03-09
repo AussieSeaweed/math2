@@ -4,9 +4,9 @@ from abc import ABC, abstractmethod
 from collections.abc import Iterable, Iterator
 from enum import Enum
 from itertools import chain
-from typing import Optional, overload
+from typing import Optional
 
-from auxiliary import iindex, ilen, retain_iter
+from auxiliary import retain_iter
 
 from math2.consts import EPS
 from math2.econ.cashflows import CashFlow
@@ -184,57 +184,3 @@ def rel_combinations(values: Iterable[float], budget: float) -> Iterator[Iterato
         return chain((chain(sub_combination, [i]) for sub_combination in chosen), skipped)
     else:
         return iter((iter(()),))
-
-
-def de_facto_marr(costs: Iterable[float], irrs: Iterable[float], budget: float) -> float:
-    """Calculates the de factor marr of the given projects based on costs and irrs.
-
-    :param costs: The costs.
-    :param irrs: The internal rate of returns.
-    :param budget: The budget.
-    :return: The de factor marr.
-    """
-    costs = tuple(costs)
-    irrs = tuple(irrs)
-    indices = sorted(range(ilen(costs)), key=irrs.__getitem__, reverse=True)
-
-    cost_sum = 0.0
-    marr = 0.0
-
-    for i in indices:
-        cost_sum += costs[i]
-
-        if cost_sum > budget:
-            break
-
-        marr = irrs[i]
-
-    return marr
-
-
-@overload
-def irr_table(table: Iterable[Iterable[float]], marr: float) -> int: ...
-
-
-@overload
-def irr_table(table: Iterable[Iterable[float]], marr: float, irrs: Iterable[float]) -> Optional[int]: ...
-
-
-def irr_table(table: Iterable[Iterable[float]], marr: float, irrs: Optional[Iterable[float]] = None) -> Optional[int]:
-    """Selects the project with respect to the given table of internal rate of returns and marr.
-
-    :param irrs: The irr values of the choices (sorted by their initial cost).
-    :param table: The table of internal rate of returns.
-    :param marr: The minimum acceptable rate of return.
-    :return: The best project.
-    """
-    try:
-        x = 0 if irrs is None else next(i for i, irr in enumerate(irrs) if irr > marr)
-    except StopIteration:
-        return None
-
-    for i, row in enumerate(table):
-        if i > x and iindex(row, x) > marr:
-            x = i
-
-    return x
