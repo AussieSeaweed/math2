@@ -288,43 +288,40 @@ class PS6TestCase(ExtTestCase):
         self.assertAlmostEqual(de_facto_marr((-data[i][0] for i in range(len(data))), irrs, 100000), 0.2178733729868983)
 
     def test_2(self) -> None:
-        self.assertEqual(from_table(
-            ((),
-             (0.17,),
-             (0.14, 0.075),
-             (0.19, 0.209, 0.286),
-             (0.2, 0.127, 0.257, 0.229),
-             (0.18, 0.177, 0.192, 0.158, 0.117),
-             (0.13, 0.128, 0.132, 0.106, 0.081, 0.062)),
-            0.12,
-        ), 4)
-
-        self.assertEqual(from_table(
-            ((),
-             (0.14,),
-             (0.20, 0.29),
-             (0.24, 0.32, 0.36),
-             (0.21, 0.24, 0.22, 0.11),
-             (0.17, 0.18, 0.15, 0.08, 0.06),
-             (0.17, 0.18, 0.16, 0.12, 0.13, 0.19)),
-            0.12,
-        ), 3)
+        self.assertEqual(from_table((0.17, 0.14, 0.19, 0.2, 0.18, 0.13), (
+            (),
+            (0.075,),
+            (0.209, 0.286),
+            (0.127, 0.257, 0.229),
+            (0.177, 0.192, 0.158, 0.117),
+            (0.128, 0.132, 0.106, 0.081, 0.062),
+        ), 0.12), 3)
+        self.assertEqual(from_table((0.14, 0.20, 0.24, 0.21, 0.17, 0.17), (
+            (),
+            (0.29,),
+            (0.32, 0.36),
+            (0.24, 0.22, 0.11),
+            (0.18, 0.15, 0.08, 0.06),
+            (0.18, 0.16, 0.12, 0.13, 0.19),
+        ), 0.12), 2)
 
     def test_3(self) -> None:
-        table = ((),
-                 (0.1096,),
-                 (0.132, 0.286),
-                 (0.1205, 0.17, -0.058),
-                 (0.1293, 0.189, 0.112, 0.228),
-                 (0.1286, 0.177, 0.112, 0.187, 0.113),
-                 (0.1113, 0.113, 0.079, 0.094, 0.069, 0.063))
+        costs = (0.1096, 0.132, 0.1205, 0.1293, 0.1286, 0.1113)
+        table = (
+            (),
+            (0.286,),
+            (0.17, -0.058),
+            (0.189, 0.112, 0.228),
+            (0.177, 0.112, 0.187, 0.113),
+            (0.113, 0.079, 0.094, 0.069, 0.063),
+        )
 
-        self.assertEqual(from_table(table, 0.04), 6)
-        self.assertEqual(from_table(table, 0.06), 6)
-        self.assertEqual(from_table(table, 0.08), 5)
-        self.assertEqual(from_table(table, 0.10), 5)
-        self.assertEqual(from_table(table, 0.12), 2)
-        self.assertEqual(from_table(table, 0.14), 0)
+        self.assertEqual(from_table(costs, table, 0.04), 5)
+        self.assertEqual(from_table(costs, table, 0.06), 5)
+        self.assertEqual(from_table(costs, table, 0.08), 4)
+        self.assertEqual(from_table(costs, table, 0.10), 4)
+        self.assertEqual(from_table(costs, table, 0.12), 1)
+        self.assertEqual(from_table(costs, table, 0.14), None)
 
     def test_4(self) -> None:
         pass

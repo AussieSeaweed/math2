@@ -9,7 +9,7 @@ from typing import Optional
 from auxiliary import iindex, ilen, retain_iter
 
 from math2.consts import EPS
-from math2.econ.cashflows import CashFlow, pw
+from math2.econ.cashflows import CashFlow
 from math2.econ.factors import ap, fa
 from math2.econ.ints import CompInt
 from math2.misc import frange
@@ -212,17 +212,21 @@ def de_facto_marr(costs: Iterable[float], irrs: Iterable[float], budget: float) 
     return marr
 
 
-def from_table(table: Iterable[Iterable[float]], marr: float) -> int:  # TODO ACCEPT irrs
+def from_irr_table(irrs: Iterable[float], table: Iterable[Iterable[float]], marr: float) -> Optional[int]:
     """Selects the project with respect to the given table of internal rate of returns and marr.
 
+    :param irrs: The irr values of the choices (sorted by their initial cost).
     :param table: The table of internal rate of returns.
     :param marr: The minimum acceptable rate of return.
     :return: The best project.
     """
-    x = 0
+    try:
+        x = next(i for i, irr in enumerate(irrs) if irr > marr)
+    except StopIteration:
+        return None
 
     for i, row in enumerate(table):
-        if i and iindex(row, x) > marr:
+        if i > x and iindex(row, x) > marr:
             x = i
 
     return x

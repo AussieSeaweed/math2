@@ -1,9 +1,10 @@
 from collections.abc import Callable
 
+from math2.consts import EPS
 from math2.misc import frange
 
 
-def diff(f: Callable[[float], float], x: float, eps: float = 1e-7) -> float:
+def diff(f: Callable[[float], float], x: float, eps: float = EPS) -> float:
     """Perform numerical differentiation on the supplied function.
 
     :param f: The function to be differentiated.
@@ -14,7 +15,7 @@ def diff(f: Callable[[float], float], x: float, eps: float = 1e-7) -> float:
     return (f(x + eps) - f(x - eps)) / (2 * eps)
 
 
-def newton(f: Callable[[float], float], x: float, eps: float = 1e-7) -> float:
+def newton(f: Callable[[float], float], x: float, eps: float = EPS) -> float:
     """Solves the root of the supplied function with the Newton's method.
 .
     :param f: The function to solve.
