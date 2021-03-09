@@ -2,7 +2,7 @@ from unittest import main
 
 from auxiliary import ExtendedTestCase
 
-from math2.stats import range_, sampled, shuffled, trimmed_mean
+from math2.stats import range_, shuffled, trimmed_mean
 
 
 class StatsTestCase(ExtendedTestCase):
@@ -23,12 +23,6 @@ class StatsTestCase(ExtendedTestCase):
         a = list(range(1000))
 
         self.assertNotEqual(shuffled(a), a)
-
-    def test_samples(self) -> None:
-        a = range(100)
-
-        for i in range(100):
-            self.assertLen(set(sampled(a, 50)), 50)
 
 
 if __name__ == '__main__':
