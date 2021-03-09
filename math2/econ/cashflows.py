@@ -1,10 +1,10 @@
-from collections.abc import Iterable
+from collections.abc import Iterable, Iterator
 from functools import total_ordering
 from itertools import accumulate
 from math import inf
-from typing import Any, Optional, overload
+from typing import Any, Optional
 
-from auxiliary import SupportsLessThan, ilen, retain_iter, windowed
+from auxiliary import SupportsLessThan, iindex, ilen, retain_iter, windowed
 
 from math2.calc import newton
 from math2.econ.factors import ap
@@ -154,15 +154,7 @@ def de_facto_marr(costs: Iterable[float], irrs: Iterable[float], budget: float) 
     return marr
 
 
-@overload
-def irr_table(table: Iterable[Iterable[float]], marr: float) -> int: ...
-
-
-@overload
-def irr_table(table: Iterable[Iterable[float]], marr: float, irrs: Iterable[float]) -> Optional[int]: ...
-
-
-def irr_table(table: Iterable[Iterable[float]], marr: float, irrs: Optional[Iterable[float]] = None) -> Optional[int]:
+def select(irrs: Iterable[float], table: Iterable[Iterable[float]], marr: float) -> Optional[int]:
     """Selects the project with respect to the given table of internal rate of returns and marr.
 
     :param irrs: The irr values of the choices (sorted by their initial cost).
@@ -171,7 +163,7 @@ def irr_table(table: Iterable[Iterable[float]], marr: float, irrs: Optional[Iter
     :return: The best project.
     """
     try:
-        x = 0 if irrs is None else next(i for i, irr in enumerate(irrs) if irr > marr)
+        x = next(i for i, irr_ in enumerate(irrs) if irr_ > marr)
     except StopIteration:
         return None
 

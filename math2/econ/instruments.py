@@ -4,12 +4,12 @@ from abc import ABC, abstractmethod
 from collections.abc import Iterable, Iterator
 from enum import Enum
 from itertools import chain
-from typing import Optional
+from typing import Any, Optional
 
 from auxiliary import retain_iter
 
 from math2.consts import EPS
-from math2.econ.cashflows import CashFlow
+from math2.econ.cashflows import CashFlow, irr
 from math2.econ.factors import ap, fa
 from math2.econ.ints import CompInt
 from math2.misc import frange
@@ -135,11 +135,18 @@ class Mortgage(Instrument):
 class Project(Instrument):
     """Project is the class for projects."""
 
-    def __init__(self, initial: float, final: float, annuity: float, life: float):
+    def __init__(self, initial: float, annuity: float, final: float, life: float):
         self.initial = initial
-        self.final = final
         self.annuity = annuity
+        self.final = final
         self.life = life
+
+    def __sub__(self, other: Any) -> Project:
+        if isinstance(other, Project):
+            return Project(
+                self.initial - other.initial, self.annuity - other.annuity, self.final - other.final, self.life)
+        else:
+            return NotImplemented
 
     def cash_flows(self, interest: Optional[CompInt] = None) -> Iterator[CashFlow]:
         return chain((CashFlow(0, self.initial),), (CashFlow(t, self.annuity) for t in frange(1, self.life + EPS)),
@@ -184,3 +191,18 @@ def rel_combinations(values: Iterable[float], budget: float) -> Iterator[Iterato
         return chain((chain(sub_combination, [i]) for sub_combination in chosen), skipped)
     else:
         return iter((iter(()),))
+
+
+def irr_table(projects: Iterable[Project], init_guess: CompInt) -> tuple[Iterator[float], Iterator[Iterator[float]]]:
+    """Creates the irr table from the projects.
+
+    :param projects: The projects.
+    :param init_guess: The initial guess.
+    :return: The irr table.
+    """
+    projects = tuple(projects)
+
+    return (
+        (irr(project.cash_flows(), init_guess).rate for project in projects),
+        ((irr((x - y).cash_flows(), init_guess).rate for y in projects[:projects.index(x)]) for x in projects),
+    )

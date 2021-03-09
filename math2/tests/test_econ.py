@@ -4,10 +4,10 @@ from unittest import TestCase, main
 
 from auxiliary import ExtTestCase, ilen
 
-from math2.calc import newton
+from math2.calc import euler, newton
 from math2.econ import (Bond, CashFlow, CompInt, ContInt, DblDeclBalDeprec, DeclBalDeprec, EfInt, Mortgage, NomInt,
                         Project, Rel, SYDDeprec, SimpleInt, StrLineDeprec, SubperiodInt, UPDeprec, aw, de_facto_marr,
-                        fp, irr, irr_table, pa, payback, pf, pg, pw, rel, rel_combinations)
+                        fp, irr, irr_table, pa, payback, pf, pg, pw, rel, rel_combinations, select)
 from math2.misc import interp
 
 
@@ -57,8 +57,8 @@ class InstrumentTestCase(ExtTestCase):
         self.assertEqual(ilen(rel_combinations((5000, 7000, 6000, 3000), 10000)), 8)
 
     def test_projects(self) -> None:
-        self.assertAlmostEqual(pw(Project(-20000, 4000, 4000 - 1000, 10).cash_flows(), EfInt(0.05)), 5620.857801717468)
-        self.assertAlmostEqual(aw(Project(-20000, 4000, 4000 - 1000, 10).cash_flows(), EfInt(0.05)), 727.9268005526942)
+        self.assertAlmostEqual(pw(Project(-20000, 4000 - 1000, 4000, 10).cash_flows(), EfInt(0.05)), 5620.857801717468)
+        self.assertAlmostEqual(aw(Project(-20000, 4000 - 1000, 4000, 10).cash_flows(), EfInt(0.05)), 727.9268005526942)
 
 
 class CashFlowTestCase(TestCase):
@@ -230,7 +230,12 @@ class PS3TestCase(TestCase):
         ), 0.10627047075771787)
 
     def test_4(self) -> None:
-        pass
+        i, n = 0.1, 10
+        a, g = 100, 10
+        r, gp = log(1 + i), log(1 + g)
+        a0 = a * pa(i, g, n) * (gp - r) / (exp(n * (gp - r)) - 1)
+
+        self.assertAlmostEqual(a * pa(i, n, g) / euler(lambda t: a0 * exp((gp - r) * t), 0, n, 10000), 1, 2)
 
     def test_5(self) -> None:
         y = newton(
@@ -257,18 +262,20 @@ class PS3TestCase(TestCase):
 
 class PS6TestCase(ExtTestCase):
     def test_1(self) -> None:
-        data = ((-41000, 6100, 7),
-                (-32000, 6700, 7),
-                (-28000, 5700, 5),
-                (-28000, 12600, 5),
-                (-36000, 9000, 7),
-                (-27000, 10600, 6),
-                (-53000, 6700, 5),
-                (-50000, 15000, 6),
-                (-32000, 6900, 7),
-                (-42000, 14600, 5))
+        projects = (
+            Project(-41000, 6100, 0, 7),
+            Project(-32000, 6700, 0, 7),
+            Project(-28000, 5700, 0, 5),
+            Project(-28000, 12600, 0, 5),
+            Project(-36000, 9000, 0, 7),
+            Project(-27000, 10600, 0, 6),
+            Project(-53000, 6700, 0, 5),
+            Project(-50000, 15000, 0, 6),
+            Project(-32000, 6900, 0, 7),
+            Project(-42000, 14600, 0, 5),
+        )
 
-        irrs = tuple(map(lambda d: irr(Project(d[0], 0, d[1], d[2]).cash_flows(), EfInt(0)).rate, data))
+        irrs = tuple(irr(project.cash_flows(), EfInt(0)).rate for project in projects)
 
         self.assertSequenceAlmostEqual(irrs, (
             0.010261108929599895,
@@ -283,30 +290,29 @@ class PS6TestCase(ExtTestCase):
             0.2178733729868983,
         ))
 
-        self.assertAlmostEqual(de_facto_marr((-data[i][0] for i in range(len(data))), irrs, 100000), 0.2178733729868983)
+        self.assertAlmostEqual(de_facto_marr((-project.initial for project in projects), irrs, 100000),
+                               0.2178733729868983)
 
     def test_2(self) -> None:
-        self.assertEqual(irr_table((
+        self.assertEqual(select((0.17, 0.14, 0.19, 0.2, 0.18, 0.13), (
             (),
-            (0.17,),
-            (0.14, 0.075),
-            (0.19, 0.209, 0.286),
-            (0.2, 0.127, 0.257, 0.229),
-            (0.18, 0.177, 0.192, 0.158, 0.117),
-            (0.13, 0.128, 0.132, 0.106, 0.081, 0.062),
-        ), 0.12), 4)
-        self.assertEqual(irr_table((
-            (),
-            (0.14,),
-            (0.20, 0.29),
-            (0.24, 0.32, 0.36),
-            (0.21, 0.24, 0.22, 0.11),
-            (0.17, 0.18, 0.15, 0.08, 0.06),
-            (0.17, 0.18, 0.16, 0.12, 0.13, 0.19),
+            (0.075,),
+            (0.209, 0.286),
+            (0.127, 0.257, 0.229),
+            (0.177, 0.192, 0.158, 0.117),
+            (0.128, 0.132, 0.106, 0.081, 0.062),
         ), 0.12), 3)
+        self.assertEqual(select((0.14, 0.20, 0.24, 0.21, 0.17, 0.17,), (
+            (),
+            (0.29,),
+            (0.32, 0.36),
+            (0.24, 0.22, 0.11),
+            (0.18, 0.15, 0.08, 0.06),
+            (0.18, 0.16, 0.12, 0.13, 0.19),
+        ), 0.12), 2)
 
     def test_3(self) -> None:
-        costs = (0.1096, 0.132, 0.1205, 0.1293, 0.1286, 0.1113)
+        irrs = (0.1096, 0.132, 0.1205, 0.1293, 0.1286, 0.1113)
         table = (
             (),
             (0.286,),
@@ -316,18 +322,35 @@ class PS6TestCase(ExtTestCase):
             (0.113, 0.079, 0.094, 0.069, 0.063),
         )
 
-        self.assertEqual(irr_table(table, 0.04, costs), 5)
-        self.assertEqual(irr_table(table, 0.06, costs), 5)
-        self.assertEqual(irr_table(table, 0.08, costs), 4)
-        self.assertEqual(irr_table(table, 0.10, costs), 4)
-        self.assertEqual(irr_table(table, 0.12, costs), 1)
-        self.assertEqual(irr_table(table, 0.14, costs), None)
+        self.assertEqual(select(irrs, table, 0.04), 5)
+        self.assertEqual(select(irrs, table, 0.06), 5)
+        self.assertEqual(select(irrs, table, 0.08), 4)
+        self.assertEqual(select(irrs, table, 0.10), 4)
+        self.assertEqual(select(irrs, table, 0.12), 1)
+        self.assertEqual(select(irrs, table, 0.14), None)
 
     def test_4(self) -> None:
-        pass
+        projects = (
+            Project(-80000, 13000, 10000, 10),
+            Project(-120000, 23000, 34000, 10),
+            Project(-145000, 24000, 25000, 10),
+            Project(-145000, 28000, 29000, 10),
+        )
+        marr = 0.12
+        projects = filter(lambda project: irr(project.cash_flows(), EfInt(0)).rate > marr, projects)
+        irrs, table = irr_table(projects, EfInt(0))
+
+        self.assertEqual(select(irrs, table, marr), 1)
 
     def test_5(self) -> None:
-        pass
+        p = newton(
+            lambda x: (
+                    -5e8 + x * (2e8 * pa(0.08, 8) * pf(0.08, 4) + 1e7 / 0.08 * pf(0.08, 12))
+                    - x * (-5e8 * pf(0.08, 2) + 2e8 * pa(0.08, 6) * pf(0.08, 6) + 1e7 / 0.08 * pf(0.08, 12))
+            ), 0,
+        )
+
+        self.assertAlmostEqual(p, 0.7237775659969569)
 
 
 class PS7TestCase(ExtTestCase):
