@@ -7,9 +7,7 @@ from auxiliary import ExtTestCase, ilen
 from math2.calc import newton
 from math2.econ import (Bond, CashFlow, CompInt, ContInt, DblDeclBalDeprec, DeclBalDeprec, EfInt, Mortgage, NomInt,
                         Project, Rel, SYDDeprec, SimpleInt, StrLineDeprec, SubperiodInt, UPDeprec, aw, de_facto_marr,
-                        fp,
-                        from_table, irr,
-                        pa, payback, pf, pg, pw, rel, rel_combinations)
+                        fp, irr, irr_table, pa, payback, pf, pg, pw, rel, rel_combinations)
 from math2.misc import interp
 
 
@@ -288,22 +286,24 @@ class PS6TestCase(ExtTestCase):
         self.assertAlmostEqual(de_facto_marr((-data[i][0] for i in range(len(data))), irrs, 100000), 0.2178733729868983)
 
     def test_2(self) -> None:
-        self.assertEqual(from_table((0.17, 0.14, 0.19, 0.2, 0.18, 0.13), (
+        self.assertEqual(irr_table((
             (),
-            (0.075,),
-            (0.209, 0.286),
-            (0.127, 0.257, 0.229),
-            (0.177, 0.192, 0.158, 0.117),
-            (0.128, 0.132, 0.106, 0.081, 0.062),
+            (0.17,),
+            (0.14, 0.075),
+            (0.19, 0.209, 0.286),
+            (0.2, 0.127, 0.257, 0.229),
+            (0.18, 0.177, 0.192, 0.158, 0.117),
+            (0.13, 0.128, 0.132, 0.106, 0.081, 0.062),
+        ), 0.12), 4)
+        self.assertEqual(irr_table((
+            (),
+            (0.14,),
+            (0.20, 0.29),
+            (0.24, 0.32, 0.36),
+            (0.21, 0.24, 0.22, 0.11),
+            (0.17, 0.18, 0.15, 0.08, 0.06),
+            (0.17, 0.18, 0.16, 0.12, 0.13, 0.19),
         ), 0.12), 3)
-        self.assertEqual(from_table((0.14, 0.20, 0.24, 0.21, 0.17, 0.17), (
-            (),
-            (0.29,),
-            (0.32, 0.36),
-            (0.24, 0.22, 0.11),
-            (0.18, 0.15, 0.08, 0.06),
-            (0.18, 0.16, 0.12, 0.13, 0.19),
-        ), 0.12), 2)
 
     def test_3(self) -> None:
         costs = (0.1096, 0.132, 0.1205, 0.1293, 0.1286, 0.1113)
@@ -316,12 +316,12 @@ class PS6TestCase(ExtTestCase):
             (0.113, 0.079, 0.094, 0.069, 0.063),
         )
 
-        self.assertEqual(from_table(costs, table, 0.04), 5)
-        self.assertEqual(from_table(costs, table, 0.06), 5)
-        self.assertEqual(from_table(costs, table, 0.08), 4)
-        self.assertEqual(from_table(costs, table, 0.10), 4)
-        self.assertEqual(from_table(costs, table, 0.12), 1)
-        self.assertEqual(from_table(costs, table, 0.14), None)
+        self.assertEqual(irr_table(table, 0.04, costs), 5)
+        self.assertEqual(irr_table(table, 0.06, costs), 5)
+        self.assertEqual(irr_table(table, 0.08, costs), 4)
+        self.assertEqual(irr_table(table, 0.10, costs), 4)
+        self.assertEqual(irr_table(table, 0.12, costs), 1)
+        self.assertEqual(irr_table(table, 0.14, costs), None)
 
     def test_4(self) -> None:
         pass

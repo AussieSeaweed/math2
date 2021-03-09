@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Iterable, Iterator
 from enum import Enum
 from itertools import chain
-from typing import Optional
+from typing import Optional, overload
 
 from auxiliary import iindex, ilen, retain_iter
 
@@ -212,7 +212,15 @@ def de_facto_marr(costs: Iterable[float], irrs: Iterable[float], budget: float) 
     return marr
 
 
-def from_irr_table(irrs: Iterable[float], table: Iterable[Iterable[float]], marr: float) -> Optional[int]:
+@overload
+def irr_table(table: Iterable[Iterable[float]], marr: float) -> int: ...
+
+
+@overload
+def irr_table(table: Iterable[Iterable[float]], marr: float, irrs: Iterable[float]) -> Optional[int]: ...
+
+
+def irr_table(table: Iterable[Iterable[float]], marr: float, irrs: Optional[Iterable[float]] = None) -> Optional[int]:
     """Selects the project with respect to the given table of internal rate of returns and marr.
 
     :param irrs: The irr values of the choices (sorted by their initial cost).
@@ -221,7 +229,7 @@ def from_irr_table(irrs: Iterable[float], table: Iterable[Iterable[float]], marr
     :return: The best project.
     """
     try:
-        x = next(i for i, irr in enumerate(irrs) if irr > marr)
+        x = 0 if irrs is None else next(i for i, irr in enumerate(irrs) if irr > marr)
     except StopIteration:
         return None
 
