@@ -4,7 +4,7 @@ from statistics import fmean
 
 from auxiliary import retain_iter, trimmed
 
-from math2.types import _T
+from math2.typing import _T
 
 
 def trimmed_mean(values: Iterable[float], percentage: float) -> float:

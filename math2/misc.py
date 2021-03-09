@@ -6,7 +6,7 @@ from typing import Optional
 
 from auxiliary import default
 
-from math2.types import _SLT, _T
+from math2.typing import _SLT, _T
 
 
 def bind(value: _SLT, lower: _SLT, upper: _SLT) -> _SLT:
