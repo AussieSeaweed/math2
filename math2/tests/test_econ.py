@@ -55,7 +55,7 @@ class InstrumentTestCase(ExtTestCase):
         self.assertEqual(relationship([5000, 7000, 6000, 3000], 10000), Relationship.RELATED)
 
     def test_combinations(self) -> None:
-        self.assertLen(tuple(related_combinations([5000, 7000, 6000, 3000], 10000)), 8)
+        self.assertEqual(len(tuple(related_combinations([5000, 7000, 6000, 3000], 10000))), 8)
 
     def test_projects(self) -> None:
         self.assertAlmostEqual(Project(-20000, 4000 - 1000, 4000, 10).present_worth(EffectiveInterest(0.05)),
