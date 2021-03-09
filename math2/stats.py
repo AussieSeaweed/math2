@@ -1,9 +1,8 @@
-from collections.abc import Iterable, Iterator, Sequence
-from itertools import chain, repeat
+from collections.abc import Iterable, Sequence
 from random import shuffle
 from statistics import fmean
 
-from auxiliary import ilen, retain_iter, trimmed
+from auxiliary import retain_iter, trimmed
 
 from math2.types import _T
 
@@ -37,16 +36,3 @@ def shuffled(values: Iterable[_T]) -> Sequence[_T]:
     values = list(values)
     shuffle(values)
     return values
-
-
-@retain_iter
-def sampled(pop: Iterable[_T], n: int) -> Iterator[_T]:
-    """Samples n values.
-
-    :param pop: The population.
-    :param n: The sample count.
-    :return: The samples.
-    """
-    picks = shuffled(chain(repeat(True, n), repeat(False, ilen(pop) - n)))
-
-    return (x for i, x in enumerate(pop) if picks[i])
