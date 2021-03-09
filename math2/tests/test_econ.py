@@ -6,8 +6,8 @@ from auxiliary import ExtTestCase, ilen
 
 from math2.calc import newton
 from math2.econ import (Bond, CashFlow, CompInt, ContInt, DblDeclBalDeprec, DeclBalDeprec, EfInt, Mortgage, NomInt,
-                        Project, Rel, SPInt, SYDDeprec, SimpleInt, StrLineDeprec, UPDeprec, fp, from_table, irr, pa,
-                        payback, pf, pg, rel, rel_combinations)
+                        Project, Rel, SYDDeprec, SimpleInt, StrLineDeprec, SubperiodInt, UPDeprec, fp, from_table, irr,
+                        pa, payback, pf, pg, rel, rel_combinations)
 from math2.misc import interp
 
 
@@ -19,7 +19,7 @@ class InterestTestCase(TestCase):
         self.assertAlmostEqual(p * EfInt(r).to_factor(t), c)
 
     def test_comparison(self) -> None:
-        self.assertLess(NomInt(0.06, 12).to_ef().rate, SPInt(0.063, 1).to_ef().rate)
+        self.assertLess(NomInt(0.06, 12).to_ef().rate, SubperiodInt(0.063, 1).to_ef().rate)
 
     def test_consistency(self) -> None:
         nr, sc, t, f = 0.1, 4, 2.5, 1.2800845441963565
@@ -29,7 +29,7 @@ class InterestTestCase(TestCase):
             EfInt((1 + nr / sc) ** sc - 1),
             ContInt(log((1 + nr / sc) ** sc)),
             NomInt(nr, sc),
-            SPInt(nr / sc, sc),
+            SubperiodInt(nr / sc, sc),
         )
 
         for interest in interests:
@@ -39,12 +39,12 @@ class InterestTestCase(TestCase):
 
             for count in counts:
                 self.assertAlmostEqual(interest.to_nom(count).to_factor(t), f)
-                self.assertAlmostEqual(interest.to_sp(count).to_factor(t), f)
+                self.assertAlmostEqual(interest.to_subperiod(count).to_factor(t), f)
 
         self.assertAlmostEqual(NomInt(nr, sc).to_nom().to_factor(t), f)
-        self.assertAlmostEqual(NomInt(nr, sc).to_sp().to_factor(t), f)
-        self.assertAlmostEqual(SPInt(nr / sc, sc).to_nom().to_factor(t), f)
-        self.assertAlmostEqual(SPInt(nr / sc, sc).to_sp().to_factor(t), f)
+        self.assertAlmostEqual(NomInt(nr, sc).to_subperiod().to_factor(t), f)
+        self.assertAlmostEqual(SubperiodInt(nr / sc, sc).to_nom().to_factor(t), f)
+        self.assertAlmostEqual(SubperiodInt(nr / sc, sc).to_subperiod().to_factor(t), f)
 
 
 class InstrumentTestCase(ExtTestCase):
@@ -103,10 +103,10 @@ class PS1TestCase(TestCase):
         self.assertAlmostEqual(fv / ContInt(cd).to_factor(0.75), 98.51119396030627)
 
     def test_6(self) -> None:
-        self.assertAlmostEqual(EfInt(0.08).to_sp(12).rate, 0.00643403011000343)
+        self.assertAlmostEqual(EfInt(0.08).to_subperiod(12).rate, 0.00643403011000343)
         self.assertAlmostEqual(NomInt(0.035, 252).to_ef().rate, 0.03561719190449408)
         self.assertAlmostEqual(NomInt(0.04, 4).to_cont().rate, 0.039801323412672354)
-        self.assertAlmostEqual(CompInt.from_factor(SPInt(0.015, 12).to_factor(1), 4).to_cont().rate,
+        self.assertAlmostEqual(CompInt.from_factor(SubperiodInt(0.015, 12).to_factor(1), 4).to_cont().rate,
                                0.04466583748125169)
         self.assertAlmostEqual(CompInt.from_factor(CompInt.from_factor(
             NomInt(0.012, 3).to_factor(1), 1 / 4).to_factor(3), 1).to_nom(6).rate, 0.1454477030768886)

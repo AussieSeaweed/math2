@@ -66,7 +66,7 @@ class Bond(Instrument):
                      (CashFlow(self.maturity, self.face),))
 
     def present_worth(self, interest: CompInt) -> float:
-        return self.coupon * pa(interest.to_sp(self.period_count).rate, self.maturity * self.period_count) \
+        return self.coupon * pa(interest.to_subperiod(self.period_count).rate, self.maturity * self.period_count) \
                + self.face / interest.to_factor(self.maturity)
 
     def annual_worth(self, interest: CompInt) -> float:
@@ -110,7 +110,7 @@ class Mortgage(Instrument):
         :param interest: The interest value.
         :return: The payment.
         """
-        return self.principal * ap(interest.to_sp(self.frequency).rate, self.frequency * self.amortization)
+        return self.principal * ap(interest.to_subperiod(self.frequency).rate, self.frequency * self.amortization)
 
     def pay(self, interest: CompInt, term: float, payment: Optional[float] = None) -> Mortgage:
         """Creates a new mortgage instance assuming payments were made.
@@ -125,7 +125,7 @@ class Mortgage(Instrument):
         else:
             return Mortgage(
                 self.principal * interest.to_factor(term) - payment
-                * fa(interest.to_sp(self.frequency).rate, term * self.frequency),
+                * fa(interest.to_subperiod(self.frequency).rate, term * self.frequency),
                 self.frequency, self.amortization - term,
             )
 

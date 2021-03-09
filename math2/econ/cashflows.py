@@ -39,10 +39,10 @@ def disc(cash_flow: CashFlow, interest: Int) -> CashFlow:
     :param interest: The interest at which is discounted.
     :return: The discounted copy of the cash flow.
     """
-    return CashFlow(cash_flow.time, cash_flow.amount / interest.to_factor(cash_flow.time))
+    return CashFlow(0, cash_flow.amount / interest.to_factor(cash_flow.time))
 
 
-def npv(cash_flows: Iterable[CashFlow], interest: Int) -> float:
+def npw(cash_flows: Iterable[CashFlow], interest: Int) -> float:
     """Calculates the net present value of the supplied cash flows at the interest.
 
     :param cash_flows: The cash flows.
@@ -60,7 +60,7 @@ def irr(cash_flows: Iterable[CashFlow], initial_guess: float) -> EfInt:
     :param initial_guess: The initial guess.
     :return: The internal rate of return.
     """
-    return EfInt(newton(lambda i: npv(cash_flows, EfInt(i)), initial_guess))
+    return EfInt(newton(lambda i: npw(cash_flows, EfInt(i)), initial_guess))
 
 
 def payback(cash_flows: Iterable[CashFlow], cost: float) -> float:
