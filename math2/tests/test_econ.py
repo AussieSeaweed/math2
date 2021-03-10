@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from itertools import chain
 from math import ceil, exp, inf, log
 from unittest import TestCase, main
 
@@ -8,7 +9,7 @@ from math2.calc import euler, newton
 from math2.econ import (Bond, CashFlow, CompInt, ContInt, DblDeclBalDeprec, DeclBalDeprec, EfInt, Mortgage, NomInt,
                         Project, Rel, SPInt, SYDDeprec, SimpleInt, StrLineDeprec, UPDeprec, aw, de_facto_marr, fp,
                         irr,
-                        irr_table, link, pa, payback, pf, pg, pw, rel, rel_combinations, rpw, select)
+                        irr_table, link, pa, payback, pf, pg, pw, rel, rel_combinations, repeated, rpw, select)
 from math2.misc import interp
 
 
@@ -313,10 +314,15 @@ class PS5TestCase(ExtTestCase):
 
     def test_5(self) -> None:
         i = EfInt(0.07)
-        sa = rpw(Project(5e6, 2e5 + 1e6, 0, 6).cash_flows, i, 25)
-        sb = rpw(Project(6e6, 1.5e5 + 1.1e6, 0, 11).cash_flows, i, 25)
-        ba = rpw(Project(5e6, 5e5 + 1e6 - 3e5, 0, 14).cash_flows, i, 25)
-        bb = rpw(Project(3e6, 3e5 + 6e5, 0, 5).cash_flows, i, 25)  # TODO BETTER MAKE REPEATED METHOD
+        sa = aw(chain((CashFlow(0, 5e6),), repeated(Project(0, 2e5, 1e6, 6).cash_flows, 25)), i, 25)
+        sb = aw(chain((CashFlow(0, 6e6),), repeated(Project(0, 1.5e5, 1.1e6, 11).cash_flows, 25)), i, 25)
+        ba = aw(chain((CashFlow(0, 5e6),), repeated(Project(0, 5e5 - 3e5, 1e6, 14).cash_flows, 25)), i, 25)
+        bb = aw(chain((CashFlow(0, 3e6),), repeated(Project(0, 3e5, 6e5, 5).cash_flows, 25)), i, 25)
+
+        self.assertAlmostEqual(sa, 766638.1419621999)
+        self.assertAlmostEqual(sb, 731013.277560719)
+        self.assertAlmostEqual(ba, 662331.3841421161)
+        self.assertAlmostEqual(bb, 661765.9683268208)
 
         self.assertAlmostEqual(min(sa + ba, sa + bb, sb + ba, sb + bb), sb + bb)
 

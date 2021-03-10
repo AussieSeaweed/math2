@@ -9,7 +9,7 @@ from auxiliary import SupportsLessThan, default, retain_iter, windowed
 from math2.calc import newton
 from math2.econ.factors import ap
 from math2.econ.ints import CompInt, EfInt, Int
-from math2.misc import interp
+from math2.misc import frange, interp
 
 
 @total_ordering
@@ -92,18 +92,7 @@ def rpw(cash_flows: Iterable[CashFlow], i: Int, total_life: float) -> float:
     :param total_life: The total life.
     :return: The repeated present worth.
     """
-    life = max(cash_flow.time for cash_flow in cash_flows)
-    ret = 0.0
-
-    while max(cash_flow.time for cash_flow in cash_flows) <= total_life:
-        ret += pw(cash_flows, i)
-
-        for cash_flow in cash_flows:
-            cash_flow.time += life
-    else:
-        ret += pw((cash_flow for cash_flow in cash_flows if cash_flow.time <= total_life), i)
-
-    return ret
+    return pw(repeated(cash_flows, total_life), i)
 
 
 @retain_iter
@@ -115,7 +104,7 @@ def aw(cash_flows: Iterable[CashFlow], i: CompInt, total_life: Optional[float] =
     :param total_life: The optional total life.
     :return: The annual worth.
     """
-    return pw(cash_flows, i) * ap(i.to_ef().rate, default(max(cash_flow.time for cash_flow in cash_flows), total_life))
+    return pw(cash_flows, i) * ap(i.to_ef().rate, default(total_life, life(cash_flows)))
 
 
 @retain_iter
@@ -129,17 +118,37 @@ def irr(cash_flows: Iterable[CashFlow], init_guess: CompInt) -> EfInt:
     return EfInt(newton(lambda i: pw(cash_flows, EfInt(i)), init_guess.to_ef().rate))
 
 
-def link(cash_flow_sets: Iterable[Iterable[CashFlow]]) -> Iterator[CashFlow]:
+def life(cash_flows: Iterable[CashFlow]) -> float:
+    """Calculates the life of the cash flows.
+
+    :param cash_flows: The cash flows.
+    :return: The life.
+    """
+    return max(cash_flow.time for cash_flow in cash_flows)
+
+
+@retain_iter
+def repeated(cash_flows: Iterable[CashFlow], total_life: float) -> Iterator[CashFlow]:
+    """Repeats the cash flows by the total life.
+
+    :param cash_flows: The cash flows.
+    :param total_life: The total life.
+    :return: The repeated cash flows.
+    """
+    return filter(lambda cf: cf.time <= total_life, link((cash_flows for _ in frange(0, total_life, life(cash_flows)))))
+
+
+def link(it: Iterable[Iterable[CashFlow]]) -> Iterator[CashFlow]:
     """Links the cash flows together, updating corresponding time periods.
 
-    :param cash_flow_sets: The cash flow sets to chain.
+    :param it: The cash flow sets to chain.
     :return: The chained cash flows.
     """
     total = list[CashFlow]()
-    life = 0.0
+    total_life = 0.0
 
-    for cash_flows in cash_flow_sets:
-        total.extend(CashFlow(cash_flow.time + life, cash_flow.amount) for cash_flow in cash_flows)
-        life = max(life, max(cash_flow.time for cash_flow in total))
+    for cash_flows in map(tuple[CashFlow], it):
+        total.extend(CashFlow(cash_flow.time + total_life, cash_flow.amount) for cash_flow in cash_flows)
+        total_life += life(cash_flows)
 
     return iter(total)
