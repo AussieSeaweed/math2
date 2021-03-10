@@ -17,7 +17,7 @@ def diff(f: Callable[[float], float], x: float, eps: float = EPS) -> float:
 
 def newton(f: Callable[[float], float], x: float, eps: float = EPS) -> float:
     """Solves the root of the supplied function with the Newton's method.
-.
+
     :param f: The function to solve.
     :param x: The initial guess.
     :param eps: The accuracy, defaults to EPS.
