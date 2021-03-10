@@ -303,8 +303,7 @@ class PS6TestCase(ExtTestCase):
             0.2178733729868983,
         ))
 
-        self.assertAlmostEqual(de_facto_marr((-project.initial for project in projects), irrs, 100000).to_ef().rate,
-                               0.2178733729868983)
+        self.assertAlmostEqual(de_facto_marr(projects, EfInt(0), 100000).to_ef().rate, 0.2178733729868983)
 
     def test_2(self) -> None:
         self.assertEqual(select(map(EfInt, (0.17, 0.14, 0.19, 0.2, 0.18, 0.13)), map(lambda row: map(EfInt, row), (
