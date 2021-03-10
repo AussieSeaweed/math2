@@ -30,32 +30,32 @@ class Instrument(ABC):
 class Bond(Instrument):
     """Bond is the class for bonds."""
 
-    def __init__(self, face: float, coupon: float, frequency: float, maturity: float):
+    def __init__(self, face: float, coupon: float, freq: float, mat: float):
         self.face = face
         self.coupon = coupon
-        self.frequency = frequency
-        self.maturity = maturity
+        self.freq = freq
+        self.mat = mat
 
     @property
     def cash_flows(self) -> Iterator[CashFlow]:
-        period = 1 / self.frequency
+        period = 1 / self.freq
 
         return chain(
-            (CashFlow(t, self.coupon) for t in frange(period, self.maturity + EPS, period)),
-            (CashFlow(self.maturity, self.face),),
+            (CashFlow(t, self.coupon) for t in frange(period, self.mat + EPS, period)),
+            (CashFlow(self.mat, self.face),),
         )
 
     @classmethod
-    def from_rate(cls, face: float, rate: float, frequency: float, maturity: float) -> Bond:
+    def from_rate(cls, face: float, rate: float, freq: float, mat: float) -> Bond:
         """Creates the bond from the coupon rate.
 
         :param face: The face value.
         :param rate: The coupon rate.
-        :param frequency: The period count.
-        :param maturity: The maturity of the bond.
+        :param freq: The period count.
+        :param mat: The maturity of the bond.
         :return: The created bond.
         """
-        return Bond(face, face * rate / frequency, frequency, maturity)
+        return Bond(face, face * rate / freq, freq, mat)
 
 
 class Mortgage(Instrument):

@@ -8,8 +8,7 @@ from auxiliary import ExtTestCase, ilen
 from math2.calc import euler, newton
 from math2.econ import (Bond, CashFlow, CompInt, ContInt, DblDeclBalDeprec, DeclBalDeprec, EfInt, Mortgage, NomInt,
                         Project, Rel, SPInt, SYDDeprec, SimpleInt, StrLineDeprec, UPDeprec, aw, de_facto_marr, fp,
-                        irr,
-                        irr_table, link, pa, payback, pf, pg, pw, rel, rel_combinations, repeated, rpw, select)
+                        irr, irr_table, link, pa, payback, pf, pg, pw, rel, rel_combinations, repeated, rpw, select)
 from math2.misc import interp
 
 

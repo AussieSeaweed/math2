@@ -71,10 +71,10 @@ class Deprec(ABC):
 class StrLineDeprec(Deprec):
     """StrLineDeprec is the class for straight line depreciations."""
 
-    def book(self, t: int) -> float:
+    def book(self, t: float) -> float:
         return self.basis - self.amount() * t
 
-    def amount(self, t: Optional[int] = None) -> float:
+    def amount(self, t: Optional[float] = None) -> float:
         return (self.basis - self.salvage) / self.life
 
 
@@ -85,10 +85,10 @@ class DeclBalDeprec(Deprec):
     def rate(self) -> float:
         return 1 - (self.salvage / self.basis) ** (1 / self.life)
 
-    def book(self, t: int) -> float:
+    def book(self, t: float) -> float:
         return self.basis * (1 - self.rate) ** t
 
-    def amount(self, t: int) -> float:
+    def amount(self, t: float) -> float:
         return self.book(t - 1) * self.rate
 
     @classmethod
@@ -115,12 +115,12 @@ class DblDeclBalDeprec(Deprec):
     def rate(self) -> float:
         return 2 / self.life
 
-    def book(self, t: int) -> float:
+    def book(self, t: float) -> float:
         book = self.basis * (1 - self.rate) ** t
 
         return max(self.salvage, book) if self.floor else book
 
-    def amount(self, t: int) -> float:
+    def amount(self, t: float) -> float:
         return self.book(t - 1) * self.rate
 
 

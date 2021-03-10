@@ -83,7 +83,6 @@ def pw(cash_flows: Iterable[CashFlow], i: Int) -> float:
     return sum(disc(cash_flow, i).amount for cash_flow in cash_flows)
 
 
-@retain_iter
 def rpw(cash_flows: Iterable[CashFlow], i: Int, total_life: float) -> float:
     """Calculates the repeated present worth of the supplied cash flows at the interest and at the total life.
 
