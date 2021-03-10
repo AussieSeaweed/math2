@@ -12,7 +12,7 @@ from math2.typing import _SLT, _T
 def bind(value: _SLT, lower: _SLT, upper: _SLT) -> _SLT:
     """Binds the value by the given interval.
 
-    :param value: The value.
+    :param value: The value to be bound.
     :param lower: The lower limit.
     :param upper: The upper limit.
     :return: The bound value.
@@ -30,9 +30,9 @@ def bind(value: _SLT, lower: _SLT, upper: _SLT) -> _SLT:
 def sum_(values: Iterable[_T], start: Optional[_T] = None) -> _T:
     """Calculates the sum of the elements in the iterable.
 
-    :param values: The values.
+    :param values: The values to be summed.
     :param start: The optional start value.
-    :return: The sum.
+    :return: The sum of the values.
     """
     try:
         return reduce(add, values if start is None else chain((start,), values))
@@ -43,9 +43,9 @@ def sum_(values: Iterable[_T], start: Optional[_T] = None) -> _T:
 def prod(values: Iterable[_T], start: Optional[_T] = None) -> _T:
     """Calculates the product of the elements in the iterable.
 
-    :param values: The values.
+    :param values: The values to be multiplied.
     :param start: The optional start value.
-    :return: The product.
+    :return: The product of the values.
     """
     try:
         return reduce(mul, values if start is None else chain((start,), values))
@@ -98,7 +98,7 @@ def interp(x: float, x0: float, x1: float, y0: float, y1: float) -> float:
 def series_sum(lo: int, hi: Optional[int] = None, n: Optional[int] = None) -> int:
     """Calculates the series sum of the interval.
 
-    :param lo: The start value.
+    :param lo: The start or end value.
     :param hi: The optional end value.
     :param n: The number of elements, defaults to (end - start) + 1.
     :return: the series sum.
