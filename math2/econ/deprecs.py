@@ -103,7 +103,7 @@ class DeclBalDeprec(Deprec):
         return DeclBalDeprec(basis, basis * (1 - rate) ** life, life)
 
 
-class DblDeclBalDeprec(Deprec):
+class DblDeclBalDeprec(DeclBalDeprec):
     """DblDeclBalDeprec is the class for double declining balance depreciations."""
 
     def __init__(self, basis: float, salvage: float, life: int, floor: bool = False):
@@ -116,12 +116,7 @@ class DblDeclBalDeprec(Deprec):
         return 2 / self.life
 
     def book(self, t: float) -> float:
-        book = self.basis * (1 - self.rate) ** t
-
-        return max(self.salvage, book) if self.floor else book
-
-    def amount(self, t: float) -> float:
-        return self.book(t - 1) * self.rate
+        return max(self.salvage, super().book(t)) if self.floor else super().book(t)
 
 
 class SYDDeprec(Deprec):
