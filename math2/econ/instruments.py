@@ -46,7 +46,7 @@ class Bond(Instrument):
         )
 
     @classmethod
-    def from_rate(cls, face: float, rate: float, freq: float, mat: float) -> Bond:
+    def from_rate(cls, face: float, rate: CompInt, freq: float, mat: float) -> Bond:
         """Creates the bond from the coupon rate.
 
         :param face: The face value.
@@ -55,7 +55,7 @@ class Bond(Instrument):
         :param mat: The maturity of the bond.
         :return: The created bond.
         """
-        return Bond(face, face * rate / freq, freq, mat)
+        return Bond(face, face * rate.to_sp(freq).rate, freq, mat)
 
 
 class Mortgage(Instrument):

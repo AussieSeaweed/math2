@@ -117,6 +117,18 @@ def irr(cash_flows: Iterable[CashFlow], init_guess: CompInt) -> EfInt:
     return EfInt(newton(lambda i: pw(cash_flows, EfInt(i)), init_guess.to_ef().rate))
 
 
+@retain_iter
+def yield_(cash_flows: Iterable[CashFlow], price: float, init_guess: CompInt) -> EfInt:
+    """Calculates the yield of the cash flows using the initial guess.
+
+    :param cash_flows: The cash flows.
+    :param price: The price.
+    :param init_guess: The initial guess.
+    :return: The internal rate of return.
+    """
+    return EfInt(newton(lambda y: pw(cash_flows, EfInt(y)) - price, init_guess.to_ef().rate))
+
+
 def life(cash_flows: Iterable[CashFlow]) -> float:
     """Calculates the life of the cash flows.
 

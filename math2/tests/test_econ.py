@@ -7,8 +7,11 @@ from auxiliary import ExtTestCase, ilen
 
 from math2.calc import euler, newton
 from math2.econ import (Bond, CashFlow, CompInt, ContInt, DblDeclBalDeprec, DeclBalDeprec, EfInt, Mortgage, NomInt,
-                        Project, Rel, SPInt, SYDDeprec, SimpleInt, StrLineDeprec, UPDeprec, aw, capm, de_facto_marr, fp,
-                        irr, irr_table, link, pa, payback, pf, pg, pw, rel, rel_combinations, repeated, rpw, select)
+                        Project, Rel, SPInt, SYDDeprec, SimpleInt, StrLineDeprec, UPDeprec, aw, beta, capm,
+                        de_facto_marr,
+                        fair, fp,
+                        irr, irr_table, link, pa, payback, perp, pf, pg, pw, rel, rel_combinations, repeated, ror, rpw,
+                        select, yield_)
 from math2.misc import interp
 
 
@@ -215,20 +218,20 @@ class PS3TestCase(TestCase):
         self.assertAlmostEqual(pw(Bond(100, 0, 2, 3 / 12).cash_flows, i), 98.2946374365981)
         self.assertAlmostEqual(pw(Bond(100, 0, 2, 5 / 12).cash_flows, i), 97.17391685967232)
         self.assertAlmostEqual(pw(Bond(100, 0, 2, 3).cash_flows, i), 81.35006443077528)
-        self.assertAlmostEqual(pw(Bond.from_rate(100, 0.04, 2, 3).cash_flows, i), 92.00717047033226)
-        self.assertAlmostEqual(pw(Bond.from_rate(100, 0.06, 2, 3.25).cash_flows, i), 95.94840994600501)
+        self.assertAlmostEqual(pw(Bond.from_rate(100, NomInt(0.04, 2), 2, 3).cash_flows, i), 92.00717047033226)
+        self.assertAlmostEqual(pw(Bond.from_rate(100, NomInt(0.06, 2), 2, 3.25).cash_flows, i), 95.94840994600501)
 
     def test_3(self) -> None:
+        self.assertAlmostEqual(yield_(
+            Bond.from_rate(100, NomInt(0.07, 2), 2, 3).cash_flows, 100, EfInt(0)).to_nom(2).rate, 0.07)
+        self.assertAlmostEqual(pw(Bond.from_rate(
+            100, NomInt(0.04, 2), 2, 3).cash_flows, NomInt(0.05, 2)) + 100 * 0.04 / 2, 99.24593731921009)
+        self.assertAlmostEqual(yield_(Bond.from_rate(
+            100, NomInt(0.03, 2), 2, 2.25).cash_flows, 100, EfInt(0)).to_nom(2).rate, 0.026754568040623247)
+        self.assertAlmostEqual(pw(Bond.from_rate(100, NomInt(0.07, 2), 2, 2.25).cash_flows, NomInt(0.05, 2)),
+                               102.65033622528411)
         self.assertAlmostEqual(newton(
-            lambda y: pw(Bond.from_rate(100, 0.07, 2, 3).cash_flows, NomInt(y, 2)) - 100, 0.1), 0.07)
-        self.assertAlmostEqual(pw(Bond.from_rate(100, 0.04, 2, 3).cash_flows, NomInt(0.05, 2)) + 100 * 0.04 / 2,
-                               99.24593731921009)
-        self.assertAlmostEqual(newton(
-            lambda y: pw(Bond.from_rate(100, 0.03, 2, 2.25).cash_flows, NomInt(y, 2)) - 100, 0.1,
-        ), 0.026754568040623247)
-        self.assertAlmostEqual(pw(Bond.from_rate(100, 0.07, 2, 2.25).cash_flows, NomInt(0.05, 2)), 102.65033622528411)
-        self.assertAlmostEqual(newton(
-            lambda c: pw(Bond.from_rate(100, c, 2, 2.25).cash_flows, NomInt(0.03, 2)) - 114, 0.1,
+            lambda c: pw(Bond.from_rate(100, NomInt(c, 2), 2, 2.25).cash_flows, NomInt(0.03, 2)) - 114, 0.1,
         ), 0.10627047075771787)
 
     def test_4(self) -> None:
@@ -240,10 +243,9 @@ class PS3TestCase(TestCase):
         self.assertAlmostEqual(a * pa(i, n, g) / euler(lambda t: a0 * exp((gp - r) * t), 0, n, 10000), 1, 2)
 
     def test_5(self) -> None:
-        y = newton(
-            lambda y_: pw(Bond.from_rate(100, 0.07, 2, 7.5).cash_flows, NomInt(y_, 2)) * fp(y_ / 2, 0.5) - 108, 0.1,
-        )
-        b: Callable[[float], float] = lambda cr: pw(Bond.from_rate(1000, cr, 2, 9).cash_flows, NomInt(y, 2))
+        y = newton(lambda y_: pw(Bond.from_rate(
+                100, NomInt(0.07, 2), 2, 7.5).cash_flows, NomInt(y_, 2)) * fp(y_ / 2, 0.5) - 108, 0.1)
+        b: Callable[[float], float] = lambda cr: pw(Bond.from_rate(1000, NomInt(cr, 2), 2, 9).cash_flows, NomInt(y, 2))
 
         cur_cr = ceil(newton(lambda cr: 9500000 / 2 - (4400 * b(cr)), 0.1) / 0.0025) * 0.0025
         self.assertAlmostEqual(cur_cr, 0.0725)
@@ -269,8 +271,65 @@ class PS4TestCase(ExtTestCase):
         self.assertAlmostEqual(fx, 0.7738596388734157)
 
     def test_2(self) -> None:
-        pass
-        # print(capm(0.015))
+        p, t, r = 42, 3, capm(0.86, EfInt(0.015), EfInt(0.08))
+
+        self.assertAlmostEqual(r.rate, 0.0709)
+        self.assertAlmostEqual(p * r.to_factor(t), 51.581746894818)
+
+    def test_3(self) -> None:
+        self.assertAlmostEqual(2 * perp(capm(1.2, EfInt(0.012), EfInt(0.07)).rate), 24.509803921568626)
+
+    def test_4(self) -> None:
+        r = capm(0.8, EfInt(0.017), EfInt(0.07))
+        self.assertAlmostEqual(41 * r.to_factor(2.5) * EfInt(-0.03).to_factor(2), 44.56329005026732)
+
+    def test_5(self) -> None:
+        rf, p_bull = EfInt(0.022), 0.6
+        a_bull, a_bear = 102, 77
+        m_price, m_bull, m_bear = 105, 127, 90
+        ap = fair(102, 77, m_price, m_bull, m_bear, rf)
+        ar, mr = ror(ap, a_bull, a_bear, p_bull), ror(m_price, m_bull, m_bear, p_bull)
+        b = beta(ar, mr, rf)
+
+        self.assertAlmostEqual(ap, 86.78663986883166)
+        self.assertAlmostEqual(ar.rate, 0.060070998704959244)
+        self.assertAlmostEqual(mr.rate, 0.0685714285714285)
+        self.assertAlmostEqual(b, 0.8174754323150769)
+
+    def test_6(self) -> None:
+        bb = ((90, 102, 66), (85, 115, 77), (150, 200, 132))
+        m_price, m_bull, m_bear = 18, 22, 16
+        p = 0.6
+        rf = EfInt(0.03)
+        fps = tuple(fair(bb[i][1], bb[i][2], m_price, m_bull, m_bear, rf) for i in range(3))
+
+        self.assertIterableEqual((i for i, fp_ in enumerate(fps) if fp_ > bb[i][0]), (1, 2))
+        self.assertAlmostEqual(fps[1] + fps[2] - bb[1][0] - bb[2][0], 11.47896440129449)
+        self.assertAlmostEqual(fps[1] + fps[2], 246.4789644012945)
+
+        a_ror = ror(fps[1] + fps[2], bb[1][1] + bb[2][1], bb[1][2] + bb[2][2], p)
+        m_ror = ror(m_price, m_bull, m_bear, p)
+
+        self.assertAlmostEqual(beta(a_ror, m_ror, rf), 1.2901709513930817)
+
+    def test_7(self) -> None:
+        self.assertAlmostEqual(newton(
+            lambda y: ContInt(0.043).to_factor(3) * ContInt(y).to_factor(5) - ContInt(0.0582).to_factor(8), 0,
+        ), 0.06732)
+
+    def test_8(self) -> None:
+        bond = Bond.from_rate(100, EfInt(0.05), 1, 5)
+        default = 0.02
+        rf = EfInt(0.03)
+        good, bad = 5 + bond.face, bond.face * 0.4
+
+        for i in range(5):
+            good = 5 + ((1 - default) * good + default * bad) / rf.to_factor()
+
+        good -= 5
+
+        self.assertAlmostEqual(good, 103.08377972409899)
+        self.assertAlmostEqual(yield_(bond.cash_flows, good, EfInt(0)).rate, 0.04301423365637252)
 
 
 class PS5TestCase(ExtTestCase):

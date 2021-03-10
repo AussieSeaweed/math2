@@ -2,7 +2,7 @@ from unittest import main
 
 from auxiliary import ExtTestCase
 
-from math2.linalg import Vector, full, ones, replaced, zeros
+from math2.linalg import Vector, full, ones, replaced, solve, zeros
 
 
 class VectorTestCase(ExtTestCase):
@@ -38,6 +38,11 @@ class VectorTestCase(ExtTestCase):
 
         self.assertRaises(ValueError, a.__add__, range(5))
         self.assertRaises(ValueError, a.__sub__, range(5))
+
+    def test_solve(self) -> None:
+        self.assertSequenceAlmostEqual(solve(((1, 2), (3, 4)), (1, 0)), (-2, 1.5))
+        self.assertSequenceAlmostEqual(solve(((127, 102.2), (90, 102.2)), (102, 77)),
+                                       (0.6756756756756757, 0.15840693922885704))
 
 
 if __name__ == '__main__':
