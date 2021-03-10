@@ -6,8 +6,9 @@ from auxiliary import ExtTestCase, ilen
 
 from math2.calc import euler, newton
 from math2.econ import (Bond, CashFlow, CompInt, ContInt, DblDeclBalDeprec, DeclBalDeprec, EfInt, Mortgage, NomInt,
-                        Project, Rel, SPInt, SYDDeprec, SimpleInt, StrLineDeprec, UPDeprec, aw, de_facto_marr, fp, irr,
-                        irr_table, pa, payback, pf, pg, pw, rel, rel_combinations, select)
+                        Project, Rel, SPInt, SYDDeprec, SimpleInt, StrLineDeprec, UPDeprec, aw, de_facto_marr, fp,
+                        irr,
+                        irr_table, link, pa, payback, pf, pg, pw, rel, rel_combinations, rpw, select)
 from math2.misc import interp
 
 
@@ -263,14 +264,82 @@ class PS3TestCase(TestCase):
 
 class PS5TestCase(ExtTestCase):
     def test_1(self) -> None:
-        pass
-        # i, n = 0.09, 6
-        # y = pw(Project(-700, 370, 0, n).cash_flows(), EfInt(i))
-        #
-        # self.assertAlmostEqual(y, 959.7898783854448)
-        # self.assertAlmostEqual(y * fp(i, n), 1609.6637114243001)
-        # self.assertAlmostEqual(y * fp(i, 4), 1354.821741793031)
-        # self.assertAlmostEqual(newton(lambda x: y - x * fp(i, 1) - 5 * x * fp(i, 3), 0), 126.86999104253076)
+        i, n = 0.05, 6
+        y = pw(Project(-700, 370, 0, n).cash_flows, EfInt(i))
+
+        self.assertAlmostEqual(y, 1178.006064888955)
+        self.assertAlmostEqual(y * fp(i, n), 1578.6407921875)
+        self.assertAlmostEqual(y * fp(i, 4), 1431.8737344104306)
+        self.assertAlmostEqual(newton(lambda x: y - x * pf(i, 1) - 5 * x * pf(i, 3), 0), 223.464034554222)
+
+        i, n = 0.09, 6
+        y = pw(Project(-700, 370, 0, n).cash_flows, EfInt(i))
+
+        self.assertAlmostEqual(y, 959.7898783854448)
+        self.assertAlmostEqual(y * fp(i, n), 1609.6637114243001)
+        self.assertAlmostEqual(y * fp(i, 4), 1354.821741793031)
+        self.assertAlmostEqual(newton(lambda x: y - x * pf(i, 1) - 5 * x * pf(i, 3), 0), 200.862256010023)
+
+    def test_2(self) -> None:
+        cr = tuple(Project(300000, 14000, 0, 20).cash_flows)
+        ed = tuple(Project(220000, 21000, 0, 20).cash_flows) + (CashFlow(8, 35000), CashFlow(16, 35000))
+        i = EfInt(0.05)
+
+        self.assertAlmostEqual(pw(cr, i), 474470.94479555974)
+        self.assertAlmostEqual(pw(ed, i), 521429.6981340426)
+        self.assertAlmostEqual(aw(cr, i), 38072.77615720737)
+        self.assertAlmostEqual(aw(ed, i), 41840.86801633675)
+
+        self.assertLess(pw(cr, i), pw(ed, i))
+        self.assertLess(aw(cr, i), aw(ed, i))
+
+    def test_3(self) -> None:
+        i = EfInt(0.05)
+
+        aw_cr = aw(Project(300000, 14000, 0, 20).cash_flows, i)
+        aw_ed = aw(Project(220000, 21000, 0, 20).cash_flows, i) + aw((CashFlow(8, 35000),), i)
+
+        self.assertAlmostEqual(aw_cr, 38072.77615720737)
+        self.assertAlmostEqual(aw_ed, 42318.6326589209)
+
+    def test_4(self) -> None:
+        a, b = Project(425, 48, 0, 3), Project(450, 45, 0, 4)
+        i = EfInt(0.1)
+
+        self.assertAlmostEqual(rpw(a.cash_flows, i, 5), 926.2665553147758)
+        self.assertAlmostEqual(rpw(link((a.cash_flows, b.cash_flows)), i, 5), 941.1376210020427)
+        self.assertAlmostEqual(rpw(b.cash_flows, i, 5), 927.9414595376618)
+        self.assertAlmostEqual(rpw(link((b.cash_flows, a.cash_flows)), i, 5), 912.7288871227124)
+
+    def test_5(self) -> None:
+        i = EfInt(0.07)
+        sa = rpw(Project(5e6, 2e5 + 1e6, 0, 6).cash_flows, i, 25)
+        sb = rpw(Project(6e6, 1.5e5 + 1.1e6, 0, 11).cash_flows, i, 25)
+        ba = rpw(Project(5e6, 5e5 + 1e6 - 3e5, 0, 14).cash_flows, i, 25)
+        bb = rpw(Project(3e6, 3e5 + 6e5, 0, 5).cash_flows, i, 25)  # TODO BETTER MAKE REPEATED METHOD
+
+        self.assertAlmostEqual(min(sa + ba, sa + bb, sb + ba, sb + bb), sb + bb)
+
+    def test_6(self) -> None:
+        i = EfInt(0.06)
+        mortgage = Mortgage(580000, i, 1)
+
+        self.assertAlmostEqual(1 - mortgage.pay(2).principal * i.rate / mortgage.payment, 0.26179726123417735)
+        self.assertAlmostEqual(1 - mortgage.pay(9).principal * i.rate / mortgage.payment, 0.39364628371277466)
+
+    def test_7(self) -> None:
+        s, t, i, n, g = 57000, 1000000, 0.065, 35, 0.035
+        sq = s / 4 * (fp(i, 0) + fp(i, 3 / 12) + fp(i, 6 / 12) + fp(i, 9 / 12))
+
+        self.assertAlmostEqual(newton(lambda x: x * s * pa(i, n, g) - t * pf(i, n), 0), 0.09187408282061407)
+        self.assertAlmostEqual(newton(lambda x: x * sq * pa(i, n, g) - t * pf(i, n), 0), 0.08971594525258755)
+
+    def test_8(self) -> None:
+        project, i = Project(1000, 500, 300, 10), EfInt(0.6)
+
+        x, y = project.cash_flows, link((project.cash_flows, project.cash_flows))
+
+        self.assertAlmostEqual(aw(x, i), aw(y, i))
 
 
 class PS6TestCase(ExtTestCase):

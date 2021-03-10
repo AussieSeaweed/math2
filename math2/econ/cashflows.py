@@ -1,10 +1,10 @@
-from collections.abc import Iterable
+from collections.abc import Iterable, Iterator
 from functools import total_ordering
 from itertools import accumulate
 from math import inf
-from typing import Any
+from typing import Any, Optional
 
-from auxiliary import SupportsLessThan, retain_iter, windowed
+from auxiliary import SupportsLessThan, default, retain_iter, windowed
 
 from math2.calc import newton
 from math2.econ.factors import ap
@@ -107,14 +107,15 @@ def rpw(cash_flows: Iterable[CashFlow], i: Int, total_life: float) -> float:
 
 
 @retain_iter
-def aw(cash_flows: Iterable[CashFlow], i: CompInt) -> float:
+def aw(cash_flows: Iterable[CashFlow], i: CompInt, total_life: Optional[float] = None) -> float:
     """Calculates the annual worth of the supplied cash flows at the interest.
 
     :param cash_flows: The cash flows.
     :param i: The interest.
+    :param total_life: The optional total life.
     :return: The annual worth.
     """
-    return pw(cash_flows, i) * ap(i.to_ef().rate, max(cash_flow.time for cash_flow in cash_flows))
+    return pw(cash_flows, i) * ap(i.to_ef().rate, default(max(cash_flow.time for cash_flow in cash_flows), total_life))
 
 
 @retain_iter
@@ -126,3 +127,19 @@ def irr(cash_flows: Iterable[CashFlow], init_guess: CompInt) -> EfInt:
     :return: The internal rate of return.
     """
     return EfInt(newton(lambda i: pw(cash_flows, EfInt(i)), init_guess.to_ef().rate))
+
+
+def link(cash_flow_sets: Iterable[Iterable[CashFlow]]) -> Iterator[CashFlow]:
+    """Links the cash flows together, updating corresponding time periods.
+
+    :param cash_flow_sets: The cash flow sets to chain.
+    :return: The chained cash flows.
+    """
+    total = list[CashFlow]()
+    life = 0.0
+
+    for cash_flows in cash_flow_sets:
+        total.extend(CashFlow(cash_flow.time + life, cash_flow.amount) for cash_flow in cash_flows)
+        life = max(life, max(cash_flow.time for cash_flow in total))
+
+    return iter(total)
