@@ -5,11 +5,11 @@ from math2.misc import frange
 
 
 def diff(f: Callable[[float], float], x: float, eps: float = EPS) -> float:
-    """Perform numerical differentiation on the supplied function.
+    """Performs a numerical differentiation on the supplied function.
 
     :param f: The function to be differentiated.
-    :param x: The point of differentiation.
-    :param eps: The accuracy.
+    :param x: The coordinate where the differentiation take place.
+    :param eps: The accuracy, defaults to EPS.
     :return: The derivative at the point.
     """
     return (f(x + eps) - f(x - eps)) / (2 * eps)
@@ -20,8 +20,8 @@ def newton(f: Callable[[float], float], x: float, eps: float = EPS) -> float:
 .
     :param f: The function to solve.
     :param x: The initial guess.
-    :param eps: The accuracy.
-    :return: The root coordinate.
+    :param eps: The accuracy, defaults to EPS.
+    :return: The root's coordinate.
     """
     while eps < abs(y := f(x)):
         x -= y / diff(f, x, eps)
@@ -30,7 +30,7 @@ def newton(f: Callable[[float], float], x: float, eps: float = EPS) -> float:
 
 
 def euler(f: Callable[[float], float], xlo: float, xhi: float, n: float = 100) -> float:
-    """Integrates the function between two given bounds with the Euler's method.
+    """Performs a numerical integration on the supplied function between the given bounds with the Euler's method.
 
     :param f: The function to integrate.
     :param xlo: The lower bound.
