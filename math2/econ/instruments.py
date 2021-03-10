@@ -6,24 +6,23 @@ from enum import Enum
 from itertools import chain
 from typing import Any, Optional
 
-from auxiliary import retain_iter
+from auxiliary import default, iindex, ilen, retain_iter
 
 from math2.consts import EPS
 from math2.econ.cashflows import CashFlow, irr
 from math2.econ.factors import ap, fa
-from math2.econ.ints import CompInt
+from math2.econ.ints import CompInt, EfInt
 from math2.misc import frange
 
 
 class Instrument(ABC):
     """Instrument is the abstract base class for all financial instruments."""
 
+    @property
     @abstractmethod
-    def cash_flows(self, interest: CompInt) -> Iterator[CashFlow]:
-        """Calculates the cash flows of this instrument at the given interest value.
-
-        :param interest: The interest value.
-        :return: The cash flows.
+    def cash_flows(self) -> Iterator[CashFlow]:
+        """
+        :return: The cash flows of this instrument.
         """
         pass
 
@@ -37,7 +36,8 @@ class Bond(Instrument):
         self.frequency = frequency
         self.maturity = maturity
 
-    def cash_flows(self, interest: Optional[CompInt] = None) -> Iterator[CashFlow]:
+    @property
+    def cash_flows(self) -> Iterator[CashFlow]:
         period = 1 / self.frequency
 
         return chain(
@@ -61,75 +61,86 @@ class Bond(Instrument):
 class Mortgage(Instrument):
     """Mortgage is the class for mortgages."""
 
-    def __init__(self, principal: float, frequency: float = 12, amortization: float = 25):
+    def __init__(self, principal: float, int_: CompInt, freq: float = 12, term: float = 5, amort: float = 25):
         self.principal = principal
-        self.frequency = frequency
-        self.amortization = amortization
+        self.int = int_
+        self.freq = freq
+        self.term = term
+        self.amort = amort
 
-    def cash_flows(self, interest: CompInt) -> Iterator[CashFlow]:
-        payment = self.payment(interest)
-        subperiod = 1 / self.frequency
+    @property
+    def cash_flows(self) -> Iterator[CashFlow]:
+        return chain(
+            (CashFlow(0, -self.principal),),
+            (CashFlow(t, self.payment) for t in frange(1 / self.freq, self.amort + EPS, 1 / self.freq)),
+        )
 
-        return chain((CashFlow(0, -self.principal),),
-                     (CashFlow(t, payment) for t in frange(subperiod, self.amortization + EPS, subperiod)))
-
-    def payment(self, interest: CompInt) -> float:
-        """Calculates the payment value with respect to the given interest value.
-
-        :param interest: The interest value.
-        :return: The payment.
+    @property
+    def payment(self) -> float:
         """
-        return self.principal * ap(interest.to_subperiod(self.frequency).rate, self.frequency * self.amortization)
+        :return: The mortgage payment.
+        """
+        return self.principal * ap(self.int.to_sp(self.freq).rate, self.freq * self.amort)
 
-    def pay(self, term: int, interest: CompInt, payment: Optional[float] = None) -> Mortgage:
+    def pay(self, term: Optional[float] = None, payment: Optional[float] = None) -> Mortgage:
         """Creates a new mortgage instance assuming payments were made.
 
-        :param interest: The interest value.
         :param term: The term during which payments were made.
         :param payment: The optional payment made, defaults to payment with respect to the interest.
         :return: The next mortgage instance.
         """
-        return self.pay(term, interest, self.payment(interest)) if payment is None else Mortgage(
-            self.principal * interest.to_factor(term) - payment
-            * fa(interest.to_subperiod(self.frequency).rate, term * self.frequency),
-            self.frequency, self.amortization - term,
+        term = default(term, self.term)
+        payment = default(payment, self.payment)
+
+        return Mortgage(
+            self.principal * self.int.to_factor(term) - payment * fa(self.int.to_sp(self.freq).rate, term * self.freq),
+            self.int, self.freq, self.term, self.amort - term,
         )
 
     @classmethod
-    def from_down(cls, value: float, down: float, frequency: float = 12, amortization: float = 25) -> Mortgage:
+    def from_down(cls, value: float, down: float, int_: CompInt, freq: float = 12, term: float = 5,
+                  amort: float = 25) -> Mortgage:
         """Constructs the mortgage instance from the down payment value.
 
         :param value: The total value.
         :param down: The down payment.
-        :param frequency: The frequency of payments, defaults to 12.
-        :param amortization: The amortization of the mortgage, defaults to 25.
+        :param int_: The interest rate.
+        :param freq: The frequency of payments, defaults to 12.
+        :param term: The term, defaults = 5.
+        :param amort: The amortization of the mortgage, defaults to 25.
         :return: The constructed mortgage instance.
         """
-        return cls(value - down, frequency, amortization)
+        return cls(value - down, int_, freq, term, amort)
 
     @classmethod
-    def from_dtv(cls, value: float, dtv: float, frequency: float = 12, amortization: float = 25) -> Mortgage:
+    def from_dtv(cls, value: float, dtv: float, int_: CompInt, freq: float = 12, term: float = 5,
+                 amort: float = 25) -> Mortgage:
         """Constructs the mortgage instance from the down payment to value percentage.
 
         :param value: The total value.
         :param dtv: The down payment to value percentage.
-        :param frequency: The frequency of payments, defaults to 12.
-        :param amortization: The amortization of the mortgage, defaults to 25.
+        :param int_: The interest rate.
+        :param freq: The frequency of payments, defaults to 12.
+        :param term: The term, defaults = 5.
+        :param amort: The amortization of the mortgage, defaults to 25.
         :return: The constructed mortgage instance.
         """
-        return cls.from_down(value, value * dtv, frequency, amortization)
+        return cls.from_down(value, value * dtv, int_, freq, term, amort)
 
     @classmethod
-    def from_ltv(cls, value: float, ltv: float, frequency: float = 12, amortization: float = 25) -> Mortgage:
+    def from_ltv(cls, value: float, ltv: float, int_: CompInt, freq: float = 12, term: float = 5,
+                 amort: float = 25) -> Mortgage:
         """Constructs the mortgage instance from the loan payment to value percentage.
 
         :param value: The total value.
         :param ltv: The loan payment to value percentage.
-        :param frequency: The frequency of payments, defaults to 12.
-        :param amortization: The amortization of the mortgage, defaults to 25.
+        :param int_: The interest rate.
+        :param freq: The frequency of payments, defaults to 12.
+        :param term: The term, defaults = 5.
+        :param amort: The amortization of the mortgage, defaults to 25.
         :return: The constructed mortgage instance.
         """
-        return cls(value * ltv, frequency, amortization)
+        return cls(value * ltv, int_, freq, term, amort)
 
 
 class Project(Instrument):
@@ -148,7 +159,8 @@ class Project(Instrument):
         else:
             return NotImplemented
 
-    def cash_flows(self, interest: Optional[CompInt] = None) -> Iterator[CashFlow]:
+    @property
+    def cash_flows(self) -> Iterator[CashFlow]:
         return chain((CashFlow(0, self.initial),), (CashFlow(t, self.annuity) for t in frange(1, self.life + EPS)),
                      (CashFlow(self.life, self.final),))
 
@@ -188,12 +200,58 @@ def rel_combinations(values: Iterable[float], budget: float) -> Iterator[Iterato
         chosen = rel_combinations(values[:i], budget - values[i]) if values[i] <= budget else ()
         skipped = rel_combinations(values[:i], budget)
 
-        return chain((chain(sub_combination, [i]) for sub_combination in chosen), skipped)
+        return chain((chain(sub_combination, (i,)) for sub_combination in chosen), skipped)
     else:
         return iter((iter(()),))
 
 
-def irr_table(projects: Iterable[Project], init_guess: CompInt) -> tuple[Iterator[float], Iterator[Iterator[float]]]:
+def de_facto_marr(costs: Iterable[float], irrs: Iterable[CompInt], budget: float) -> CompInt:
+    """Calculates the de factor marr of the given projects based on costs and irrs.
+
+    :param costs: The costs.
+    :param irrs: The internal rate of returns.
+    :param budget: The budget.
+    :return: The de factor marr.
+    """
+    costs = tuple(costs)
+    irrs = tuple(irrs)
+    indices = sorted(range(ilen(costs)), key=irrs.__getitem__, reverse=True)
+
+    cost_sum = 0.0
+    marr: CompInt = EfInt(0)
+
+    for i in indices:
+        cost_sum += costs[i]
+
+        if cost_sum > budget:
+            break
+
+        marr = irrs[i]
+
+    return marr
+
+
+def select(irrs: Iterable[CompInt], table: Iterable[Iterable[CompInt]], marr: CompInt) -> Optional[int]:
+    """Selects the project with respect to the given table of internal rate of returns and marr.
+
+    :param irrs: The irr values of the choices (sorted by their initial cost).
+    :param table: The table of internal rate of returns.
+    :param marr: The minimum acceptable rate of return.
+    :return: The best project.
+    """
+    try:
+        x = next(i for i, irr_ in enumerate(irrs) if irr_ > marr)
+    except StopIteration:
+        return None
+
+    for i, row in enumerate(table):
+        if i > x and iindex(row, x) > marr:
+            x = i
+
+    return x
+
+
+def irr_table(projects: Iterable[Project], init_guess: CompInt) -> Iterator[Iterator[EfInt]]:
     """Creates the irr table from the projects.
 
     :param projects: The projects.
@@ -202,7 +260,4 @@ def irr_table(projects: Iterable[Project], init_guess: CompInt) -> tuple[Iterato
     """
     projects = tuple(projects)
 
-    return (
-        (irr(project.cash_flows(), init_guess).rate for project in projects),
-        ((irr((x - y).cash_flows(), init_guess).rate for y in projects[:projects.index(x)]) for x in projects),
-    )
+    return ((irr((x - y).cash_flows, init_guess) for y in projects[:projects.index(x)]) for x in projects)

@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from functools import total_ordering
 from math import exp, inf, log
-from typing import Optional
+from typing import Any, Optional
+
+from auxiliary import SupportsLessThan
 
 from math2.econ.factors import fp
 
@@ -14,39 +17,64 @@ class Int(ABC):
         self.rate = rate
 
     @abstractmethod
-    def to_factor(self, time: float) -> float:
+    def to_factor(self, t: float) -> float:
         """Converts this interest to the factor at the given time period.
 
-        :param time: The time period.
+        :param t: The time period.
         :return: The converted factor.
         """
         pass
 
     @classmethod
     @abstractmethod
-    def from_factor(cls, factor: float, time: float) -> Int:
+    def from_factor(cls, factor: float, t: float) -> Int:
         """Converts the factor at a time period to an interest value.
 
         :param factor: The factor.
-        :param time: The time period.
+        :param t: The time period.
         :return: The converted interest value.
         """
         pass
 
 
-class SimpleInt(Int):
+@total_ordering
+class SimpleInt(Int, SupportsLessThan):
     """SimpleInt is the class for simple interests."""
 
-    def to_factor(self, time: float) -> float:
-        return 1 + self.rate * time
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, SimpleInt):
+            return self.rate == other.rate
+        else:
+            return NotImplemented
+
+    def __lt__(self, other: Any) -> bool:
+        if isinstance(other, SimpleInt):
+            return self.rate < other.rate
+        else:
+            return NotImplemented
+
+    def to_factor(self, t: float) -> float:
+        return 1 + self.rate * t
 
     @classmethod
-    def from_factor(cls, factor: float, time: float) -> SimpleInt:
-        return SimpleInt((factor - 1) / time)
+    def from_factor(cls, factor: float, t: float) -> SimpleInt:
+        return SimpleInt((factor - 1) / t)
 
 
 class CompInt(Int, ABC):
     """CompInt is the abstract base class for all compound interests."""
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, CompInt):
+            return self.to_ef().rate == other.to_ef().rate
+        else:
+            return NotImplemented
+
+    def __lt__(self, other: Any) -> bool:
+        if isinstance(other, CompInt):
+            return self.to_ef().rate < other.to_ef().rate
+        else:
+            return NotImplemented
 
     @abstractmethod
     def to_ef(self) -> EfInt:
@@ -65,33 +93,34 @@ class CompInt(Int, ABC):
         pass
 
     @abstractmethod
-    def to_nom(self, subperiod_count: float) -> NomInt:
+    def to_nom(self, sp_count: float) -> NomInt:
         """Converts this interest value to a nominal interest value.
 
-        :param subperiod_count: The number of subperiods of the converted interest value.
+        :param sp_count: The number of subperiods of the converted interest value.
         :return: The converted interest value.
         """
         pass
 
     @abstractmethod
-    def to_subperiod(self, subperiod_count: float) -> SubperiodInt:
+    def to_sp(self, sp_count: float) -> SPInt:
         """Converts this interest value to a subperiod interest value.
 
-        :param subperiod_count: The number of subperiods of the converted interest value.
+        :param sp_count: The number of subperiods of the converted interest value.
         :return: The converted interest value.
         """
         pass
 
     @classmethod
-    def from_factor(cls, factor: float, time: float) -> CompInt:
-        return EfInt(factor ** (1 / time) - 1)
+    def from_factor(cls, factor: float, t: float) -> CompInt:
+        return EfInt(factor ** (1 / t) - 1)
 
 
+@total_ordering
 class EfInt(CompInt):
     """EfInt is the class for effective interests."""
 
-    def to_factor(self, time: float) -> float:
-        return fp(self.rate, time)
+    def to_factor(self, t: float) -> float:
+        return fp(self.rate, t)
 
     def to_ef(self) -> EfInt:
         return self
@@ -99,81 +128,78 @@ class EfInt(CompInt):
     def to_cont(self) -> ContInt:
         return ContInt(log(self.rate + 1))
 
-    def to_nom(self, subperiod_count: float) -> NomInt:
-        return NomInt(subperiod_count * ((self.rate + 1) ** (1 / subperiod_count) - 1), subperiod_count)
+    def to_nom(self, sp_count: float) -> NomInt:
+        return NomInt(sp_count * ((self.rate + 1) ** (1 / sp_count) - 1), sp_count)
 
-    def to_subperiod(self, subperiod_count: float) -> SubperiodInt:
-        return SubperiodInt((self.rate + 1) ** (1 / subperiod_count) - 1, subperiod_count)
+    def to_sp(self, sp_count: float) -> SPInt:
+        return SPInt((self.rate + 1) ** (1 / sp_count) - 1, sp_count)
 
 
 class MulCompInt(CompInt, ABC):
     """MulCompInt is the abstract base class for all multiple compounding interests."""
 
-    def __init__(self, rate: float, subperiod_count: float):
+    def __init__(self, rate: float, sp_count: float):
         super().__init__(rate)
 
-        self.subperiod_count = subperiod_count
+        self.sp_count = sp_count
 
     @property
-    def subperiod(self) -> float:
+    def sp(self) -> float:
         """
         :return: The subperiod of this multiple compound interest value.
         """
-        return 1 / self.subperiod_count
+        return 1 / self.sp_count
 
 
+@total_ordering
 class NomInt(MulCompInt):
     """NomInt is the class for nominal interests."""
 
-    def to_factor(self, time: float) -> float:
-        return fp(self.rate / self.subperiod_count, self.subperiod_count * time)
+    def to_factor(self, t: float) -> float:
+        return fp(self.rate / self.sp_count, self.sp_count * t)
 
     def to_ef(self) -> EfInt:
-        return EfInt(fp(self.rate / self.subperiod_count, self.subperiod_count) - 1)
+        return EfInt(fp(self.rate / self.sp_count, self.sp_count) - 1)
 
     def to_cont(self) -> ContInt:
         return self.to_ef().to_cont()
 
-    def to_nom(self, subperiod_count: Optional[float] = None) -> NomInt:
-        return self if subperiod_count is None else self.to_ef().to_nom(subperiod_count)
+    def to_nom(self, sp_count: Optional[float] = None) -> NomInt:
+        return self if sp_count is None else self.to_ef().to_nom(sp_count)
 
-    def to_subperiod(self, subperiod_count: Optional[float] = None) -> SubperiodInt:
-        if subperiod_count is None:
-            return SubperiodInt(self.rate / self.subperiod_count, self.subperiod_count)
-        else:
-            return self.to_ef().to_subperiod(subperiod_count)
+    def to_sp(self, sp_count: Optional[float] = None) -> SPInt:
+        return SPInt(self.rate / self.sp_count, self.sp_count) if sp_count is None else self.to_ef().to_sp(sp_count)
 
 
-class SubperiodInt(MulCompInt):
-    """SubperiodInt is the class for subperiod interests."""
+@total_ordering
+class SPInt(MulCompInt):
+    """SPInt is the class for sp interests."""
 
-    def to_factor(self, time: float) -> float:
-        return fp(self.rate, self.subperiod_count * time)
+    def to_factor(self, t: float) -> float:
+        return fp(self.rate, self.sp_count * t)
 
     def to_ef(self) -> EfInt:
-        return EfInt(fp(self.rate, self.subperiod_count) - 1)
+        return EfInt(fp(self.rate, self.sp_count) - 1)
 
     def to_cont(self) -> ContInt:
         return self.to_ef().to_cont()
 
-    def to_nom(self, subperiod_count: Optional[float] = None) -> NomInt:
-        if subperiod_count is None:
-            return NomInt(self.rate * self.subperiod_count, self.subperiod_count)
-        else:
-            return self.to_ef().to_nom(subperiod_count)
+    def to_nom(self, sp_count: Optional[float] = None) -> NomInt:
+        return NomInt(self.rate * self.sp_count, self.sp_count) if sp_count is None else self.to_ef().to_nom(sp_count)
 
-    def to_subperiod(self, subperiod_count: Optional[float] = None) -> SubperiodInt:
-        return self if subperiod_count is None else self.to_ef().to_subperiod(subperiod_count)
+    def to_sp(self, sp_count: Optional[float] = None) -> SPInt:
+        return self if sp_count is None else self.to_ef().to_sp(sp_count)
 
 
+@total_ordering
 class ContInt(MulCompInt):
     """ContInt is the class for continuous interests."""
 
     def __init__(self, rate: float):
         super().__init__(rate, inf)
 
-    def to_factor(self, time: float) -> float:
-        return exp(self.rate) ** time
+    def to_factor(self, t: float) -> float:
+        return exp(self.rate) ** t
 
     def to_ef(self) -> EfInt:
         return EfInt(exp(self.rate) - 1)
@@ -181,8 +207,8 @@ class ContInt(MulCompInt):
     def to_cont(self) -> ContInt:
         return self
 
-    def to_nom(self, subperiod_count: float) -> NomInt:
-        return self.to_ef().to_nom(subperiod_count)
+    def to_nom(self, sp_count: float) -> NomInt:
+        return self.to_ef().to_nom(sp_count)
 
-    def to_subperiod(self, subperiod_count: float) -> SubperiodInt:
-        return self.to_ef().to_subperiod(subperiod_count)
+    def to_sp(self, sp_count: float) -> SPInt:
+        return self.to_ef().to_sp(sp_count)

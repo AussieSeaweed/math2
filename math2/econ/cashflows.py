@@ -1,10 +1,10 @@
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterable
 from functools import total_ordering
 from itertools import accumulate
 from math import inf
-from typing import Any, Optional
+from typing import Any
 
-from auxiliary import SupportsLessThan, iindex, ilen, retain_iter, windowed
+from auxiliary import SupportsLessThan, retain_iter, windowed
 
 from math2.calc import newton
 from math2.econ.factors import ap
@@ -33,14 +33,14 @@ class CashFlow(SupportsLessThan):
             return NotImplemented
 
 
-def disc(cash_flow: CashFlow, interest: Int) -> CashFlow:
+def disc(cash_flow: CashFlow, i: Int) -> CashFlow:
     """Discounts the cash flow from a copied value.
 
     :param cash_flow: The cash flow.
-    :param interest: The interest at which is discounted.
+    :param i: The interest at which is discounted.
     :return: The discounted copy of the cash flow.
     """
-    return CashFlow(0, cash_flow.amount / interest.to_factor(cash_flow.time))
+    return CashFlow(0, cash_flow.amount / i.to_factor(cash_flow.time))
 
 
 def payback(cash_flows: Iterable[CashFlow], cost: float) -> float:
@@ -62,33 +62,33 @@ def payback(cash_flows: Iterable[CashFlow], cost: float) -> float:
             return inf
 
 
-def disc_payback(cash_flows: Iterable[CashFlow], cost: float, interest: Int) -> float:
+def disc_payback(cash_flows: Iterable[CashFlow], cost: float, i: Int) -> float:
     """Calculates the discounted payback period of the cash flows at the given interest value.
 
     :param cash_flows: The cash flows.
     :param cost: The cost to pay back.
-    :param interest: The interest at which the cash flows are discounted.
+    :param i: The interest at which the cash flows are discounted.
     :return: The payback period.
     """
-    return payback(map(lambda cash_flow: disc(cash_flow, interest), cash_flows), cost)
+    return payback(map(lambda cash_flow: disc(cash_flow, i), cash_flows), cost)
 
 
-def pw(cash_flows: Iterable[CashFlow], i: CompInt) -> float:
+def pw(cash_flows: Iterable[CashFlow], i: Int) -> float:
     """Calculates the present worth of the supplied cash flows at the interest.
 
     :param cash_flows: The cash flows.
-    :param i: The interest.
+    :param i: The interest rate.
     :return: The present worth.
     """
     return sum(disc(cash_flow, i).amount for cash_flow in cash_flows)
 
 
 @retain_iter
-def rpw(cash_flows: Iterable[CashFlow], i: CompInt, total_life: float) -> float:
+def rpw(cash_flows: Iterable[CashFlow], i: Int, total_life: float) -> float:
     """Calculates the repeated present worth of the supplied cash flows at the interest and at the total life.
 
     :param cash_flows: The cash flows.
-    :param i: The interest.
+    :param i: The interest rate.
     :param total_life: The total life.
     :return: The repeated present worth.
     """
@@ -126,49 +126,3 @@ def irr(cash_flows: Iterable[CashFlow], init_guess: CompInt) -> EfInt:
     :return: The internal rate of return.
     """
     return EfInt(newton(lambda i: pw(cash_flows, EfInt(i)), init_guess.to_ef().rate))
-
-
-def de_facto_marr(costs: Iterable[float], irrs: Iterable[float], budget: float) -> float:
-    """Calculates the de factor marr of the given projects based on costs and irrs.
-
-    :param costs: The costs.
-    :param irrs: The internal rate of returns.
-    :param budget: The budget.
-    :return: The de factor marr.
-    """
-    costs = tuple(costs)
-    irrs = tuple(irrs)
-    indices = sorted(range(ilen(costs)), key=irrs.__getitem__, reverse=True)
-
-    cost_sum = 0.0
-    marr = 0.0
-
-    for i in indices:
-        cost_sum += costs[i]
-
-        if cost_sum > budget:
-            break
-
-        marr = irrs[i]
-
-    return marr
-
-
-def select(irrs: Iterable[float], table: Iterable[Iterable[float]], marr: float) -> Optional[int]:
-    """Selects the project with respect to the given table of internal rate of returns and marr.
-
-    :param irrs: The irr values of the choices (sorted by their initial cost).
-    :param table: The table of internal rate of returns.
-    :param marr: The minimum acceptable rate of return.
-    :return: The best project.
-    """
-    try:
-        x = next(i for i, irr_ in enumerate(irrs) if irr_ > marr)
-    except StopIteration:
-        return None
-
-    for i, row in enumerate(table):
-        if i > x and iindex(row, x) > marr:
-            x = i
-
-    return x
