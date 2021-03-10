@@ -57,7 +57,7 @@ class SimpleInt(Int, SupportsLessThan):
         return 1 + self.rate * t
 
     @classmethod
-    def from_factor(cls, factor: float, t: float) -> SimpleInt:
+    def from_factor(cls, factor: float, t: float = 1) -> SimpleInt:
         return SimpleInt((factor - 1) / t)
 
 
@@ -111,7 +111,7 @@ class CompInt(Int, ABC):
         pass
 
     @classmethod
-    def from_factor(cls, factor: float, t: float) -> CompInt:
+    def from_factor(cls, factor: float, t: float = 1) -> CompInt:
         return EfInt(factor ** (1 / t) - 1)
 
 

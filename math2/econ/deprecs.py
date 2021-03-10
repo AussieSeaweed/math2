@@ -6,6 +6,7 @@ from typing import Optional
 
 from auxiliary import ilen, retain_iter
 
+from math2.econ.ints import CompInt, EfInt
 from math2.misc import series_sum
 
 
@@ -82,17 +83,17 @@ class DeclBalDeprec(Deprec):
     """DeclBalDeprec is the class for declining balance depreciations."""
 
     @property
-    def rate(self) -> float:
-        return 1 - (self.salvage / self.basis) ** (1 / self.life)
+    def rate(self) -> CompInt:
+        return EfInt(1 - (self.salvage / self.basis) ** (1 / self.life))
 
     def book(self, t: float) -> float:
-        return self.basis * (1 - self.rate) ** t
+        return self.basis * (1 - self.rate.to_ef().rate) ** t
 
     def amount(self, t: float) -> float:
-        return self.book(t - 1) * self.rate
+        return self.book(t - 1) * self.rate.rate
 
     @classmethod
-    def from_rate(cls, basis: float, life: int, rate: float) -> DeclBalDeprec:
+    def from_rate(cls, basis: float, life: int, rate: CompInt) -> DeclBalDeprec:
         """Constructs the declining balance depreciation from salvage value.
 
         :param basis: The basis.
@@ -100,7 +101,7 @@ class DeclBalDeprec(Deprec):
         :param rate: The depreciation rate.
         :return: The declining balance depreciation.
         """
-        return DeclBalDeprec(basis, basis * (1 - rate) ** life, life)
+        return DeclBalDeprec(basis, basis * (1 - rate.to_ef().rate) ** life, life)
 
 
 class DblDeclBalDeprec(DeclBalDeprec):
@@ -112,8 +113,8 @@ class DblDeclBalDeprec(DeclBalDeprec):
         self.floor = floor
 
     @property
-    def rate(self) -> float:
-        return 2 / self.life
+    def rate(self) -> CompInt:
+        return EfInt(2 / self.life)
 
     def book(self, t: float) -> float:
         return max(self.salvage, super().book(t)) if self.floor else super().book(t)
