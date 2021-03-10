@@ -180,7 +180,7 @@ class PS2TestCase(ExtTestCase):
             170000 * pf(i, 10),
         )
 
-        self.assertSequenceAlmostEqual(options, (139230.06759675476, 140000, 140388.27552363696, 139459.21097877636))
+        self.assertIterableAlmostEqual(options, (139230.06759675476, 140000, 140388.27552363696, 139459.21097877636))
         self.assertEqual(max(range(4), key=options.__getitem__), 2)
 
     def test_6(self) -> None:
@@ -244,7 +244,7 @@ class PS3TestCase(TestCase):
 
     def test_5(self) -> None:
         y = newton(lambda y_: pw(Bond.from_rate(
-                100, NomInt(0.07, 2), 2, 7.5).cash_flows, NomInt(y_, 2)) * fp(y_ / 2, 0.5) - 108, 0.1)
+            100, NomInt(0.07, 2), 2, 7.5).cash_flows, NomInt(y_, 2)) * fp(y_ / 2, 0.5) - 108, 0.1)
         b: Callable[[float], float] = lambda cr: pw(Bond.from_rate(1000, NomInt(cr, 2), 2, 9).cash_flows, NomInt(y, 2))
 
         cur_cr = ceil(newton(lambda cr: 9500000 / 2 - (4400 * b(cr)), 0.1) / 0.0025) * 0.0025
