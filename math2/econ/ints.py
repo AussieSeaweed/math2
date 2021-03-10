@@ -17,7 +17,7 @@ class Int(ABC):
         self.rate = rate
 
     @abstractmethod
-    def to_factor(self, t: float) -> float:
+    def to_factor(self, t: float = 1) -> float:
         """Converts this interest to the factor at the given time period.
 
         :param t: The time period.
@@ -27,7 +27,7 @@ class Int(ABC):
 
     @classmethod
     @abstractmethod
-    def from_factor(cls, factor: float, t: float) -> Int:
+    def from_factor(cls, factor: float, t: float = 1) -> Int:
         """Converts the factor at a time period to an interest value.
 
         :param factor: The factor.
@@ -53,7 +53,7 @@ class SimpleInt(Int, SupportsLessThan):
         else:
             return NotImplemented
 
-    def to_factor(self, t: float) -> float:
+    def to_factor(self, t: float = 1) -> float:
         return 1 + self.rate * t
 
     @classmethod
@@ -119,7 +119,7 @@ class CompInt(Int, ABC):
 class EfInt(CompInt):
     """EfInt is the class for effective interests."""
 
-    def to_factor(self, t: float) -> float:
+    def to_factor(self, t: float = 1) -> float:
         return fp(self.rate, t)
 
     def to_ef(self) -> EfInt:
@@ -155,7 +155,7 @@ class MulCompInt(CompInt, ABC):
 class NomInt(MulCompInt):
     """NomInt is the class for nominal interests."""
 
-    def to_factor(self, t: float) -> float:
+    def to_factor(self, t: float = 1) -> float:
         return fp(self.rate / self.sp_count, self.sp_count * t)
 
     def to_ef(self) -> EfInt:
@@ -175,7 +175,7 @@ class NomInt(MulCompInt):
 class SPInt(MulCompInt):
     """SPInt is the class for sp interests."""
 
-    def to_factor(self, t: float) -> float:
+    def to_factor(self, t: float = 1) -> float:
         return fp(self.rate, self.sp_count * t)
 
     def to_ef(self) -> EfInt:
@@ -198,7 +198,7 @@ class ContInt(MulCompInt):
     def __init__(self, rate: float):
         super().__init__(rate, inf)
 
-    def to_factor(self, t: float) -> float:
+    def to_factor(self, t: float = 1) -> float:
         return exp(self.rate) ** t
 
     def to_ef(self) -> EfInt:

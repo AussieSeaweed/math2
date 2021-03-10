@@ -107,10 +107,10 @@ class PS1TestCase(TestCase):
         self.assertAlmostEqual(EfInt(0.08).to_sp(12).rate, 0.00643403011000343)
         self.assertAlmostEqual(NomInt(0.035, 252).to_ef().rate, 0.03561719190449408)
         self.assertAlmostEqual(NomInt(0.04, 4).to_cont().rate, 0.039801323412672354)
-        self.assertAlmostEqual(CompInt.from_factor(SPInt(0.015, 12).to_factor(1), 4).to_cont().rate,
+        self.assertAlmostEqual(CompInt.from_factor(SPInt(0.015, 12).to_factor(), 4).to_cont().rate,
                                0.04466583748125169)
         self.assertAlmostEqual(CompInt.from_factor(CompInt.from_factor(
-            NomInt(0.012, 3).to_factor(1), 1 / 4).to_factor(3), 1).to_nom(6).rate, 0.1454477030768886)
+            NomInt(0.012, 3).to_factor(), 1 / 4).to_factor(3), 1).to_nom(6).rate, 0.1454477030768886)
 
 
 class PS2TestCase(ExtTestCase):
@@ -260,6 +260,11 @@ class PS3TestCase(TestCase):
         self.assertAlmostEqual(Mortgage.from_down(500000, 50000, i).pay(3, 700).payment, 3490.3113416458878)
         self.assertLess(Mortgage.from_down(500000, 50000, i).pay(3).principal,
                         Mortgage.from_down(500000, 50000, i).pay(3, 700).principal)
+
+
+class PS4TestCase(ExtTestCase):
+    def test_1(self) -> None:
+        pass
 
 
 class PS5TestCase(ExtTestCase):
