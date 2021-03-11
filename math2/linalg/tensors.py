@@ -149,5 +149,54 @@ class Matrix(MutableSequence[Vector]):
     def __len__(self) -> int:
         return len(self.__values)
 
+    def __pos__(self) -> Matrix:
+        return Matrix(self)
+
+    def __neg__(self) -> Matrix:
+        return Matrix(-x for x in self)
+
+    @const_len
+    def __add__(self, other: Iterable[Iterable[float]]) -> Matrix:
+        return Matrix(x + y for x, y in zip(self, other))
+
+    @const_len
+    def __sub__(self, other: Iterable[Iterable[float]]) -> Matrix:
+        return Matrix(x - y for x, y in zip(self, other))
+
+    def __mul__(self, other: float) -> Matrix:
+        return Matrix(x * other for x in self)
+
+    def __rmul__(self, other: float) -> Matrix:
+        return self * other
+
+    def __truediv__(self, other: float) -> Matrix:
+        return Matrix(x / other for x in self)
+
+    @const_len
+    def __matmul__(self, other: Iterable[Iterable[float]]) -> float:
+        return sum(x @ y for x, y in zip(self, other))
+
+    @const_len
+    def __iadd__(self, other: Iterable[Iterable[float]]) -> Matrix:
+        self.__values = [x + y for x, y in zip(self, other)]
+
+        return self
+
+    @const_len
+    def __isub__(self, other: Iterable[Iterable[float]]) -> Matrix:
+        self.__values = [x - y for x, y in zip(self, other)]
+
+        return self
+
+    def __imul__(self, other: float) -> Matrix:
+        self.__values = [x * other for x in self]
+
+        return self
+
+    def __itruediv__(self, other: float) -> Matrix:
+        self.__values = [x / other for x in self]
+
+        return self
+
     def insert(self, index: int, value: Iterable[float]) -> None:
         self.__values.insert(index, Vector(value))
