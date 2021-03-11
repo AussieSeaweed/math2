@@ -6,7 +6,7 @@ from auxiliary import ExtTestCase
 from math2.linalg import Matrix, Vector, full, ones, replaced, solve, zeros
 
 
-class VectorTestCase(ExtTestCase):
+class TensorTestCase(ExtTestCase):
     def test_init(self) -> None:
         self.assertIterableAlmostEqual(Vector(range(10)), range(10))
 
@@ -40,6 +40,13 @@ class VectorTestCase(ExtTestCase):
         self.assertRaises(ValueError, add, a, range(5))
         self.assertRaises(ValueError, add, a, range(5))
 
+
+class UtilTestCase(ExtTestCase):
+    def test_transposed(self) -> None:
+        pass
+
+
+class FuncTestCase(ExtTestCase):
     def test_solve(self) -> None:
         self.assertIterableAlmostEqual(solve(Matrix(((1, 2), (3, 4))), Vector((1, 0))), (-2, 1.5))
         self.assertIterableAlmostEqual(solve(Matrix(((127, 102.2), (90, 102.2))), Vector((102, 77))),

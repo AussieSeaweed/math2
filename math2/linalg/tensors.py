@@ -163,8 +163,15 @@ class Matrix(MutableSequence[Vector]):
     def __sub__(self, other: Iterable[Iterable[float]]) -> Matrix:
         return Matrix(x - y for x, y in zip(self, other))
 
-    def __mul__(self, other: float) -> Matrix:
-        return Matrix(x * other for x in self)
+    def __mul__(self, other: Union[float, Iterable[Iterable[float]]]) -> Matrix:
+        if isinstance(other, float):
+            return Matrix(x * other for x in self)
+        elif isinstance(other, Iterable):
+            from math2.linalg import transposed
+
+            return Matrix((row @ col for col in transposed(Matrix(other))) for row in self)
+        else:
+            return NotImplemented
 
     def __rmul__(self, other: float) -> Matrix:
         return self * other
@@ -188,8 +195,15 @@ class Matrix(MutableSequence[Vector]):
 
         return self
 
-    def __imul__(self, other: float) -> Matrix:
-        self.__values = [x * other for x in self]
+    def __imul__(self, other: Union[float, Iterable[Iterable[float]]]) -> Matrix:
+        if isinstance(other, float):
+            self.__values = [x * other for x in self]
+        elif isinstance(other, Iterable):
+            from math2.linalg import transposed
+
+            self.__values = list(map(Vector, ((row @ col for col in transposed(Matrix(other))) for row in self)))
+        else:
+            return NotImplemented
 
         return self
 
