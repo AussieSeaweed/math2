@@ -1,5 +1,5 @@
 from math2.econ import CompInt, EfInt, Int
-from math2.linalg import solve
+from math2.linalg import Matrix, Vector, solve
 
 
 def fair(bull: float, bear: float, m_price: float, m_bull: float, m_bear: float, rf: Int) -> float:
@@ -13,7 +13,7 @@ def fair(bull: float, bear: float, m_price: float, m_bull: float, m_bear: float,
     :param rf: The risk free rate.
     :return: The fair price of an asset.
     """
-    a, b = solve(((m_bull, rf.to_factor()), (m_bear, rf.to_factor())), (bull, bear))
+    a, b = solve(Matrix(((m_bull, rf.to_factor()), (m_bear, rf.to_factor()))), Vector((bull, bear)))
 
     return m_price * a + b
 

@@ -1,8 +1,9 @@
+from operator import add
 from unittest import main
 
 from auxiliary import ExtTestCase
 
-from math2.linalg import Vector, full, ones, replaced, solve, zeros
+from math2.linalg import Matrix, Vector, full, ones, replaced, solve, zeros
 
 
 class VectorTestCase(ExtTestCase):
@@ -36,12 +37,12 @@ class VectorTestCase(ExtTestCase):
         a /= 3
         self.assertIterableAlmostEqual(a, range(10))
 
-        self.assertRaises(ValueError, a.__add__, range(5))
-        self.assertRaises(ValueError, a.__sub__, range(5))
+        self.assertRaises(ValueError, add, a, range(5))
+        self.assertRaises(ValueError, add, a, range(5))
 
     def test_solve(self) -> None:
-        self.assertIterableAlmostEqual(solve(((1, 2), (3, 4)), (1, 0)), (-2, 1.5))
-        self.assertIterableAlmostEqual(solve(((127, 102.2), (90, 102.2)), (102, 77)),
+        self.assertIterableAlmostEqual(solve(Matrix(((1, 2), (3, 4))), Vector((1, 0))), (-2, 1.5))
+        self.assertIterableAlmostEqual(solve(Matrix(((127, 102.2), (90, 102.2))), Vector((102, 77))),
                                        (0.6756756756756757, 0.15840693922885704))
 
 
