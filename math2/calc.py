@@ -1,35 +1,34 @@
 from collections.abc import Callable
 
 from math2.consts import EPS
-from math2.misc import frange
+from math2.misc import arange
+from math2.typing import Scalar
 
 
-def diff(f: Callable[[float], float], x: float, eps: float = EPS) -> float:
+def derivative(f: Callable[[Scalar], Scalar], x: Scalar) -> Scalar:
     """Performs a numerical differentiation on the supplied function.
 
     :param f: The function to be differentiated.
     :param x: The coordinate where the differentiation take place.
-    :param eps: The accuracy, defaults to EPS.
     :return: The derivative at the point.
     """
-    return (f(x + eps) - f(x - eps)) / (2 * eps)
+    return (f(x + EPS) - f(x - EPS)) / (2 * EPS)
 
 
-def newton(f: Callable[[float], float], x: float, eps: float = EPS) -> float:
+def root(f: Callable[[Scalar], Scalar], x: Scalar) -> Scalar:
     """Solves the root of the supplied function with the Newton's method.
 
     :param f: The function to solve.
     :param x: The initial guess.
-    :param eps: The accuracy, defaults to EPS.
     :return: The root's coordinate.
     """
-    while eps < abs(y := f(x)):
-        x -= y / diff(f, x, eps)
+    while EPS < abs(y := f(x)):
+        x -= y / derivative(f, x)
     else:
         return x
 
 
-def euler(f: Callable[[float], float], xlo: float, xhi: float, n: float = 100) -> float:
+def integrate(f: Callable[[Scalar], Scalar], xlo: Scalar, xhi: Scalar, n: Scalar = 100) -> Scalar:
     """Performs a numerical integration on the supplied function between the given bounds with the Euler's method.
 
     :param f: The function to integrate.
@@ -40,4 +39,4 @@ def euler(f: Callable[[float], float], xlo: float, xhi: float, n: float = 100) -
     """
     dx = (xhi - xlo) / n
 
-    return sum(dx * f(x) for x in frange(xlo, xhi, dx))
+    return sum(dx * f(x) for x in arange(xlo, xhi, dx))
