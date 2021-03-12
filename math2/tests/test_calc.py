@@ -7,15 +7,15 @@ from math2.calc import derivative, integrate, root
 
 
 class CalcTestCase(ExtendedTestCase):
-    def test_derivative(self):
+    def test_derivative(self) -> None:
         self.assertAlmostEqual(derivative(lambda x: x ** 3 - 2 * x ** 2, 3), 3 * 3 ** 2 - 4 * 3)
         self.assertAlmostEqual(derivative(lambda x: -3 * sin(2 * x), 5), -6 * cos(2 * 5))
 
-    def test_root(self):
+    def test_root(self) -> None:
         self.assertAlmostEqual(root(lambda x: (x - 1) * (x + 5), 4), 1)
         self.assertAlmostEqual(root(lambda x: exp(2 * x) - 10, 0.1), log(10) / 2)
 
-    def test_integrate(self):
+    def test_integrate(self) -> None:
         self.assertAlmostEqual(integrate(lambda x: x, 0, 1), 0.5, 2)
         self.assertAlmostEqual(integrate(lambda x: 2 * x ** 2, -1, 1), 4 / 3, 3)
 

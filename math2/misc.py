@@ -1,59 +1,12 @@
-from collections.abc import Iterable, Iterator
-from functools import reduce
-from itertools import chain
-from operator import add, mul
+from collections.abc import Iterator
 from typing import Optional
 
 from auxiliary import default
 
-from math2.typing import _SLT, _T
+from math2.typing import Scalar
 
 
-def bind(value: _SLT, lower: _SLT, upper: _SLT) -> _SLT:
-    """Binds the value by the given interval.
-
-    :param value: The value to be bound.
-    :param lower: The lower limit.
-    :param upper: The upper limit.
-    :return: The bound value.
-    """
-    if upper < lower:
-        raise ValueError('Lower bound is greater than the upper bound')
-    elif value < lower:
-        return lower
-    elif upper < value:
-        return upper
-    else:
-        return value
-
-
-def sum_(values: Iterable[_T], start: Optional[_T] = None) -> _T:
-    """Calculates the sum of the elements in the iterable.
-
-    :param values: The values to be summed.
-    :param start: The optional start value.
-    :return: The sum of the values.
-    """
-    try:
-        return reduce(add, values if start is None else chain((start,), values))
-    except TypeError:
-        raise ValueError('Invalid iterable')
-
-
-def prod(values: Iterable[_T], start: Optional[_T] = None) -> _T:
-    """Calculates the product of the elements in the iterable.
-
-    :param values: The values to be multiplied.
-    :param start: The optional start value.
-    :return: The product of the values.
-    """
-    try:
-        return reduce(mul, values if start is None else chain((start,), values))
-    except TypeError:
-        raise ValueError('Invalid iterable')
-
-
-def frange(start: float, stop: Optional[float] = None, step: Optional[float] = None) -> Iterator[float]:
+def arange(start: Scalar, stop: Optional[Scalar] = None, step: Optional[Scalar] = None) -> Iterator[Scalar]:
     """Generates a range of floating point values.
 
     :param start: The start value.
@@ -62,27 +15,27 @@ def frange(start: float, stop: Optional[float] = None, step: Optional[float] = N
     :return: The iterator of range values.
     """
     if stop is None:
-        yield from frange(0, start, step)
+        yield from arange(0, start, step)
     elif step is None:
-        yield from frange(start, stop, 1)
+        yield from arange(start, stop, 1)
     else:
         while start < stop:
             yield start
             start += step
 
 
-def linspace(start: float, stop: float, n: int = 100) -> Iterator[float]:
+def linspace(start: Scalar, stop: Scalar, n: Scalar = 100) -> Iterator[Scalar]:
     """Generates an iterator of values from start to stop with length of n.
 
     :param start: The start value.
     :param stop: The stop value.
-    :param n: The number of values.
+    :param n: The number of values, defaults to 100.
     :return: The linspace of arguments.
     """
-    return frange(start, stop, (stop - start) / n)
+    return arange(start, stop, (stop - start) / n)
 
 
-def interp(x: float, x0: float, x1: float, y0: float, y1: float) -> float:
+def interpolate(x: Scalar, x0: Scalar, x1: Scalar, y0: Scalar, y1: Scalar) -> Scalar:
     """Interpolates the point between two given points.
 
     :param x: The point to interpolate.
