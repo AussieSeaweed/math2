@@ -1,8 +1,10 @@
 from collections.abc import Iterable, MutableSequence
 
+from math2.typing import Scalar
 
-class Vector(MutableSequence[float]):
-    def __init__(self, it: Iterable[float]):
+
+class Vector(MutableSequence[Scalar]):
+    def __init__(self, it: Iterable[Scalar]):
         self.__values = list(it)
 
     def __getitem__(self, i):
@@ -75,7 +77,7 @@ class Vector(MutableSequence[float]):
 
 
 class Matrix(MutableSequence[Vector]):
-    def __init__(self, it: Iterable[Iterable[float]]):
+    def __init__(self, it: Iterable[Iterable[Scalar]]):
         self.__values = list(map(Vector, it))
 
     def __getitem__(self, i):
