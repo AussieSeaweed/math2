@@ -1,8 +1,10 @@
 from math2.econ import CompInt, EfInt, Int
 from math2.linalg import Matrix, Vector, solve
 
+from math2.typing import Scalar
 
-def fair(bull: float, bear: float, m_price: float, m_bull: float, m_bear: float, rf: Int) -> float:
+
+def fair(bull: Scalar, bear: Scalar, m_price: Scalar, m_bull: Scalar, m_bear: Scalar, rf: Int) -> Scalar:
     """Calculates the fair price of an asset, given its potential payoffs.
 
     :param bull: The asset price in a bull market.
@@ -18,7 +20,7 @@ def fair(bull: float, bear: float, m_price: float, m_bull: float, m_bear: float,
     return m_price * a + b
 
 
-def ror(price: float, bull: float, bear: float, p: float) -> EfInt:
+def ror(price: Scalar, bull: Scalar, bear: Scalar, p: Scalar) -> EfInt:
     """Calculates the expected rate of return of an asset.
 
     :param price: The price of an asset.
@@ -30,7 +32,7 @@ def ror(price: float, bull: float, bear: float, p: float) -> EfInt:
     return EfInt((bull * p + bear * (1 - p)) / price - 1)
 
 
-def beta(a_ror: CompInt, m_ror: CompInt, rf: CompInt) -> float:
+def beta(a_ror: CompInt, m_ror: CompInt, rf: CompInt) -> Scalar:
     """Calculates the asset risk.
 
     :param a_ror: The rate of return of an asset.
@@ -41,7 +43,7 @@ def beta(a_ror: CompInt, m_ror: CompInt, rf: CompInt) -> float:
     return (a_ror.to_ef().rate - rf.to_ef().rate) / (m_ror.to_ef().rate - rf.to_ef().rate)
 
 
-def capm(b: float, rf: CompInt, em: CompInt) -> EfInt:
+def capm(b: Scalar, rf: CompInt, em: CompInt) -> EfInt:
     """Calculates the expected return using the CAPM model.
 
     :param b: The company risk.

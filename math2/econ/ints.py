@@ -8,16 +8,17 @@ from typing import Any, Optional
 from auxiliary import SupportsLessThan
 
 from math2.econ.factors import fp
+from math2.typing import Scalar
 
 
 class Int(ABC):
     """Int is the abstract base class for all interests."""
 
-    def __init__(self, rate: float):
+    def __init__(self, rate: Scalar):
         self.rate = rate
 
     @abstractmethod
-    def to_factor(self, t: float = 1) -> float:
+    def to_factor(self, t: Scalar = 1) -> Scalar:
         """Converts this interest to the factor at the given time period.
 
         :param t: The time period.
@@ -27,7 +28,7 @@ class Int(ABC):
 
     @classmethod
     @abstractmethod
-    def from_factor(cls, factor: float, t: float = 1) -> Int:
+    def from_factor(cls, factor: Scalar, t: Scalar = 1) -> Int:
         """Converts the factor at a time period to an interest value.
 
         :param factor: The factor.
@@ -53,11 +54,11 @@ class SimpleInt(Int, SupportsLessThan):
         else:
             return NotImplemented
 
-    def to_factor(self, t: float = 1) -> float:
+    def to_factor(self, t: Scalar = 1) -> Scalar:
         return 1 + self.rate * t
 
     @classmethod
-    def from_factor(cls, factor: float, t: float = 1) -> SimpleInt:
+    def from_factor(cls, factor: Scalar, t: Scalar = 1) -> SimpleInt:
         return SimpleInt((factor - 1) / t)
 
 
@@ -93,7 +94,7 @@ class CompInt(Int, ABC):
         pass
 
     @abstractmethod
-    def to_nom(self, sp_count: float) -> NomInt:
+    def to_nom(self, sp_count: Scalar) -> NomInt:
         """Converts this interest value to a nominal interest value.
 
         :param sp_count: The number of subperiods of the converted interest value.
@@ -102,7 +103,7 @@ class CompInt(Int, ABC):
         pass
 
     @abstractmethod
-    def to_sp(self, sp_count: float) -> SPInt:
+    def to_sp(self, sp_count: Scalar) -> SPInt:
         """Converts this interest value to a subperiod interest value.
 
         :param sp_count: The number of subperiods of the converted interest value.
@@ -111,7 +112,7 @@ class CompInt(Int, ABC):
         pass
 
     @classmethod
-    def from_factor(cls, factor: float, t: float = 1) -> CompInt:
+    def from_factor(cls, factor: Scalar, t: Scalar = 1) -> CompInt:
         return EfInt(factor ** (1 / t) - 1)
 
 
@@ -119,7 +120,7 @@ class CompInt(Int, ABC):
 class EfInt(CompInt):
     """EfInt is the class for effective interests."""
 
-    def to_factor(self, t: float = 1) -> float:
+    def to_factor(self, t: Scalar = 1) -> Scalar:
         return fp(self.rate, t)
 
     def to_ef(self) -> EfInt:
@@ -128,23 +129,23 @@ class EfInt(CompInt):
     def to_cont(self) -> ContInt:
         return ContInt(log(self.rate + 1))
 
-    def to_nom(self, sp_count: float) -> NomInt:
+    def to_nom(self, sp_count: Scalar) -> NomInt:
         return NomInt(sp_count * ((self.rate + 1) ** (1 / sp_count) - 1), sp_count)
 
-    def to_sp(self, sp_count: float) -> SPInt:
+    def to_sp(self, sp_count: Scalar) -> SPInt:
         return SPInt((self.rate + 1) ** (1 / sp_count) - 1, sp_count)
 
 
 class MulCompInt(CompInt, ABC):
     """MulCompInt is the abstract base class for all multiple compounding interests."""
 
-    def __init__(self, rate: float, sp_count: float):
+    def __init__(self, rate: Scalar, sp_count: Scalar):
         super().__init__(rate)
 
         self.sp_count = sp_count
 
     @property
-    def sp(self) -> float:
+    def sp(self) -> Scalar:
         """
         :return: The subperiod of this multiple compound interest value.
         """
@@ -155,7 +156,7 @@ class MulCompInt(CompInt, ABC):
 class NomInt(MulCompInt):
     """NomInt is the class for nominal interests."""
 
-    def to_factor(self, t: float = 1) -> float:
+    def to_factor(self, t: Scalar = 1) -> Scalar:
         return fp(self.rate / self.sp_count, self.sp_count * t)
 
     def to_ef(self) -> EfInt:
@@ -164,10 +165,10 @@ class NomInt(MulCompInt):
     def to_cont(self) -> ContInt:
         return self.to_ef().to_cont()
 
-    def to_nom(self, sp_count: Optional[float] = None) -> NomInt:
+    def to_nom(self, sp_count: Optional[Scalar] = None) -> NomInt:
         return self if sp_count is None else self.to_ef().to_nom(sp_count)
 
-    def to_sp(self, sp_count: Optional[float] = None) -> SPInt:
+    def to_sp(self, sp_count: Optional[Scalar] = None) -> SPInt:
         return SPInt(self.rate / self.sp_count, self.sp_count) if sp_count is None else self.to_ef().to_sp(sp_count)
 
 
@@ -175,7 +176,7 @@ class NomInt(MulCompInt):
 class SPInt(MulCompInt):
     """SPInt is the class for sp interests."""
 
-    def to_factor(self, t: float = 1) -> float:
+    def to_factor(self, t: Scalar = 1) -> Scalar:
         return fp(self.rate, self.sp_count * t)
 
     def to_ef(self) -> EfInt:
@@ -184,10 +185,10 @@ class SPInt(MulCompInt):
     def to_cont(self) -> ContInt:
         return self.to_ef().to_cont()
 
-    def to_nom(self, sp_count: Optional[float] = None) -> NomInt:
+    def to_nom(self, sp_count: Optional[Scalar] = None) -> NomInt:
         return NomInt(self.rate * self.sp_count, self.sp_count) if sp_count is None else self.to_ef().to_nom(sp_count)
 
-    def to_sp(self, sp_count: Optional[float] = None) -> SPInt:
+    def to_sp(self, sp_count: Optional[Scalar] = None) -> SPInt:
         return self if sp_count is None else self.to_ef().to_sp(sp_count)
 
 
@@ -195,10 +196,10 @@ class SPInt(MulCompInt):
 class ContInt(MulCompInt):
     """ContInt is the class for continuous interests."""
 
-    def __init__(self, rate: float):
+    def __init__(self, rate: Scalar):
         super().__init__(rate, inf)
 
-    def to_factor(self, t: float = 1) -> float:
+    def to_factor(self, t: Scalar = 1) -> Scalar:
         return exp(self.rate) ** t
 
     def to_ef(self) -> EfInt:
@@ -207,8 +208,8 @@ class ContInt(MulCompInt):
     def to_cont(self) -> ContInt:
         return self
 
-    def to_nom(self, sp_count: float) -> NomInt:
+    def to_nom(self, sp_count: Scalar) -> NomInt:
         return self.to_ef().to_nom(sp_count)
 
-    def to_sp(self, sp_count: float) -> SPInt:
+    def to_sp(self, sp_count: Scalar) -> SPInt:
         return self.to_ef().to_sp(sp_count)

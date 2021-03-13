@@ -1,7 +1,9 @@
 from typing import Optional
 
+from math2.typing import Scalar
 
-def af(i: float, n: float) -> float:
+
+def af(i: Scalar, n: Scalar) -> Scalar:
     """Calculates the sinking fund factor.
 
     :param i: The interest rate.
@@ -11,7 +13,7 @@ def af(i: float, n: float) -> float:
     return i / ((1 + i) ** n - 1)
 
 
-def ag(i: float, n: float) -> float:
+def ag(i: Scalar, n: Scalar) -> Scalar:
     """Calculates the arithmetic gradient to annuity conversion factor.
 
     :param i: The interest rate.
@@ -21,7 +23,7 @@ def ag(i: float, n: float) -> float:
     return 1 / i - n / ((1 + i) ** n - 1)
 
 
-def ap(i: float, n: float) -> float:
+def ap(i: Scalar, n: Scalar) -> Scalar:
     """Calculates the capital recovery factor.
 
     :param i: The interest rate.
@@ -31,7 +33,7 @@ def ap(i: float, n: float) -> float:
     return i * (1 + i) ** n / ((1 + i) ** n - 1)
 
 
-def fa(i: float, n: float) -> float:
+def fa(i: Scalar, n: Scalar) -> Scalar:
     """Calculates the uniform series compound amount factor.
 
     :param i: The interest rate.
@@ -41,7 +43,7 @@ def fa(i: float, n: float) -> float:
     return ((1 + i) ** n - 1) / i
 
 
-def fp(i: float, n: float) -> float:
+def fp(i: Scalar, n: Scalar) -> Scalar:
     """Calculates the compound amount factor.
 
     :param i: The interest rate.
@@ -51,7 +53,7 @@ def fp(i: float, n: float) -> float:
     return (1 + i) ** n
 
 
-def pa(i: float, n: float, g: Optional[float] = None) -> float:
+def pa(i: Scalar, n: Scalar, g: Optional[Scalar] = None) -> Scalar:
     """If the geometric gradient rate is supplied, calculates the geometric gradient to present worth conversion factor.
        Otherwise, calculates the series present worth factor.
 
@@ -66,7 +68,7 @@ def pa(i: float, n: float, g: Optional[float] = None) -> float:
         return pa((1 + i) / (1 + g) - 1, n) / (1 + g)
 
 
-def pf(i: float, n: float) -> float:
+def pf(i: Scalar, n: Scalar) -> Scalar:
     """Calculates the present worth factor.
 
     :param i: The interest rate.
@@ -76,7 +78,7 @@ def pf(i: float, n: float) -> float:
     return (1 + i) ** -n
 
 
-def pg(i: float, n: float) -> float:
+def pg(i: Scalar, n: Scalar) -> Scalar:
     """Calculates the arithmetic gradient to present worth factor.
 
     :param i: The interest rate.
@@ -86,7 +88,7 @@ def pg(i: float, n: float) -> float:
     return 1 / i ** 2 * (1 - (1 + i * n) / (1 + i) ** n)
 
 
-def perp(i: float) -> float:
+def perp(i: Scalar) -> Scalar:
     """Calculates the perpetuity to present worth factor.
 
     :param i: The interest rate.
