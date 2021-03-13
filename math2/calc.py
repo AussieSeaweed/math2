@@ -2,10 +2,9 @@ from collections.abc import Callable
 
 from math2.consts import EPS
 from math2.misc import arange
-from math2.typing import Scalar
 
 
-def derivative(f: Callable[[Scalar], Scalar], x: Scalar) -> Scalar:
+def derivative(f: Callable[[float], float], x: float) -> float:
     """Performs a numerical differentiation on the supplied function.
 
     :param f: The function to be differentiated.
@@ -15,7 +14,7 @@ def derivative(f: Callable[[Scalar], Scalar], x: Scalar) -> Scalar:
     return (f(x + EPS) - f(x - EPS)) / (2 * EPS)
 
 
-def root(f: Callable[[Scalar], Scalar], x: Scalar) -> Scalar:
+def root(f: Callable[[float], float], x: float) -> float:
     """Solves the root of the supplied function with the Newton's method.
 
     :param f: The function to solve.
@@ -28,7 +27,7 @@ def root(f: Callable[[Scalar], Scalar], x: Scalar) -> Scalar:
         return x
 
 
-def integrate(f: Callable[[Scalar], Scalar], xlo: Scalar, xhi: Scalar, n: Scalar = 100) -> Scalar:
+def integrate(f: Callable[[float], float], xlo: float, xhi: float, n: float = 100) -> float:
     """Performs a numerical integration on the supplied function between the given bounds with the Euler's method.
 
     :param f: The function to integrate.

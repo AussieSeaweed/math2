@@ -10,14 +10,13 @@ from math2.calc import root
 from math2.econ.factors import ap
 from math2.econ.ints import CompInt, EfInt, Int
 from math2.misc import arange, interpolate
-from math2.typing import Scalar
 
 
 @total_ordering
 class CashFlow(SupportsLessThan):
     """CashFlow is the class for cash flows."""
 
-    def __init__(self, time: Scalar, amount: Scalar):
+    def __init__(self, time: float, amount: float):
         self.time = time
         self.amount = amount
 
@@ -44,7 +43,7 @@ def disc(cash_flow: CashFlow, i: Int) -> CashFlow:
     return CashFlow(0, cash_flow.amount / i.to_factor(cash_flow.time))
 
 
-def payback(cash_flows: Iterable[CashFlow], cost: Scalar) -> Scalar:
+def payback(cash_flows: Iterable[CashFlow], cost: float) -> float:
     """Calculates the payback period of the cash flows.
 
     :param cash_flows: The cash flows.
@@ -63,7 +62,7 @@ def payback(cash_flows: Iterable[CashFlow], cost: Scalar) -> Scalar:
             return inf
 
 
-def disc_payback(cash_flows: Iterable[CashFlow], cost: Scalar, i: Int) -> Scalar:
+def disc_payback(cash_flows: Iterable[CashFlow], cost: float, i: Int) -> float:
     """Calculates the discounted payback period of the cash flows at the given interest value.
 
     :param cash_flows: The cash flows.
@@ -74,7 +73,7 @@ def disc_payback(cash_flows: Iterable[CashFlow], cost: Scalar, i: Int) -> Scalar
     return payback((disc(cash_flow, i) for cash_flow in cash_flows), cost)
 
 
-def pw(cash_flows: Iterable[CashFlow], i: Int) -> Scalar:
+def pw(cash_flows: Iterable[CashFlow], i: Int) -> float:
     """Calculates the present worth of the supplied cash flows at the interest.
 
     :param cash_flows: The cash flows.
@@ -84,7 +83,7 @@ def pw(cash_flows: Iterable[CashFlow], i: Int) -> Scalar:
     return sum(disc(cash_flow, i).amount for cash_flow in cash_flows)
 
 
-def rpw(cash_flows: Iterable[CashFlow], i: Int, total_life: Scalar) -> Scalar:
+def rpw(cash_flows: Iterable[CashFlow], i: Int, total_life: float) -> float:
     """Calculates the repeated present worth of the supplied cash flows at the interest and at the total life.
 
     :param cash_flows: The cash flows.
@@ -95,7 +94,7 @@ def rpw(cash_flows: Iterable[CashFlow], i: Int, total_life: Scalar) -> Scalar:
     return pw(repeated(cash_flows, total_life), i)
 
 
-def aw(cash_flows: Iterable[CashFlow], i: CompInt, total_life: Optional[Scalar] = None) -> Scalar:
+def aw(cash_flows: Iterable[CashFlow], i: CompInt, total_life: Optional[float] = None) -> float:
     """Calculates the annual worth of the supplied cash flows at the interest.
 
     :param cash_flows: The cash flows.
@@ -122,7 +121,7 @@ def irr(cash_flows: Iterable[CashFlow], init_guess: CompInt) -> EfInt:
         return EfInt(root(lambda i: pw(cash_flows, EfInt(i)), init_guess.to_ef().rate))
 
 
-def yield_(cash_flows: Iterable[CashFlow], price: Scalar, init_guess: CompInt) -> EfInt:
+def yield_(cash_flows: Iterable[CashFlow], price: float, init_guess: CompInt) -> EfInt:
     """Calculates the yield of the cash flows using the initial guess.
 
     :param cash_flows: The cash flows.
@@ -136,7 +135,7 @@ def yield_(cash_flows: Iterable[CashFlow], price: Scalar, init_guess: CompInt) -
         return EfInt(root(lambda y: pw(cash_flows, EfInt(y)) - price, init_guess.to_ef().rate))
 
 
-def life(cash_flows: Iterable[CashFlow]) -> Scalar:
+def life(cash_flows: Iterable[CashFlow]) -> float:
     """Calculates the life of the cash flows.
 
     :param cash_flows: The cash flows.
@@ -145,7 +144,7 @@ def life(cash_flows: Iterable[CashFlow]) -> Scalar:
     return max(cash_flow.time for cash_flow in cash_flows)
 
 
-def repeated(cash_flows: Iterable[CashFlow], total_life: Scalar) -> Iterator[CashFlow]:
+def repeated(cash_flows: Iterable[CashFlow], total_life: float) -> Iterator[CashFlow]:
     """Repeats the cash flows by the total life.
 
     :param cash_flows: The cash flows.

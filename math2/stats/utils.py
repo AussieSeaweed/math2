@@ -4,10 +4,10 @@ from statistics import fmean
 
 from auxiliary import trimmed
 
-from math2.typing import Scalar, _T
+from math2.typing import _T
 
 
-def trimmed_mean(values: Iterable[Scalar], percentage: Scalar) -> Scalar:
+def trimmed_mean(values: Iterable[float], percentage: float) -> float:
     """Calculates the trimmed mean of the values.
 
     :param values: The values.
@@ -17,7 +17,7 @@ def trimmed_mean(values: Iterable[Scalar], percentage: Scalar) -> Scalar:
     return fmean(trimmed(sorted(values), percentage))
 
 
-def range_(values: Iterable[Scalar]) -> Scalar:
+def range_(values: Iterable[float]) -> float:
     """Calculates the range of the values.
 
     :param values: The values.

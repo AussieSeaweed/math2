@@ -13,7 +13,6 @@ from math2.econ.cashflows import CashFlow, irr
 from math2.econ.factors import ap, fa
 from math2.econ.ints import CompInt, EfInt
 from math2.misc import arange
-from math2.typing import Scalar
 
 
 class Instrument(ABC):
@@ -31,7 +30,7 @@ class Instrument(ABC):
 class Bond(Instrument):
     """Bond is the class for bonds."""
 
-    def __init__(self, face: Scalar, coupon: Scalar, freq: Scalar, mat: Scalar):
+    def __init__(self, face: float, coupon: float, freq: float, mat: float):
         self.face = face
         self.coupon = coupon
         self.freq = freq
@@ -47,7 +46,7 @@ class Bond(Instrument):
         )
 
     @classmethod
-    def from_rate(cls, face: Scalar, rate: CompInt, freq: Scalar, mat: Scalar) -> Bond:
+    def from_rate(cls, face: float, rate: CompInt, freq: float, mat: float) -> Bond:
         """Creates the bond from the coupon rate.
 
         :param face: The face value.
@@ -62,7 +61,7 @@ class Bond(Instrument):
 class Mortgage(Instrument):
     """Mortgage is the class for mortgages."""
 
-    def __init__(self, principal: Scalar, int_: CompInt, freq: Scalar = 12, term: Scalar = 5, amort: Scalar = 25):
+    def __init__(self, principal: float, int_: CompInt, freq: float = 12, term: float = 5, amort: float = 25):
         self.principal = principal
         self.int = int_
         self.freq = freq
@@ -77,13 +76,13 @@ class Mortgage(Instrument):
         )
 
     @property
-    def payment(self) -> Scalar:
+    def payment(self) -> float:
         """
         :return: The mortgage payment.
         """
         return self.principal * ap(self.int.to_sp(self.freq).rate, self.freq * self.amort)
 
-    def pay(self, term: Optional[Scalar] = None, payment: Optional[Scalar] = None) -> Mortgage:
+    def pay(self, term: Optional[float] = None, payment: Optional[float] = None) -> Mortgage:
         """Creates a new mortgage instance assuming payments were made.
 
         :param term: The term during which payments were made.
@@ -99,8 +98,8 @@ class Mortgage(Instrument):
         )
 
     @classmethod
-    def from_down(cls, value: Scalar, down: Scalar, int_: CompInt, freq: Scalar = 12, term: Scalar = 5,
-                  amort: Scalar = 25) -> Mortgage:
+    def from_down(cls, value: float, down: float, int_: CompInt, freq: float = 12, term: float = 5,
+                  amort: float = 25) -> Mortgage:
         """Constructs the mortgage instance from the down payment value.
 
         :param value: The total value.
@@ -114,8 +113,8 @@ class Mortgage(Instrument):
         return cls(value - down, int_, freq, term, amort)
 
     @classmethod
-    def from_dtv(cls, value: Scalar, dtv: Scalar, int_: CompInt, freq: Scalar = 12, term: Scalar = 5,
-                 amort: Scalar = 25) -> Mortgage:
+    def from_dtv(cls, value: float, dtv: float, int_: CompInt, freq: float = 12, term: float = 5,
+                 amort: float = 25) -> Mortgage:
         """Constructs the mortgage instance from the down payment to value percentage.
 
         :param value: The total value.
@@ -129,8 +128,8 @@ class Mortgage(Instrument):
         return cls.from_down(value, value * dtv, int_, freq, term, amort)
 
     @classmethod
-    def from_ltv(cls, value: Scalar, ltv: Scalar, int_: CompInt, freq: Scalar = 12, term: Scalar = 5,
-                 amort: Scalar = 25) -> Mortgage:
+    def from_ltv(cls, value: float, ltv: float, int_: CompInt, freq: float = 12, term: float = 5,
+                 amort: float = 25) -> Mortgage:
         """Constructs the mortgage instance from the loan payment to value percentage.
 
         :param value: The total value.
@@ -147,7 +146,7 @@ class Mortgage(Instrument):
 class Project(Instrument):
     """Project is the class for projects."""
 
-    def __init__(self, initial: Scalar, annuity: Scalar, final: Scalar, life: Scalar):
+    def __init__(self, initial: float, annuity: float, final: float, life: float):
         self.initial = initial
         self.annuity = annuity
         self.final = final
@@ -173,7 +172,7 @@ class Rel(Enum):
     REL = 2
 
 
-def rel(values: Iterable[Scalar], budget: Scalar) -> Rel:
+def rel(values: Iterable[float], budget: float) -> Rel:
     """Determines the relationship of values with respect to the budget.
 
     :param values: The values.
@@ -190,7 +189,7 @@ def rel(values: Iterable[Scalar], budget: Scalar) -> Rel:
         return Rel.MEX
 
 
-def rel_combinations(values: Iterable[Scalar], budget: Scalar) -> Iterator[Iterator[int]]:
+def rel_combinations(values: Iterable[float], budget: float) -> Iterator[Iterator[int]]:
     """Gets the combinations of the related values given their values and the budget.
 
     :param values: The values of the projects.
@@ -207,7 +206,7 @@ def rel_combinations(values: Iterable[Scalar], budget: Scalar) -> Iterator[Itera
         return iter((iter(()),))
 
 
-def de_facto_marr(projects: Iterable[Project], init_guess: CompInt, budget: Scalar) -> CompInt:
+def de_facto_marr(projects: Iterable[Project], init_guess: CompInt, budget: float) -> CompInt:
     """Calculates the de factor marr of the given projects based on costs and irrs.
 
     :param projects: The projects.

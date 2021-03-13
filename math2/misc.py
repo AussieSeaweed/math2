@@ -3,10 +3,8 @@ from typing import Optional
 
 from auxiliary import default
 
-from math2.typing import Scalar
 
-
-def arange(start: Scalar, stop: Optional[Scalar] = None, step: Optional[Scalar] = None) -> Iterator[Scalar]:
+def arange(start: float, stop: Optional[float] = None, step: Optional[float] = None) -> Iterator[float]:
     """Generates a range of floating point values.
 
     :param start: The start value.
@@ -24,7 +22,7 @@ def arange(start: Scalar, stop: Optional[Scalar] = None, step: Optional[Scalar] 
             start += step
 
 
-def linspace(start: Scalar, stop: Scalar, n: Scalar = 100) -> Iterator[Scalar]:
+def linspace(start: float, stop: float, n: float = 100) -> Iterator[float]:
     """Generates an iterator of values from start to stop with length of n.
 
     :param start: The start value.
@@ -35,7 +33,7 @@ def linspace(start: Scalar, stop: Scalar, n: Scalar = 100) -> Iterator[Scalar]:
     return arange(start, stop, (stop - start) / n)
 
 
-def interpolate(x: Scalar, x0: Scalar, x1: Scalar, y0: Scalar, y1: Scalar) -> Scalar:
+def interpolate(x: float, x0: float, x1: float, y0: float, y1: float) -> float:
     """Interpolates the point between two given points.
 
     :param x: The point to interpolate.

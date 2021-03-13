@@ -3,7 +3,7 @@ from unittest import main
 
 from auxiliary import ExtendedTestCase
 
-from math2.linalg import Vector, full, ones, replaced, solve, zeros
+from math2.linalg import Matrix, Vector, full, ones, replaced, solve, zeros
 
 
 class VectorTestCase(ExtendedTestCase):
@@ -44,8 +44,8 @@ class VectorTestCase(ExtendedTestCase):
 
 class UtilsTestCase(ExtendedTestCase):
     def test_solve(self):
-        self.assertIterableAlmostEqual(solve(((1, 2), (3, 4)), (1, 0)), (-2, 1.5))
-        self.assertIterableAlmostEqual(solve(((127, 102.2), (90, 102.2)), (102, 77)),
+        self.assertIterableAlmostEqual(solve(Matrix(((1, 2), (3, 4))), Vector((1, 0))), (-2, 1.5))
+        self.assertIterableAlmostEqual(solve(Matrix(((127, 102.2), (90, 102.2))), Vector((102, 77))),
                                        (0.6756756756756757, 0.15840693922885704))
 
 
