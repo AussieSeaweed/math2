@@ -1,13 +1,15 @@
+from __future__ import annotations
+
 from enum import Enum
 from functools import cached_property, total_ordering
-from typing import Any
+from typing import TypeVar
 
 
 @total_ordering
 class OrderedEnum(Enum):
     """OrderedEnum is the enum class for all ordered enums."""
 
-    def __lt__(self, other: Any) -> bool:
+    def __lt__(self: _OE_co, other: _OE_co) -> bool:
         if isinstance(other, type(self)):
             return self.index < other.index
         else:
@@ -21,3 +23,6 @@ class OrderedEnum(Enum):
         values: tuple[OrderedEnum, ...] = tuple(type(self))
 
         return values.index(self)
+
+
+_OE_co = TypeVar('_OE_co', bound=OrderedEnum)

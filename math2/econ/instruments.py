@@ -205,16 +205,17 @@ def rel_combinations(values: Iterable[float], budget: float) -> Iterator[Iterato
         return iter((iter(()),))
 
 
-def de_facto_marr(projects: Iterable[Project], init_guess: CompInt, budget: float) -> CompInt:
+def de_facto_marr(projects: Iterable[Project], budget: float, guess: CompInt, eps: float) -> CompInt:
     """Calculates the de factor marr of the given projects based on costs and irrs.
 
     :param projects: The projects.
-    :param init_guess: The initial guess for irr.
     :param budget: The budget.
+    :param guess: The initial guess for irr.
+    :param eps: The desired accuracy.
     :return: The de factor marr.
     """
     if isinstance(projects, Sequence):
-        irrs = tuple(irr(project.cash_flows, init_guess) for project in projects)
+        irrs = tuple(irr(project.cash_flows, guess, eps) for project in projects)
         indices = sorted(range(len(projects)), key=irrs.__getitem__, reverse=True)
         marr: CompInt = EfInt(0)
 
@@ -228,7 +229,7 @@ def de_facto_marr(projects: Iterable[Project], init_guess: CompInt, budget: floa
 
         return marr
     else:
-        return de_facto_marr(tuple(projects), init_guess, budget)
+        return de_facto_marr(tuple(projects), budget, guess, eps)
 
 
 def select(irrs: Iterable[CompInt], table: Iterable[Iterable[CompInt]], marr: CompInt) -> Optional[int]:
@@ -254,13 +255,14 @@ def select(irrs: Iterable[CompInt], table: Iterable[Iterable[CompInt]], marr: Co
     return x
 
 
-def irr_table(projects: Iterable[Project], init_guess: CompInt) -> Iterator[Iterator[EfInt]]:
+def irr_table(projects: Iterable[Project], guess: CompInt, eps: float) -> Iterator[Iterator[EfInt]]:
     """Creates the irr table from the projects.
 
     :param projects: The projects.
-    :param init_guess: The initial guess.
+    :param guess: The initial guess.
+    :param eps: The desired accuracy.
     :return: The irr table.
     """
     projects = tuple(projects)
 
-    return ((irr((x - y).cash_flows, init_guess) for y in projects[:projects.index(x)]) for x in projects)
+    return ((irr((x - y).cash_flows, guess, eps) for y in projects[:projects.index(x)]) for x in projects)

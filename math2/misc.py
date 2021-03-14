@@ -33,19 +33,6 @@ def linspace(start: float, stop: float, n: float = 100) -> Iterator[float]:
     return arange(start, stop, (stop - start) / n)
 
 
-def interpolate(x: float, x0: float, x1: float, y0: float, y1: float) -> float:
-    """Interpolates the point between two given points.
-
-    :param x: The point to interpolate.
-    :param x0: The x coordinate of the first point.
-    :param x1: The x coordinate of the second point.
-    :param y0: The y coordinate of the first point.
-    :param y1: The y coordinate of the second point.
-    :return: The interpolated value.
-    """
-    return (x - x0) / (x1 - x0) * (y1 - y0) + y0
-
-
 def series_sum(lo: int, hi: Optional[int] = None, n: Optional[int] = None) -> int:
     """Calculates the series sum of the interval.
 

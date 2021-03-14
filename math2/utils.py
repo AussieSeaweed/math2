@@ -111,8 +111,8 @@ def const(it: Iterable[Any]) -> bool:
         x = next(it)
     except StopIteration:
         return True
-
-    return all(x == y for y in it)
+    else:
+        return all(x == y for y in it)
 
 
 def unique(it: Iterable[Any]) -> bool:
@@ -123,14 +123,17 @@ def unique(it: Iterable[Any]) -> bool:
     :param it: The iterable.
     :return: True if all elements are unique, else False.
     """
-    if not (it := tuple(it)):
-        return True
-    elif isinstance(it[0], Hashable):
-        return len(it) == len(set(it))
-    elif isinstance(it[0], SupportsLessThan):
-        return all(x != y for x, y in windowed(it, 2))
+    if isinstance(it, Sequence):
+        if not it:
+            return True
+        elif isinstance(it[0], Hashable):
+            return len(it) == len(set(it))
+        elif isinstance(it[0], SupportsLessThan):
+            return all(x != y for x, y in windowed(it, 2))
+        else:
+            return all(all(it[i] != it[j] for j in range(len(it)) if i != j) for i in range(len(it)))
     else:
-        return all(all(it[i] != it[j] for j in range(len(it)) if i != j) for i in range(len(it)))
+        return unique(tuple(it))
 
 
 def empty(it: Iterable[Any]) -> bool:

@@ -4,10 +4,11 @@ from itertools import accumulate
 from math import inf
 from typing import Any, Optional
 
+from math2.analysis import interpolate
 from math2.calc import root
 from math2.econ.factors import ap
 from math2.econ.ints import CompInt, EfInt, Int
-from math2.misc import arange, interpolate
+from math2.misc import arange
 from math2.typing import SupportsLessThan
 from math2.utils import default, windowed
 
@@ -57,7 +58,7 @@ def payback(cash_flows: Iterable[CashFlow], cost: float) -> float:
     else:
         for i, (x, y) in enumerate(windowed(prefix_sums, 2)):
             if y >= cost:
-                return interpolate(cost, x, y, i, i + 1)
+                return interpolate(cost, (x, y), (i, i + 1))
         else:
             return inf
 
@@ -108,31 +109,33 @@ def aw(cash_flows: Iterable[CashFlow], i: CompInt, total_life: Optional[float] =
         return pw(cash_flows, i) * ap(i.to_ef().rate, default(total_life, life(cash_flows)))
 
 
-def irr(cash_flows: Iterable[CashFlow], init_guess: CompInt) -> EfInt:
+def irr(cash_flows: Iterable[CashFlow], init_guess: CompInt, eps: float) -> EfInt:
     """Calculates the internal rate of return using the initial guess.
 
     :param cash_flows: The cash flows.
     :param init_guess: The initial guess.
+    :param eps: The desired accuracy.
     :return: The internal rate of return.
     """
     if isinstance(cash_flows, Iterator):
-        return irr(tuple(cash_flows), init_guess)
+        return irr(tuple(cash_flows), init_guess, eps)
     else:
-        return EfInt(root(lambda i: pw(cash_flows, EfInt(i)), init_guess.to_ef().rate))
+        return EfInt(root(lambda i: pw(cash_flows, EfInt(i)), init_guess.to_ef().rate, eps))
 
 
-def yield_(cash_flows: Iterable[CashFlow], price: float, init_guess: CompInt) -> EfInt:
+def yield_(cash_flows: Iterable[CashFlow], price: float, init_guess: CompInt, eps: float) -> EfInt:
     """Calculates the yield of the cash flows using the initial guess.
 
     :param cash_flows: The cash flows.
     :param price: The price.
     :param init_guess: The initial guess.
+    :param eps: The desired accuracy.
     :return: The internal rate of return.
     """
     if isinstance(cash_flows, Iterator):
-        return yield_(tuple(cash_flows), price, init_guess)
+        return yield_(tuple(cash_flows), price, init_guess, eps)
     else:
-        return EfInt(root(lambda y: pw(cash_flows, EfInt(y)) - price, init_guess.to_ef().rate))
+        return EfInt(root(lambda y: pw(cash_flows, EfInt(y)) - price, init_guess.to_ef().rate, eps))
 
 
 def life(cash_flows: Iterable[CashFlow]) -> float:

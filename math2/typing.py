@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any, Protocol, TypeVar, runtime_checkable
 
 
@@ -12,7 +14,7 @@ class SupportsLessThan(Protocol):
 class SupportsMul(Protocol):
     """SupportsMul is the protocol for types that support the __mul__ operator."""
 
-    def __lt__(self, other: Any) -> Any: ...
+    def __mul__(self: _SM, other: _SM) -> _SM: ...
 
 
 _T = TypeVar('_T')

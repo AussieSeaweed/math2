@@ -1,28 +1,29 @@
 from collections.abc import Callable
 
-from math2.consts import EPS
 from math2.misc import arange
 
 
-def derivative(f: Callable[[float], float], x: float) -> float:
+def derivative(f: Callable[[float], float], x: float, eps: float) -> float:
     """Performs a numerical differentiation on the supplied function.
 
     :param f: The function to be differentiated.
     :param x: The coordinate where the differentiation take place.
+    :param eps: The desired accuracy.
     :return: The derivative at the point.
     """
-    return (f(x + EPS) - f(x - EPS)) / (2 * EPS)
+    return (f(x + eps) - f(x - eps)) / (2 * eps)
 
 
-def root(f: Callable[[float], float], x: float) -> float:
+def root(f: Callable[[float], float], x: float, eps: float) -> float:
     """Solves the root of the supplied function with the Newton's method.
 
     :param f: The function to solve.
     :param x: The initial guess.
     :return: The root's coordinate.
+    :param eps: The desired accuracy.
     """
-    while EPS < abs(y := f(x)):
-        x -= y / derivative(f, x)
+    while eps < abs(y := f(x)):
+        x -= y / derivative(f, x, eps)
     else:
         return x
 
