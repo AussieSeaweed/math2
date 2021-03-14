@@ -1,9 +1,8 @@
 from operator import add, matmul, sub
 from unittest import main
 
-from auxiliary import ExtendedTestCase
-
 from math2.linalg import Matrix, Vector, full, ones, replaced, solve, zeros
+from math2.tests import ExtendedTestCase
 
 
 class VectorTestCase(ExtendedTestCase):

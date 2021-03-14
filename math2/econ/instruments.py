@@ -6,13 +6,12 @@ from enum import Enum
 from itertools import chain
 from typing import Any, Optional
 
-from auxiliary import default
-
 from math2.consts import EPS
 from math2.econ.cashflows import CashFlow, irr
 from math2.econ.factors import ap, fa
 from math2.econ.ints import CompInt, EfInt
 from math2.misc import arange
+from math2.utils import default
 
 
 class Instrument(ABC):

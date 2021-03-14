@@ -4,12 +4,12 @@ from itertools import accumulate
 from math import inf
 from typing import Any, Optional
 
-from auxiliary import SupportsLessThan, default, windowed
-
 from math2.calc import root
 from math2.econ.factors import ap
 from math2.econ.ints import CompInt, EfInt, Int
 from math2.misc import arange, interpolate
+from math2.typing import SupportsLessThan
+from math2.utils import default, windowed
 
 
 @total_ordering

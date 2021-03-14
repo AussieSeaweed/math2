@@ -1,8 +1,7 @@
 from unittest import main
 
-from auxiliary import ExtendedTestCase
-
 from math2.misc import arange, interpolate, linspace, series_sum
+from math2.tests import ExtendedTestCase
 
 
 class MiscTestCase(ExtendedTestCase):

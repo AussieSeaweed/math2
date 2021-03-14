@@ -1,4 +1,3 @@
-auxiliary
 mypy
 sphinx
 sphinx-rtd-theme

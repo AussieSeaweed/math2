@@ -3,14 +3,13 @@ from itertools import chain
 from math import ceil, exp, inf, log
 from unittest import TestCase, main
 
-from auxiliary import ExtendedTestCase
-
 from math2.calc import integrate, root
 from math2.econ import (Bond, CashFlow, CompInt, ContInt, DblDeclBalDeprec, DeclBalDeprec, EfInt, Mortgage, NomInt,
                         Project, Rel, SPInt, SYDDeprec, SimpleInt, StrLineDeprec, UPDeprec, aw, beta, capm,
                         de_facto_marr, fair, fp, irr, irr_table, link, pa, payback, perp, pf, pg, pw, rel,
                         rel_combinations, repeated, ror, rpw, select, yield_)
 from math2.misc import interpolate
+from math2.tests import ExtendedTestCase
 
 
 class InterestTestCase(TestCase):

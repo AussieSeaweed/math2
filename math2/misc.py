@@ -1,7 +1,7 @@
 from collections.abc import Iterator
 from typing import Optional
 
-from auxiliary import default
+from math2.utils import default
 
 
 def arange(start: float, stop: Optional[float] = None, step: Optional[float] = None) -> Iterator[float]:
