@@ -1,10 +1,11 @@
-from collections.abc import Collection, Iterable, Iterator, Sequence
+from collections import Collection
+from collections.abc import Hashable, Iterable, Iterator, Sequence
 from functools import reduce
 from itertools import chain
 from operator import mul
-from typing import Optional, cast
+from typing import Any, Optional, cast
 
-from math2.typing import _SLT, _T
+from math2.typing import SupportsLessThan, _SLT, _SM, _T
 
 
 def windowed(it: Iterable[_T], width: int, step: int = 1, partial: bool = False) -> Iterator[Iterator[_T]]:
@@ -79,7 +80,7 @@ def after(it: Iterable[_T], v: _T, loop: bool = False) -> _T:
         return after(tuple(it), v, loop)
 
 
-def iter_equal(it1: Iterable[_T], it2: Iterable[_T]) -> bool:
+def iter_equal(it1: Iterable[Any], it2: Iterable[_T]) -> bool:
     """Checks if all elements in both iterables are equal to the elements in the other iterable at the same position.
 
     :param it1: The first iterable.
@@ -88,11 +89,15 @@ def iter_equal(it1: Iterable[_T], it2: Iterable[_T]) -> bool:
     """
     if isinstance(it1, Collection) and isinstance(it2, Collection):
         return len(it1) == len(it2) and all(x == y for x, y in zip(it1, it2))
+    elif isinstance(it1, Collection):
+        return iter_equal(it1, tuple(it2))
+    elif isinstance(it2, Collection):
+        return iter_equal(tuple(it1), it2)
     else:
         return iter_equal(tuple(it1), tuple(it2))
 
 
-def const(it: Iterable[_T]) -> bool:
+def const(it: Iterable[Any]) -> bool:
     """Checks if all elements inside the iterable are equal to each other.
 
        If the iterable is empty, True is returned.
@@ -100,10 +105,17 @@ def const(it: Iterable[_T]) -> bool:
     :param it: The iterable.
     :return: True if all elements are equal, else False.
     """
-    return all(x == it[0] for x in it) if isinstance(it, Sequence) else const(tuple(it))
+    it = iter(it)
+
+    try:
+        x = next(it)
+    except StopIteration:
+        return True
+
+    return all(x == y for y in it)
 
 
-def unique(it: Iterable[_T]) -> bool:
+def unique(it: Iterable[Any]) -> bool:
     """Checks if all elements inside the iterable are unique to each other.
 
        If the iterable is empty, True is returned.
@@ -111,23 +123,28 @@ def unique(it: Iterable[_T]) -> bool:
     :param it: The iterable.
     :return: True if all elements are unique, else False.
     """
-    if isinstance(it, Sequence):
-        return all(all(it[i] != it[j] for j in range(len(it)) if i != j) for i in range(len(it)))
+    if not (it := tuple(it)):
+        return True
+    elif isinstance(it[0], Hashable):
+        return len(it) == len(set(it))
+    elif isinstance(it[0], SupportsLessThan):
+        return all(x != y for x, y in windowed(it, 2))
     else:
-        return unique(tuple(it))
+        return all(all(it[i] != it[j] for j in range(len(it)) if i != j) for i in range(len(it)))
 
 
-def product(values: Iterable[_T], start: Optional[_T] = None) -> _T:
-    """Calculates the product of the elements in the iterable.
+def empty(it: Iterable[Any]) -> bool:
+    """Checks if the iterable is empty.
 
-    :param values: The values to be multiplied.
-    :param start: The optional start value.
-    :return: The product of the values.
+    :param it: The iterable to check.
+    :return: True if the iterable is empty, else False.
     """
     try:
-        return reduce(mul, values if start is None else chain((start,), values))
-    except TypeError:
-        raise ValueError('Invalid iterable')
+        next(iter(it))
+
+        return False
+    except StopIteration:
+        return True
 
 
 def bind(value: _SLT, lower: _SLT, upper: _SLT) -> _SLT:
@@ -146,6 +163,19 @@ def bind(value: _SLT, lower: _SLT, upper: _SLT) -> _SLT:
         return upper
     else:
         return value
+
+
+def product(values: Iterable[_SM], start: Optional[_SM] = None) -> _SM:
+    """Calculates the product of the elements in the iterable.
+
+    :param values: The values to be multiplied.
+    :param start: The optional start value.
+    :return: The product of the values.
+    """
+    try:
+        return reduce(mul, values if start is None else chain((start,), values))
+    except TypeError:
+        raise ValueError('Invalid iterable')
 
 
 def next_or_none(it: Iterator[_T]) -> Optional[_T]:

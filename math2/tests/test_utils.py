@@ -3,7 +3,8 @@ from typing import Optional, cast
 from unittest import main
 
 from math2.tests import ExtendedTestCase
-from math2.utils import (after, bind, chunked, const, default, get, iter_equal, next_or_none, product, rotated, trimmed,
+from math2.utils import (after, bind, chunked, const, default, empty, get, iter_equal, next_or_none, product, rotated,
+                         trimmed,
                          unique, windowed)
 
 
@@ -41,8 +42,9 @@ class UtilsTestCase(ExtendedTestCase):
         self.assertRaises(ValueError, after, range(6), -1)
 
     def test_iter_equal(self) -> None:
+        self.assertTrue(iter_equal(iter(range(6)), iter(range(6))))
         self.assertTrue(iter_equal(iter(range(6)), range(6)))
-        self.assertTrue(iter_equal([0, 1, 2], (0, 1, 2)))
+        self.assertTrue(iter_equal([0, 1, 2], iter((0, 1, 2))))
         self.assertTrue(iter_equal((), []))
         self.assertFalse(iter_equal(range(7), range(6)))
         self.assertFalse(iter_equal(range(1, 7), range(6)))
@@ -63,18 +65,25 @@ class UtilsTestCase(ExtendedTestCase):
         self.assertTrue(unique(range(10)))
         self.assertTrue(unique(iter(range(10))))
 
-    def test_product(self) -> None:
-        self.assertEqual(product(iter(range(6))), 0)
-        self.assertEqual(product(range(1, 6)), 120)
-        self.assertEqual(product(range(1, 6), 1), 120)
-        self.assertEqual(product((), 1), 1)
-        self.assertRaises(ValueError, product, ())
+    def test_empty(self) -> None:
+        self.assertTrue(empty(()))
+        self.assertTrue(empty([]))
+        self.assertTrue(empty(iter(())))
+        self.assertFalse(empty(range(10)))
+        self.assertFalse(empty(iter((1, 2, 3))))
 
     def test_bind(self) -> None:
         self.assertEqual(bind(1, 0, 2), 1)
         self.assertEqual(bind(-100, 0, 2), 0)
         self.assertEqual(bind(100, 0, 2), 2)
         self.assertRaises(ValueError, bind, 100, 2, 0)
+
+    def test_product(self) -> None:
+        self.assertEqual(product(iter(range(6))), 0)
+        self.assertEqual(product(range(1, 6)), 120)
+        self.assertEqual(product(range(1, 6), 1), 120)
+        self.assertEqual(product((), 1), 1)
+        self.assertRaises(ValueError, product, ())
 
     def test_next_or_none(self) -> None:
         self.assertEqual(next_or_none(iter(range(3))), 0)
