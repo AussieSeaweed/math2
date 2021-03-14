@@ -1,28 +1,27 @@
 from collections.abc import Iterator
-from typing import Optional
-
-from math2.utils import default
 
 
-def arange(start: float, stop: Optional[float] = None, step: Optional[float] = None) -> Iterator[float]:
+def arange(*args: float) -> Iterator[float]:
     """Generates a range of floating point values.
 
-    :param start: The start value.
-    :param stop: The stop value.
-    :param step: The step value.
+    :param args: stop or start[, stop[, step]]
     :return: The iterator of range values.
     """
-    if stop is None:
-        yield from arange(0, start, step)
-    elif step is None:
-        yield from arange(start, stop, 1)
+    if not args:
+        raise ValueError('Not enough arguments')
+    if len(args) == 1:
+        yield from arange(0, args[0])
+    elif len(args) == 2:
+        yield from arange(args[0], args[1], 1)
     else:
+        start, stop, step = args
+
         while start < stop:
             yield start
             start += step
 
 
-def linspace(start: float, stop: float, n: float = 100) -> Iterator[float]:
+def linspace(start: float, stop: float, n: float) -> Iterator[float]:
     """Generates an iterator of values from start to stop with length of n.
 
     :param start: The start value.
@@ -33,12 +32,19 @@ def linspace(start: float, stop: float, n: float = 100) -> Iterator[float]:
     return arange(start, stop, (stop - start) / n)
 
 
-def series_sum(lo: int, hi: Optional[int] = None, n: Optional[int] = None) -> int:
+def series_sum(*args: int) -> int:
     """Calculates the series sum of the interval.
 
-    :param lo: The start or end value.
-    :param hi: The optional end value.
-    :param n: The number of elements, defaults to (end - start) + 1.
+    :param args: stop or start[, stop[, n]]
     :return: the series sum.
     """
-    return (lo + default(hi, 0)) * default(n, abs(default(hi, 0) - lo) + 1) // 2
+    if not args:
+        raise ValueError('Not enough arguments')
+    if len(args) == 1:
+        return series_sum(0, args[0])
+    elif len(args) == 2:
+        return series_sum(args[0], args[1], abs(args[1] - args[0]) + 1)
+    else:
+        start, stop, n = args
+
+        return (start + stop) * n // 2

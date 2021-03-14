@@ -4,8 +4,7 @@ from unittest import main
 
 from math2.tests import ExtendedTestCase
 from math2.utils import (after, bind, chunked, const, default, empty, get, iter_equal, next_or_none, product, rotated,
-                         trimmed,
-                         unique, windowed)
+                         trimmed, unique, windowed)
 
 
 class UtilsTestCase(ExtendedTestCase):

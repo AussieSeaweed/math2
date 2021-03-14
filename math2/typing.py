@@ -14,7 +14,7 @@ class SupportsLessThan(Protocol):
 class SupportsMul(Protocol):
     """SupportsMul is the protocol for types that support the __mul__ operator."""
 
-    def __mul__(self: _SM, other: _SM) -> _SM: ...
+    def __mul__(self: _SM, other: Any) -> _SM: ...
 
 
 _T = TypeVar('_T')

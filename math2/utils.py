@@ -1,5 +1,4 @@
-from collections import Collection
-from collections.abc import Hashable, Iterable, Iterator, Sequence
+from collections.abc import Collection, Hashable, Iterable, Iterator, Sequence
 from functools import reduce
 from itertools import chain
 from operator import mul
@@ -80,7 +79,7 @@ def after(it: Iterable[_T], v: _T, loop: bool = False) -> _T:
         return after(tuple(it), v, loop)
 
 
-def iter_equal(it1: Iterable[Any], it2: Iterable[_T]) -> bool:
+def iter_equal(it1: Iterable[Any], it2: Iterable[Any]) -> bool:
     """Checks if all elements in both iterables are equal to the elements in the other iterable at the same position.
 
     :param it1: The first iterable.
