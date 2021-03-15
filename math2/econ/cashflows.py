@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections.abc import Iterable, Iterator
 from functools import total_ordering
 from itertools import accumulate
@@ -27,7 +29,7 @@ class CashFlow(SupportsLessThan):
         else:
             return NotImplemented
 
-    def __lt__(self, other: Any) -> bool:
+    def __lt__(self, other: CashFlow) -> bool:
         if isinstance(other, CashFlow):
             return self.time < other.time
         else:

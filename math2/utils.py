@@ -16,10 +16,10 @@ def windowed(it: Iterable[_T], width: int, step: int = 1, partial: bool = False)
     :param partial: Allow partial view.
     :return: The window views.
     """
-    if isinstance(it, Sequence):
-        return (iter(it[i:i + width]) for i in range(0, len(it) if partial else len(it) - width + 1, step))
-    else:
-        return windowed(tuple(it), width, step, partial)
+    it = tuple(it)
+
+    for i in range(0, len(it) if partial else len(it) - width + 1, step):
+        yield iter(it[i:i + width])
 
 
 def chunked(it: Iterable[_T], width: int) -> Iterator[Iterator[_T]]:
@@ -133,20 +133,6 @@ def unique(it: Iterable[Any]) -> bool:
             return all(all(it[i] != it[j] for j in range(len(it)) if i != j) for i in range(len(it)))
     else:
         return unique(tuple(it))
-
-
-def empty(it: Iterable[Any]) -> bool:
-    """Checks if the iterable is empty.
-
-    :param it: The iterable to check.
-    :return: True if the iterable is empty, else False.
-    """
-    try:
-        next(iter(it))
-
-        return False
-    except StopIteration:
-        return True
 
 
 def bind(value: _SLT, lower: _SLT, upper: _SLT) -> _SLT:

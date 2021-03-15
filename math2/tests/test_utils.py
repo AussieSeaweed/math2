@@ -3,8 +3,8 @@ from typing import Optional, cast
 from unittest import main
 
 from math2.tests import ExtendedTestCase
-from math2.utils import (after, bind, chunked, const, default, empty, get, iter_equal, next_or_none, product, rotated,
-                         trimmed, unique, windowed)
+from math2.utils import (after, bind, chunked, const, default, get, iter_equal, next_or_none, product, rotated, trimmed,
+                         unique, windowed)
 
 
 class UtilsTestCase(ExtendedTestCase):
@@ -63,13 +63,6 @@ class UtilsTestCase(ExtendedTestCase):
         self.assertTrue(unique(([2, 1], [1, 1], [1, 2])))
         self.assertTrue(unique(range(10)))
         self.assertTrue(unique(iter(range(10))))
-
-    def test_empty(self) -> None:
-        self.assertTrue(empty(()))
-        self.assertTrue(empty([]))
-        self.assertTrue(empty(iter(())))
-        self.assertFalse(empty(range(10)))
-        self.assertFalse(empty(iter((1, 2, 3))))
 
     def test_bind(self) -> None:
         self.assertEqual(bind(1, 0, 2), 1)
