@@ -165,7 +165,7 @@ def link(it):
     total = list[CashFlow]()
     total_life = 0.0
 
-    for cash_flows in map(tuple[CashFlow], it):
+    for cash_flows in map(tuple, it):
         total.extend(CashFlow(cash_flow.time + total_life, cash_flow.amount) for cash_flow in cash_flows)
         total_life += life(cash_flows)
 

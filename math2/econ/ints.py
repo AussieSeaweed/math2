@@ -37,6 +37,13 @@ class Int(ABC):
 class SimpleInt(Int):
     """SimpleInt is the class for simple interests."""
 
+    def to_factor(self, t=1):
+        return 1 + self.rate * t
+
+    @classmethod
+    def from_factor(cls, factor, t=1):
+        return SimpleInt((factor - 1) / t)
+
     def __eq__(self, other):
         if isinstance(other, SimpleInt):
             return self.rate == other.rate
@@ -49,28 +56,9 @@ class SimpleInt(Int):
         else:
             return NotImplemented
 
-    def to_factor(self, t=1):
-        return 1 + self.rate * t
-
-    @classmethod
-    def from_factor(cls, factor, t=1):
-        return SimpleInt((factor - 1) / t)
-
 
 class CompInt(Int, ABC):
     """CompInt is the abstract base class for all compound interests."""
-
-    def __eq__(self, other):
-        if isinstance(other, CompInt):
-            return self.to_ef().rate == other.to_ef().rate
-        else:
-            return NotImplemented
-
-    def __lt__(self, other):
-        if isinstance(other, CompInt):
-            return self.to_ef().rate < other.to_ef().rate
-        else:
-            return NotImplemented
 
     @abstractmethod
     def to_ef(self):
@@ -110,13 +98,22 @@ class CompInt(Int, ABC):
     def from_factor(cls, factor, t=1):
         return EfInt(factor ** (1 / t) - 1)
 
+    def __eq__(self, other):
+        if isinstance(other, CompInt):
+            return self.to_ef().rate == other.to_ef().rate
+        else:
+            return NotImplemented
+
+    def __lt__(self, other):
+        if isinstance(other, CompInt):
+            return self.to_ef().rate < other.to_ef().rate
+        else:
+            return NotImplemented
+
 
 @total_ordering
 class EfInt(CompInt):
     """EfInt is the class for effective interests."""
-
-    def to_factor(self, t=1):
-        return fp(self.rate, t)
 
     def to_ef(self):
         return self
@@ -129,6 +126,9 @@ class EfInt(CompInt):
 
     def to_sp(self, sp_count):
         return SPInt((self.rate + 1) ** (1 / sp_count) - 1, sp_count)
+
+    def to_factor(self, t=1):
+        return fp(self.rate, t)
 
 
 class MulCompInt(CompInt, ABC):
@@ -151,9 +151,6 @@ class MulCompInt(CompInt, ABC):
 class NomInt(MulCompInt):
     """NomInt is the class for nominal interests."""
 
-    def to_factor(self, t=1):
-        return fp(self.rate / self.sp_count, self.sp_count * t)
-
     def to_ef(self):
         return EfInt(fp(self.rate / self.sp_count, self.sp_count) - 1)
 
@@ -166,13 +163,13 @@ class NomInt(MulCompInt):
     def to_sp(self, sp_count=None):
         return SPInt(self.rate / self.sp_count, self.sp_count) if sp_count is None else self.to_ef().to_sp(sp_count)
 
+    def to_factor(self, t=1):
+        return fp(self.rate / self.sp_count, self.sp_count * t)
+
 
 @total_ordering
 class SPInt(MulCompInt):
     """SPInt is the class for sp interests."""
-
-    def to_factor(self, t=1):
-        return fp(self.rate, self.sp_count * t)
 
     def to_ef(self):
         return EfInt(fp(self.rate, self.sp_count) - 1)
@@ -186,6 +183,9 @@ class SPInt(MulCompInt):
     def to_sp(self, sp_count=None):
         return self if sp_count is None else self.to_ef().to_sp(sp_count)
 
+    def to_factor(self, t=1):
+        return fp(self.rate, self.sp_count * t)
+
 
 @total_ordering
 class ContInt(MulCompInt):
@@ -193,9 +193,6 @@ class ContInt(MulCompInt):
 
     def __init__(self, rate):
         super().__init__(rate, np.inf)
-
-    def to_factor(self, t=1):
-        return np.exp(self.rate) ** t
 
     def to_ef(self):
         return EfInt(np.exp(self.rate) - 1)
@@ -208,3 +205,6 @@ class ContInt(MulCompInt):
 
     def to_sp(self, sp_count):
         return self.to_ef().to_sp(sp_count)
+
+    def to_factor(self, t=1):
+        return np.exp(self.rate) ** t
