@@ -1,9 +1,9 @@
 from collections.abc import Callable
 
-from math2.misc import arange
+from math2.misc import frange
 
 
-def derivative(f: Callable[[float], float], x: float, eps: float) -> float:
+def differentiate(f: Callable[[float], float], x: float, eps: float) -> float:
     """Performs a numerical differentiation on the supplied function.
 
     :param f: The function to be differentiated.
@@ -23,7 +23,7 @@ def root(f: Callable[[float], float], x: float, eps: float) -> float:
     :param eps: The desired accuracy.
     """
     while eps < abs(y := f(x)):
-        x -= y / derivative(f, x, eps)
+        x -= y / differentiate(f, x, eps)
     else:
         return x
 
@@ -39,4 +39,4 @@ def integrate(f: Callable[[float], float], xlo: float, xhi: float, n: float = 10
     """
     dx = (xhi - xlo) / n
 
-    return sum(dx * f(x) for x in arange(xlo, xhi, dx))
+    return sum(dx * f(x) for x in frange(xlo, xhi, dx))

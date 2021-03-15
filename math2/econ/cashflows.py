@@ -10,7 +10,7 @@ from math2.analysis import interpolate
 from math2.calc import root
 from math2.econ.factors import ap
 from math2.econ.ints import CompInt, EfInt, Int
-from math2.misc import arange
+from math2.misc import frange
 from math2.typing import SupportsLessThan
 from math2.utils import default, windowed
 
@@ -159,7 +159,7 @@ def repeated(cash_flows: Iterable[CashFlow], total_life: float) -> Iterator[Cash
     if isinstance(cash_flows, Iterator):
         return repeated(tuple(cash_flows), total_life)
     else:
-        return (cash_flow for cash_flow in link((cash_flows for _ in arange(0, total_life, life(cash_flows))))
+        return (cash_flow for cash_flow in link((cash_flows for _ in frange(0, total_life, life(cash_flows))))
                 if cash_flow.time <= total_life)
 
 

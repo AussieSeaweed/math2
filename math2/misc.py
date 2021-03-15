@@ -1,7 +1,7 @@
 from collections.abc import Iterator
 
 
-def arange(*args: float) -> Iterator[float]:
+def frange(*args: float) -> Iterator[float]:
     """Generates a range of floating point values.
 
     :param args: stop or start[, stop[, step]]
@@ -10,9 +10,9 @@ def arange(*args: float) -> Iterator[float]:
     if not args:
         raise ValueError('Not enough arguments')
     if len(args) == 1:
-        yield from arange(0, args[0])
+        yield from frange(0, args[0])
     elif len(args) == 2:
-        yield from arange(args[0], args[1], 1)
+        yield from frange(args[0], args[1], 1)
     else:
         start, stop, step = args
 
@@ -29,7 +29,7 @@ def linspace(start: float, stop: float, n: float) -> Iterator[float]:
     :param n: The number of values, defaults to 100.
     :return: The linspace of arguments.
     """
-    return arange(start, stop, (stop - start) / n)
+    return frange(start, stop, (stop - start) / n)
 
 
 def series_sum(*args: int) -> int:

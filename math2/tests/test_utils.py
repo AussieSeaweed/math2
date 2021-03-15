@@ -60,6 +60,7 @@ class UtilsTestCase(ExtendedTestCase):
         self.assertFalse(unique(iter((1, 1, 1))))
         self.assertTrue(unique(()))
         self.assertFalse(unique(((1, 1), (1, 1), (1, 2))))
+        self.assertFalse(unique(([2, 1], [1, 1], [2, 1])))
         self.assertTrue(unique(([2, 1], [1, 1], [1, 2])))
         self.assertTrue(unique(range(10)))
         self.assertTrue(unique(iter(range(10))))

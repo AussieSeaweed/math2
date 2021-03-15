@@ -10,7 +10,7 @@ from math2.consts import EPS
 from math2.econ.cashflows import CashFlow, irr
 from math2.econ.factors import ap, fa
 from math2.econ.ints import CompInt, EfInt
-from math2.misc import arange
+from math2.misc import frange
 from math2.utils import default
 
 
@@ -40,7 +40,7 @@ class Bond(Instrument):
         period = 1 / self.freq
 
         return chain(
-            (CashFlow(t, self.coupon) for t in arange(period, self.mat + EPS, period)),
+            (CashFlow(t, self.coupon) for t in frange(period, self.mat + EPS, period)),
             (CashFlow(self.mat, self.face),),
         )
 
@@ -71,7 +71,7 @@ class Mortgage(Instrument):
     def cash_flows(self) -> Iterator[CashFlow]:
         return chain(
             (CashFlow(0, -self.principal),),
-            (CashFlow(t, self.payment) for t in arange(1 / self.freq, self.amort + EPS, 1 / self.freq)),
+            (CashFlow(t, self.payment) for t in frange(1 / self.freq, self.amort + EPS, 1 / self.freq)),
         )
 
     @property
@@ -160,7 +160,7 @@ class Project(Instrument):
 
     @property
     def cash_flows(self) -> Iterator[CashFlow]:
-        return chain((CashFlow(0, self.initial),), (CashFlow(t, self.annuity) for t in arange(1, self.life + EPS)),
+        return chain((CashFlow(0, self.initial),), (CashFlow(t, self.annuity) for t in frange(1, self.life + EPS)),
                      (CashFlow(self.life, self.final),))
 
 

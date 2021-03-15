@@ -128,7 +128,7 @@ def unique(it: Iterable[Any]) -> bool:
         elif isinstance(it[0], Hashable):
             return len(it) == len(set(it))
         elif isinstance(it[0], SupportsLessThan):
-            return all(x != y for x, y in windowed(it, 2))
+            return all(x != y for x, y in windowed(sorted(it), 2))
         else:
             return all(all(it[i] != it[j] for j in range(len(it)) if i != j) for i in range(len(it)))
     else:
