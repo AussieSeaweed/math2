@@ -1,17 +1,14 @@
-from __future__ import annotations
-
 from abc import ABC, abstractmethod
 from collections.abc import Iterable, Iterator, Sequence
 from enum import Enum
 from itertools import chain
-from typing import Any, Optional
 
-from math2.consts import EPS
+import numpy as np
+from auxiliary import default
+
 from math2.econ.cashflows import CashFlow, irr
 from math2.econ.factors import ap, fa
 from math2.econ.ints import CompInt, EfInt
-from math2.misc import frange
-from auxiliary import default
 
 
 class Instrument(ABC):
@@ -19,7 +16,7 @@ class Instrument(ABC):
 
     @property
     @abstractmethod
-    def cash_flows(self) -> Iterator[CashFlow]:
+    def cash_flows(self):
         """
         :return: The cash flows of this instrument.
         """
@@ -29,23 +26,22 @@ class Instrument(ABC):
 class Bond(Instrument):
     """Bond is the class for bonds."""
 
-    def __init__(self, face: float, coupon: float, freq: float, mat: float):
+    def __init__(self, face, coupon, freq, mat):
         self.face = face
         self.coupon = coupon
         self.freq = freq
         self.mat = mat
 
     @property
-    def cash_flows(self) -> Iterator[CashFlow]:
-        period = 1 / self.freq
-
+    def cash_flows(self):
         return chain(
-            (CashFlow(t, self.coupon) for t in frange(period, self.mat + EPS, period)),
+            (CashFlow(t, self.coupon) for t in np.arange(1 / self.freq, self.mat + 1e-7, 1 / self.freq)),
+            # TODO remove 1e-7
             (CashFlow(self.mat, self.face),),
         )
 
     @classmethod
-    def from_rate(cls, face: float, rate: CompInt, freq: float, mat: float) -> Bond:
+    def from_rate(cls, face, rate, freq, mat):
         """Creates the bond from the coupon rate.
 
         :param face: The face value.
@@ -60,7 +56,7 @@ class Bond(Instrument):
 class Mortgage(Instrument):
     """Mortgage is the class for mortgages."""
 
-    def __init__(self, principal: float, int_: CompInt, freq: float = 12, term: float = 5, amort: float = 25):
+    def __init__(self, principal, int_, freq=12, term=5, amort=25):
         self.principal = principal
         self.int = int_
         self.freq = freq
@@ -68,20 +64,21 @@ class Mortgage(Instrument):
         self.amort = amort
 
     @property
-    def cash_flows(self) -> Iterator[CashFlow]:
+    def cash_flows(self):
         return chain(
             (CashFlow(0, -self.principal),),
-            (CashFlow(t, self.payment) for t in frange(1 / self.freq, self.amort + EPS, 1 / self.freq)),
+            (CashFlow(t, self.payment) for t in np.arange(1 / self.freq, self.amort + 1e-7, 1 / self.freq)),
+            # TODO remove 1e-7
         )
 
     @property
-    def payment(self) -> float:
+    def payment(self):
         """
         :return: The mortgage payment.
         """
         return self.principal * ap(self.int.to_sp(self.freq).rate, self.freq * self.amort)
 
-    def pay(self, term: Optional[float] = None, payment: Optional[float] = None) -> Mortgage:
+    def pay(self, term=None, payment=None):
         """Creates a new mortgage instance assuming payments were made.
 
         :param term: The term during which payments were made.
@@ -97,8 +94,7 @@ class Mortgage(Instrument):
         )
 
     @classmethod
-    def from_down(cls, value: float, down: float, int_: CompInt, freq: float = 12, term: float = 5,
-                  amort: float = 25) -> Mortgage:
+    def from_down(cls, value, down, int_: CompInt, freq=12, term=5, amort=25):
         """Constructs the mortgage instance from the down payment value.
 
         :param value: The total value.
@@ -112,8 +108,7 @@ class Mortgage(Instrument):
         return cls(value - down, int_, freq, term, amort)
 
     @classmethod
-    def from_dtv(cls, value: float, dtv: float, int_: CompInt, freq: float = 12, term: float = 5,
-                 amort: float = 25) -> Mortgage:
+    def from_dtv(cls, value, dtv, int_: CompInt, freq=12, term=5, amort=25):
         """Constructs the mortgage instance from the down payment to value percentage.
 
         :param value: The total value.
@@ -127,8 +122,7 @@ class Mortgage(Instrument):
         return cls.from_down(value, value * dtv, int_, freq, term, amort)
 
     @classmethod
-    def from_ltv(cls, value: float, ltv: float, int_: CompInt, freq: float = 12, term: float = 5,
-                 amort: float = 25) -> Mortgage:
+    def from_ltv(cls, value, ltv, int_: CompInt, freq=12, term=5, amort=25):
         """Constructs the mortgage instance from the loan payment to value percentage.
 
         :param value: The total value.
@@ -145,13 +139,13 @@ class Mortgage(Instrument):
 class Project(Instrument):
     """Project is the class for projects."""
 
-    def __init__(self, initial: float, annuity: float, final: float, life: float):
+    def __init__(self, initial, annuity, final, life):
         self.initial = initial
         self.annuity = annuity
         self.final = final
         self.life = life
 
-    def __sub__(self, other: Any) -> Project:
+    def __sub__(self, other):
         if isinstance(other, Project):
             return Project(
                 self.initial - other.initial, self.annuity - other.annuity, self.final - other.final, self.life)
@@ -159,8 +153,9 @@ class Project(Instrument):
             return NotImplemented
 
     @property
-    def cash_flows(self) -> Iterator[CashFlow]:
-        return chain((CashFlow(0, self.initial),), (CashFlow(t, self.annuity) for t in frange(1, self.life + EPS)),
+    def cash_flows(self):
+        return chain((CashFlow(0, self.initial),), (CashFlow(t, self.annuity) for t in np.arange(1, self.life + 1e-7)),
+                     # TODO remove 1e-7
                      (CashFlow(self.life, self.final),))
 
 
@@ -171,7 +166,7 @@ class Rel(Enum):
     REL = 2
 
 
-def rel(values: Iterable[float], budget: float) -> Rel:
+def rel(values, budget):
     """Determines the relationship of values with respect to the budget.
 
     :param values: The values.
@@ -188,7 +183,7 @@ def rel(values: Iterable[float], budget: float) -> Rel:
         return Rel.MEX
 
 
-def rel_combinations(values: Iterable[float], budget: float) -> Iterator[Iterator[int]]:
+def rel_combinations(values, budget):
     """Gets the combinations of the related values given their values and the budget.
 
     :param values: The values of the projects.
@@ -205,17 +200,16 @@ def rel_combinations(values: Iterable[float], budget: float) -> Iterator[Iterato
         return iter((iter(()),))
 
 
-def de_facto_marr(projects: Iterable[Project], budget: float, guess: CompInt, eps: float) -> CompInt:
+def de_facto_marr(projects: Iterable[Project], budget, guess):
     """Calculates the de factor marr of the given projects based on costs and irrs.
 
     :param projects: The projects.
     :param budget: The budget.
     :param guess: The initial guess for irr.
-    :param eps: The desired accuracy.
     :return: The de factor marr.
     """
     if isinstance(projects, Sequence):
-        irrs = tuple(irr(project.cash_flows, guess, eps) for project in projects)
+        irrs = tuple(irr(project.cash_flows, guess) for project in projects)
         indices = sorted(range(len(projects)), key=irrs.__getitem__, reverse=True)
         marr: CompInt = EfInt(0)
 
@@ -229,10 +223,10 @@ def de_facto_marr(projects: Iterable[Project], budget: float, guess: CompInt, ep
 
         return marr
     else:
-        return de_facto_marr(tuple(projects), budget, guess, eps)
+        return de_facto_marr(tuple(projects), budget, guess)
 
 
-def select(irrs: Iterable[CompInt], table: Iterable[Iterable[CompInt]], marr: CompInt) -> Optional[int]:
+def select(irrs, table, marr):
     """Selects the project with respect to the given table of internal rate of returns and marr.
 
     :param irrs: The irr values of the choices (sorted by their initial cost).
@@ -255,14 +249,13 @@ def select(irrs: Iterable[CompInt], table: Iterable[Iterable[CompInt]], marr: Co
     return x
 
 
-def irr_table(projects: Iterable[Project], guess: CompInt, eps: float) -> Iterator[Iterator[EfInt]]:
+def irr_table(projects, guess):
     """Creates the irr table from the projects.
 
     :param projects: The projects.
     :param guess: The initial guess.
-    :param eps: The desired accuracy.
     :return: The irr table.
     """
     projects = tuple(projects)
 
-    return ((irr((x - y).cash_flows, guess, eps) for y in projects[:projects.index(x)]) for x in projects)
+    return ((irr((x - y).cash_flows, guess) for y in projects[:projects.index(x)]) for x in projects)

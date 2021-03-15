@@ -1,31 +1,31 @@
-from collections.abc import Iterable, Iterator, Sequence
 from random import shuffle
-from statistics import fmean
 
-from auxiliary.typing import _T
+import numpy as np
 from auxiliary import trimmed
 
 
-def trimmed_mean(values: Iterable[float], percentage: float) -> float:
+def trimmed_mean(values, percentage):
     """Calculates the trimmed mean of the values.
 
     :param values: The values.
     :param percentage: The trimmed percentage.
     :return: The trimmed mean.
     """
-    return fmean(trimmed(sorted(values), percentage))
+    return np.mean(np.fromiter(trimmed(sorted(values), percentage), float))
 
 
-def range_(values: Iterable[float]) -> float:
+def range_(values):
     """Calculates the range of the values.
 
     :param values: The values.
     :return: The range of the values.
     """
-    return range_(tuple(values)) if isinstance(values, Iterator) else max(values) - min(values)
+    array = np.fromiter(values, float)
+
+    return np.max(array) - np.min(array)
 
 
-def shuffled(values: Iterable[_T]) -> Sequence[_T]:
+def shuffled(values):
     """Shuffles the copied values and returns the list.
 
     :param values: The values to be shuffled.

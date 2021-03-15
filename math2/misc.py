@@ -1,38 +1,4 @@
-from collections.abc import Iterator
-
-
-def frange(*args: float) -> Iterator[float]:
-    """Generates a range of floating point values.
-
-    :param args: stop or start[, stop[, step]]
-    :return: The iterator of range values.
-    """
-    if not args:
-        raise ValueError('Not enough arguments')
-    if len(args) == 1:
-        yield from frange(0, args[0])
-    elif len(args) == 2:
-        yield from frange(args[0], args[1], 1)
-    else:
-        start, stop, step = args
-
-        while start < stop:
-            yield start
-            start += step
-
-
-def linspace(start: float, stop: float, n: float) -> Iterator[float]:
-    """Generates an iterator of values from start to stop with length of n.
-
-    :param start: The start value.
-    :param stop: The stop value.
-    :param n: The number of values, defaults to 100.
-    :return: The linspace of arguments.
-    """
-    return frange(start, stop, (stop - start) / n)
-
-
-def series_sum(*args: int) -> int:
+def series_sum(*args):
     """Calculates the series sum of the interval.
 
     :param args: stop or start[, stop[, n]]

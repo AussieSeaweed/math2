@@ -1,8 +1,9 @@
-from math2.econ import CompInt, EfInt, Int
-from math2.linalg import Matrix, Vector, solve
+import numpy as np
+
+from math2.econ import EfInt, Int
 
 
-def fair(bull: float, bear: float, m_price: float, m_bull: float, m_bear: float, rf: Int) -> float:
+def fair(bull, bear, m_price, m_bull, m_bear, rf: Int):
     """Calculates the fair price of an asset, given its potential payoffs.
 
     :param bull: The asset price in a bull market.
@@ -13,12 +14,12 @@ def fair(bull: float, bear: float, m_price: float, m_bull: float, m_bear: float,
     :param rf: The risk free rate.
     :return: The fair price of an asset.
     """
-    a, b = solve(Matrix(((m_bull, rf.to_factor()), (m_bear, rf.to_factor()))), Vector((bull, bear)))
+    a, b = np.linalg.solve(((m_bull, rf.to_factor()), (m_bear, rf.to_factor())), (bull, bear))
 
     return m_price * a + b
 
 
-def ror(price: float, bull: float, bear: float, p: float) -> EfInt:
+def ror(price, bull, bear, p):
     """Calculates the expected rate of return of an asset.
 
     :param price: The price of an asset.
@@ -30,7 +31,7 @@ def ror(price: float, bull: float, bear: float, p: float) -> EfInt:
     return EfInt((bull * p + bear * (1 - p)) / price - 1)
 
 
-def beta(a_ror: CompInt, m_ror: CompInt, rf: CompInt) -> float:
+def beta(a_ror, m_ror, rf):
     """Calculates the asset risk.
 
     :param a_ror: The rate of return of an asset.
@@ -41,7 +42,7 @@ def beta(a_ror: CompInt, m_ror: CompInt, rf: CompInt) -> float:
     return (a_ror.to_ef().rate - rf.to_ef().rate) / (m_ror.to_ef().rate - rf.to_ef().rate)
 
 
-def capm(b: float, rf: CompInt, em: CompInt) -> EfInt:
+def capm(b, rf, em):
     """Calculates the expected return using the CAPM model.
 
     :param b: The company risk.
