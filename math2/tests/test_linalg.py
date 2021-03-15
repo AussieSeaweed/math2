@@ -2,7 +2,7 @@ from operator import add, matmul, sub
 from unittest import main
 
 from math2.linalg import Matrix, Vector, full, ones, replaced, solve, zeros
-from math2.tests import ExtendedTestCase
+from auxiliary import ExtendedTestCase
 
 
 class VectorTestCase(ExtendedTestCase):

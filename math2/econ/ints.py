@@ -6,7 +6,7 @@ from math import exp, inf, log
 from typing import Any, Optional
 
 from math2.econ.factors import fp
-from math2.typing import SupportsLessThan
+from auxiliary import SupportsLessThan
 
 
 class Int(ABC):

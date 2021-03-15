@@ -10,7 +10,7 @@ from math2.econ import (Bond, CashFlow, CompInt, ContInt, DblDeclBalDeprec, Decl
                         Project, Rel, SPInt, SYDDeprec, SimpleInt, StrLineDeprec, UPDeprec, aw, beta, capm,
                         de_facto_marr, fair, fp, irr, irr_table, link, pa, payback, perp, pf, pg, pw, rel,
                         rel_combinations, repeated, ror, rpw, select, yield_)
-from math2.tests import ExtendedTestCase
+from auxiliary import ExtendedTestCase
 
 
 class InterestTestCase(TestCase):

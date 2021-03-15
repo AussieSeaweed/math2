@@ -1,6 +1,6 @@
 from unittest import main
 
-from math2.tests import ExtendedTestCase
+from auxiliary import ExtendedTestCase
 
 
 class NTheoryTestCase(ExtendedTestCase):

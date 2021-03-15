@@ -2,8 +2,8 @@ from collections.abc import Iterable, Iterator, Sequence
 from random import shuffle
 from statistics import fmean
 
-from math2.typing import _T
-from math2.utils import trimmed
+from auxiliary.typing import _T
+from auxiliary import trimmed
 
 
 def trimmed_mean(values: Iterable[float], percentage: float) -> float:

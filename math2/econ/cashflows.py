@@ -11,8 +11,7 @@ from math2.calc import root
 from math2.econ.factors import ap
 from math2.econ.ints import CompInt, EfInt, Int
 from math2.misc import frange
-from math2.typing import SupportsLessThan
-from math2.utils import default, windowed
+from auxiliary import SupportsLessThan, default, windowed
 
 
 @total_ordering

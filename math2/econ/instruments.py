@@ -11,7 +11,7 @@ from math2.econ.cashflows import CashFlow, irr
 from math2.econ.factors import ap, fa
 from math2.econ.ints import CompInt, EfInt
 from math2.misc import frange
-from math2.utils import default
+from auxiliary import default
 
 
 class Instrument(ABC):

@@ -1,7 +1,7 @@
 from unittest import main
 
 from math2.misc import frange, linspace, series_sum
-from math2.tests import ExtendedTestCase
+from auxiliary import ExtendedTestCase
 
 
 class MiscTestCase(ExtendedTestCase):
