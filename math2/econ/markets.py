@@ -1,9 +1,9 @@
 import numpy as np
 
-from math2.econ import EfInt, Int
+from math2.econ import EfInt
 
 
-def fair(bull, bear, m_price, m_bull, m_bear, rf: Int):
+def fair(bull, bear, m_price, m_bull, m_bear, rf):
     """Calculates the fair price of an asset, given its potential payoffs.
 
     :param bull: The asset price in a bull market.

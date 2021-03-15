@@ -5,7 +5,7 @@ from auxiliary import ExtendedTestCase
 
 
 class StatsTestCase(ExtendedTestCase):
-    def setUp(self) -> None:
+    def setUp(self):
         self.value_sets = (
             (0.32, 0.53, 0.28, 0.37, 0.47, 0.43, 0.36, 0.42, 0.38, 0.43),
             (0.26, 0.43, 0.47, 0.49, 0.52, 0.75, 0.79, 0.86, 0.62, 0.46),
@@ -13,11 +13,11 @@ class StatsTestCase(ExtendedTestCase):
             (1., 2., 3., 4., 5.),
         )
 
-    def test_trimmed_mean(self) -> None:
+    def test_trimmed_mean(self):
         self.assertIterableAlmostEqual((trimmed_mean(seq, 0.1) for seq in self.value_sets),
                                        (0.39750, 0.56625, 7.0225, 3))
 
-    def test_range(self) -> None:
+    def test_range(self):
         self.assertAlmostEqual(range_(map(float, range(5))), 4)
         self.assertIterableAlmostEqual(map(range_, self.value_sets), (0.25, 0.6, 0.13, 4))
 

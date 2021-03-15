@@ -14,16 +14,16 @@ from math2.econ import (Bond, CashFlow, CompInt, ContInt, DblDeclBalDeprec, Decl
 
 
 class InterestTestCase(TestCase):
-    def test_difference(self) -> None:
+    def test_difference(self):
         r, p, t, s, c = 0.07, 24, 2020 - 1626, 685.92, 9066082143624.828
 
         self.assertAlmostEqual(p * SimpleInt(r).to_factor(t), s)
         self.assertAlmostEqual(p * EfInt(r).to_factor(t), c)
 
-    def test_comparison(self) -> None:
+    def test_comparison(self):
         self.assertLess(NomInt(0.06, 12).to_ef().rate, SPInt(0.063, 1).to_ef().rate)
 
-    def test_consistency(self) -> None:
+    def test_consistency(self):
         nr, sc, t, f = 0.1, 4, 2.5, 1.2800845441963565
         counts = range(1, 366)
 
@@ -50,39 +50,39 @@ class InterestTestCase(TestCase):
 
 
 class InstrumentTestCase(ExtendedTestCase):
-    def test_relationships(self) -> None:
+    def test_relationships(self):
         self.assertEqual(rel((5000, 7000, 6000, 3000), 1000000), Rel.INDEP)
         self.assertEqual(rel((5000, 7000, 6000, 3000), 7000), Rel.MEX)
         self.assertEqual(rel((5000, 7000, 6000, 3000), 10000), Rel.REL)
 
-    def test_combinations(self) -> None:
+    def test_combinations(self):
         self.assertEqual(len(tuple(rel_combinations((5000, 7000, 6000, 3000), 10000))), 8)
 
-    def test_projects(self) -> None:
+    def test_projects(self):
         self.assertAlmostEqual(pw(Project(-20000, 4000 - 1000, 4000, 10).cash_flows, EfInt(0.05)), 5620.857801717468)
         self.assertAlmostEqual(aw(Project(-20000, 4000 - 1000, 4000, 10).cash_flows, EfInt(0.05)), 727.9268005526942)
 
 
 class CashFlowTestCase(TestCase):
-    def test_payback_period(self) -> None:
+    def test_payback_period(self):
         self.assertAlmostEqual(payback((), 0), 0)
         self.assertAlmostEqual(payback((), 10), np.inf)
         self.assertAlmostEqual(payback((CashFlow(0, 100), CashFlow(1, 200), CashFlow(2, 300)), 450), 1.5)
 
 
 class PS1TestCase(TestCase):
-    def test_1(self) -> None:
+    def test_1(self):
         self.assertLess(8000 + 1200, 6800 + 2500)
         self.assertAlmostEqual(np.float_(fsolve(lambda mv: 8000 + 1200 - (mv + 2500), np.array(6800))), 6700)
 
-    def test_2(self) -> None:
+    def test_2(self):
         self.assertAlmostEqual(np.float_(fsolve(lambda t: 7500 - t * 1700, np.array(0))), 4.411764705882353)
         self.assertAlmostEqual(np.float_(fsolve(lambda t: 9000 - t * 2200, np.array(0))), 4.09090909)
 
-    def test_3(self) -> None:
+    def test_3(self):
         self.assertAlmostEqual((1 + 0.05 / 1000000) ** 1000000, np.exp(0.05))
 
-    def test_4(self) -> None:
+    def test_4(self):
         e, p, t = EfInt(0.034), 100000, 4
 
         self.assertAlmostEqual(e.to_nom(2).rate, 0.03371581102178567)
@@ -95,7 +95,7 @@ class PS1TestCase(TestCase):
         self.assertAlmostEqual(p * e.to_nom(365).to_factor(t), p * e.to_cont().to_factor(t))
         self.assertAlmostEqual(p * e.to_cont().to_factor(t), 114309.4552336)
 
-    def test_5(self) -> None:
+    def test_5(self):
         fv, c, cd = 100, 0.023, 0.02
 
         self.assertAlmostEqual(ContInt(c).to_ef().rate, 0.02326653954721758)
@@ -104,7 +104,7 @@ class PS1TestCase(TestCase):
         self.assertAlmostEqual(fv / ContInt(cd).to_factor(0.5), 99.0049833749168)
         self.assertAlmostEqual(fv / ContInt(cd).to_factor(0.75), 98.51119396030627)
 
-    def test_6(self) -> None:
+    def test_6(self):
         self.assertAlmostEqual(EfInt(0.08).to_sp(12).rate, 0.00643403011000343)
         self.assertAlmostEqual(NomInt(0.035, 252).to_ef().rate, 0.03561719190449408)
         self.assertAlmostEqual(NomInt(0.04, 4).to_cont().rate, 0.039801323412672354)
@@ -115,17 +115,17 @@ class PS1TestCase(TestCase):
 
 
 class PS2TestCase(ExtendedTestCase):
-    def test_1(self) -> None:
+    def test_1(self):
         factor = NomInt(0.15, 4).to_factor(4 / 12) * ContInt(0.11).to_factor(5 / 12)
 
         self.assertAlmostEqual(CompInt.from_factor(factor, 9 / 12).rate, 0.134915472328168)
 
-    def test_2(self) -> None:
+    def test_2(self):
         p, i, n = 100, 0.05, 10
 
         self.assertAlmostEqual(p * pa(i, n), p * ((1 + i) ** n - 1) / (i * (1 + i) ** n))
 
-    def test_3(self) -> None:
+    def test_3(self):
         cases = (
             (1, 99.52, 0.05943811, 0.05773868),
             (4, 99.01, 0.03029791, 0.02984799),
@@ -143,7 +143,7 @@ class PS2TestCase(ExtendedTestCase):
         self.assertAlmostEqual(np.float_(fsolve(
             lambda y: 1.03029791 ** (4. / 12) * (1 + y) ** (8. / 12) - 1.04329682, np.array(0))), 0.04985765)
 
-    def test_4(self) -> None:
+    def test_4(self):
         data = {
             2: 99.11,
             6: 98.72,
@@ -151,7 +151,7 @@ class PS2TestCase(ExtendedTestCase):
             12: 95.97,
         }
 
-        r: dict[float, float] = {
+        r = {
             t: np.float_(fsolve(lambda y: p * ContInt(y).to_factor(t / 12) - 100, np.array(0)))
             for t, p in data.items()
         }
@@ -169,7 +169,7 @@ class PS2TestCase(ExtendedTestCase):
         self.assertAlmostEqual(2000 * pf(r[2], 1. / 12) + 500 * pf(r[4], 4. / 12) - 1200 * pf(r[7], 7. / 12) - 1000
                                * pf(r[10], 10. / 12) + 500 * pf(r[12], 1), 820.3872419304298)
 
-    def test_5(self) -> None:
+    def test_5(self):
         i = 0.02
         options = (
             15500 * pa(i, 10),
@@ -181,7 +181,7 @@ class PS2TestCase(ExtendedTestCase):
         self.assertIterableAlmostEqual(options, (139230.06759675476, 140000, 140388.27552363696, 139459.21097877636))
         self.assertEqual(max(range(4), key=options.__getitem__), 2)
 
-    def test_6(self) -> None:
+    def test_6(self):
         i = 0.02
         options = (
             155000 * pf(i, 5),
@@ -191,7 +191,7 @@ class PS2TestCase(ExtendedTestCase):
         self.assertAlmostEqual(options[1], 148258.50062422457)
         self.assertEqual(max(range(2), key=options.__getitem__), 1)
 
-    def test_7(self) -> None:
+    def test_7(self):
         i = 0.02
         option = 10000 * pa(i, 10, g=0.05)
 
@@ -199,7 +199,7 @@ class PS2TestCase(ExtendedTestCase):
 
 
 class PS3TestCase(TestCase):
-    def test_1(self) -> None:
+    def test_1(self):
         mortgage = Mortgage.from_dtv(2995000, 0.2, NomInt(0.02, 2))
 
         self.assertAlmostEqual(mortgage.payment, 10145.891129693951)
@@ -210,7 +210,7 @@ class PS3TestCase(TestCase):
 
         self.assertAlmostEqual(mortgage.payment, 12128.043601452593)
 
-    def test_2(self) -> None:
+    def test_2(self):
         i = NomInt(0.07, 2)
 
         self.assertAlmostEqual(pw(Bond(100, 0, 2, 3 / 12).cash_flows, i), 98.2946374365981)
@@ -219,7 +219,7 @@ class PS3TestCase(TestCase):
         self.assertAlmostEqual(pw(Bond.from_rate(100, NomInt(0.04, 2), 2, 3).cash_flows, i), 92.00717047033226)
         self.assertAlmostEqual(pw(Bond.from_rate(100, NomInt(0.06, 2), 2, 3.25).cash_flows, i), 95.94840994600501)
 
-    def test_3(self) -> None:
+    def test_3(self):
         self.assertAlmostEqual(yield_(Bond.from_rate(
             100, NomInt(0.07, 2), 2, 3).cash_flows, 100, EfInt(0)).to_nom(2).rate, 0.07)
         self.assertAlmostEqual(pw(Bond.from_rate(
@@ -232,7 +232,7 @@ class PS3TestCase(TestCase):
             lambda c: pw(Bond.from_rate(100, NomInt(c, 2), 2, 2.25).cash_flows, NomInt(0.03, 2)) - 114, np.array(0.1)),
         ), 0.10627047075771787)
 
-    def test_4(self) -> None:
+    def test_4(self):
         i, n = 0.1, 10
         a, g = 100, 10
         r, gp = np.log(1 + i), np.log(1 + g)
@@ -240,7 +240,7 @@ class PS3TestCase(TestCase):
 
         self.assertAlmostEqual(a * pa(i, n, g), quad(lambda t: a0 * np.exp((gp - r) * t), 0, n)[0], 3)
 
-    def test_5(self) -> None:
+    def test_5(self):
         y = fsolve(lambda y_: pw(Bond.from_rate(
             100, NomInt(0.07, 2), 2, 7.5).cash_flows, NomInt(y_, 2)) * fp(y_ / 2, 0.5) - 108, np.array(0.1))
         b = lambda cr: pw(Bond.from_rate(1000, NomInt(cr, 2), 2, 9).cash_flows, NomInt(y, 2))
@@ -254,7 +254,7 @@ class PS3TestCase(TestCase):
         self.assertAlmostEqual(cur_cr, 0.0725)
         self.assertAlmostEqual(np.float_(4400 * b(cur_cr) * (1 - 0.008)), 4763817.304209939)
 
-    def test_6(self) -> None:
+    def test_6(self):
         i = NomInt(0.060755, 2)
 
         self.assertAlmostEqual(Mortgage.from_down(500000, 50000, i).payment, 2899.3558026129626)
@@ -264,25 +264,25 @@ class PS3TestCase(TestCase):
 
 
 class PS4TestCase(ExtendedTestCase):
-    def test_1(self) -> None:
+    def test_1(self):
         fx = np.float_(fsolve(lambda x: ContInt(0.015).to_factor() - 0.77 * ContInt(0.02).to_factor() / x, np.array(1)))
 
         self.assertAlmostEqual(fx, 0.7738596388734157)
 
-    def test_2(self) -> None:
+    def test_2(self):
         p, t, r = 42, 3, capm(0.86, EfInt(0.015), EfInt(0.08))
 
         self.assertAlmostEqual(r.rate, 0.0709)
         self.assertAlmostEqual(p * r.to_factor(t), 51.581746894818)
 
-    def test_3(self) -> None:
+    def test_3(self):
         self.assertAlmostEqual(2 * perp(capm(1.2, EfInt(0.012), EfInt(0.07)).rate), 24.509803921568626)
 
-    def test_4(self) -> None:
+    def test_4(self):
         r = capm(0.8, EfInt(0.017), EfInt(0.07))
         self.assertAlmostEqual(41 * r.to_factor(2.5) * EfInt(-0.03).to_factor(2), 44.56329005026732)
 
-    def test_5(self) -> None:
+    def test_5(self):
         rf, p_bull = EfInt(0.022), 0.6
         a_bull, a_bear = 102, 77
         m_price, m_bull, m_bear = 105, 127, 90
@@ -295,7 +295,7 @@ class PS4TestCase(ExtendedTestCase):
         self.assertAlmostEqual(mr.rate, 0.0685714285714285)
         self.assertAlmostEqual(b, 0.8174754323150769)
 
-    def test_6(self) -> None:
+    def test_6(self):
         bb = ((90, 102, 66), (85, 115, 77), (150, 200, 132))
         m_price, m_bull, m_bear = 18, 22, 16
         p = 0.6
@@ -311,12 +311,12 @@ class PS4TestCase(ExtendedTestCase):
 
         self.assertAlmostEqual(beta(a_ror, m_ror, rf), 1.2901709513930817)
 
-    def test_7(self) -> None:
+    def test_7(self):
         self.assertAlmostEqual(np.float_(fsolve(
             lambda y: ContInt(0.043).to_factor(3) * ContInt(y).to_factor(5) - ContInt(0.0582).to_factor(8), np.array(0),
         )), 0.06732)
 
-    def test_8(self) -> None:
+    def test_8(self):
         bond = Bond.from_rate(100, EfInt(0.05), 1, 5)
         default = 0.02
         rf = EfInt(0.03)
@@ -332,7 +332,7 @@ class PS4TestCase(ExtendedTestCase):
 
 
 class PS5TestCase(ExtendedTestCase):
-    def test_1(self) -> None:
+    def test_1(self):
         i, n = 0.05, 6
         y = pw(Project(-700, 370, 0, n).cash_flows, EfInt(i))
 
@@ -351,7 +351,7 @@ class PS5TestCase(ExtendedTestCase):
         self.assertAlmostEqual(np.float_(fsolve(lambda x: y - x * pf(i, 1) - 5 * x * pf(i, 3), np.array(0))),
                                200.862256010023)
 
-    def test_2(self) -> None:
+    def test_2(self):
         cr = tuple(Project(300000, 14000, 0, 20).cash_flows)
         ed = tuple(Project(220000, 21000, 0, 20).cash_flows) + (CashFlow(8, 35000), CashFlow(16, 35000))
         i = EfInt(0.05)
@@ -364,7 +364,7 @@ class PS5TestCase(ExtendedTestCase):
         self.assertLess(pw(cr, i), pw(ed, i))
         self.assertLess(aw(cr, i), aw(ed, i))
 
-    def test_3(self) -> None:
+    def test_3(self):
         i = EfInt(0.05)
 
         aw_cr = aw(Project(300000, 14000, 0, 20).cash_flows, i)
@@ -373,7 +373,7 @@ class PS5TestCase(ExtendedTestCase):
         self.assertAlmostEqual(aw_cr, 38072.77615720737)
         self.assertAlmostEqual(aw_ed, 42318.6326589209)
 
-    def test_4(self) -> None:
+    def test_4(self):
         a, b = Project(425, 48, 0, 3), Project(450, 45, 0, 4)
         i = EfInt(0.1)
 
@@ -382,7 +382,7 @@ class PS5TestCase(ExtendedTestCase):
         self.assertAlmostEqual(rpw(b.cash_flows, i, 5), 927.9414595376618)
         self.assertAlmostEqual(rpw(link((b.cash_flows, a.cash_flows)), i, 5), 912.7288871227124)
 
-    def test_5(self) -> None:
+    def test_5(self):
         i = EfInt(0.07)
         sa = aw(chain((CashFlow(0, 5e6),), repeated(Project(0, 2e5, 1e6, 6).cash_flows, 25)), i, 25)
         sb = aw(chain((CashFlow(0, 6e6),), repeated(Project(0, 1.5e5, 1.1e6, 11).cash_flows, 25)), i, 25)
@@ -396,14 +396,14 @@ class PS5TestCase(ExtendedTestCase):
 
         self.assertAlmostEqual(min(sa + ba, sa + bb, sb + ba, sb + bb), sb + bb)
 
-    def test_6(self) -> None:
+    def test_6(self):
         i = EfInt(0.06)
         mortgage = Mortgage(580000, i, 1)
 
         self.assertAlmostEqual(1 - mortgage.pay(2).principal * i.rate / mortgage.payment, 0.26179726123417735)
         self.assertAlmostEqual(1 - mortgage.pay(9).principal * i.rate / mortgage.payment, 0.39364628371277466)
 
-    def test_7(self) -> None:
+    def test_7(self):
         s, t, i, n, g = 57000, 1000000, 0.065, 35, 0.035
         sq = s / 4 * (fp(i, 0) + fp(i, 3 / 12) + fp(i, 6 / 12) + fp(i, 9 / 12))
 
@@ -412,7 +412,7 @@ class PS5TestCase(ExtendedTestCase):
         self.assertAlmostEqual(np.float_(fsolve(lambda x: x * sq * pa(i, n, g) - t * pf(i, n), np.array(0))),
                                0.08971594525258755)
 
-    def test_8(self) -> None:
+    def test_8(self):
         project, i = Project(1000, 500, 300, 10), EfInt(0.6)
 
         x, y = project.cash_flows, link((project.cash_flows, project.cash_flows))
@@ -421,7 +421,7 @@ class PS5TestCase(ExtendedTestCase):
 
 
 class PS6TestCase(ExtendedTestCase):
-    def test_1(self) -> None:
+    def test_1(self):
         projects = (
             Project(-41000, 6100, 0, 7),
             Project(-32000, 6700, 0, 7),
@@ -452,7 +452,7 @@ class PS6TestCase(ExtendedTestCase):
 
         self.assertAlmostEqual(de_facto_marr(projects, 100000, EfInt(0)).to_ef().rate, 0.2178733729868983)
 
-    def test_2(self) -> None:
+    def test_2(self):
         self.assertEqual(select(map(EfInt, (0.17, 0.14, 0.19, 0.2, 0.18, 0.13)), map(lambda row: map(EfInt, row), (
             (),
             (0.075,),
@@ -470,7 +470,7 @@ class PS6TestCase(ExtendedTestCase):
             (0.18, 0.16, 0.12, 0.13, 0.19),
         )), EfInt(0.12)), 2)
 
-    def test_3(self) -> None:
+    def test_3(self):
         irrs = tuple(map(EfInt, (0.1096, 0.132, 0.1205, 0.1293, 0.1286, 0.1113)))
         table = tuple(map(lambda row: tuple(map(EfInt, row)), (
             (),
@@ -488,7 +488,7 @@ class PS6TestCase(ExtendedTestCase):
         self.assertEqual(select(irrs, table, EfInt(0.12)), 1)
         self.assertEqual(select(irrs, table, EfInt(0.14)), None)
 
-    def test_4(self) -> None:
+    def test_4(self):
         marr = EfInt(0.12)
         projects = tuple(filter(lambda project: irr(project.cash_flows, EfInt(0)) > marr, (
             Project(-80000, 13000, 10000, 10),
@@ -501,7 +501,7 @@ class PS6TestCase(ExtendedTestCase):
 
         self.assertEqual(select(irrs, table, marr), 1)
 
-    def test_5(self) -> None:
+    def test_5(self):
         p = np.float_(fsolve(lambda x: (
                 -5e8 + x * (2e8 * pa(0.08, 8) * pf(0.08, 4) + 1e7 / 0.08 * pf(0.08, 12))
                 - x * (-5e8 * pf(0.08, 2) + 2e8 * pa(0.08, 6) * pf(0.08, 6) + 1e7 / 0.08 * pf(0.08, 12))
@@ -511,7 +511,7 @@ class PS6TestCase(ExtendedTestCase):
 
 
 class PS7TestCase(ExtendedTestCase):
-    def test_1(self) -> None:
+    def test_1(self):
         basis, salvage, life = 92000, 19000, 4
 
         self.assertIterableAlmostEqual(StrLineDeprec(basis, salvage, life).books, (92000, 73750, 55500, 37250, 19000))
@@ -524,7 +524,7 @@ class PS7TestCase(ExtendedTestCase):
         self.assertIterableAlmostEqual(UPDeprec(basis, salvage, (37000, 37000, 32000, 30000)).books,
                                        (92000, 72139.70588235295, 52279.41176470589, 35102.94117647059, 19000))
 
-    def test_2(self) -> None:
+    def test_2(self):
         basis, salvage, life, t = 210000, 10000, 20, 6
 
         self.assertAlmostEqual(StrLineDeprec(basis, salvage, life).book(t), 150000)
@@ -537,7 +537,7 @@ class PS7TestCase(ExtendedTestCase):
         self.assertAlmostEqual(DeclBalDeprec.from_rate(basis, life, EfInt(0.2)).amount(t), 13762.56)
         self.assertAlmostEqual(DblDeclBalDeprec(basis, salvage, life).amount(t), 12400.29)
 
-    def test_3(self) -> None:
+    def test_3(self):
         basis, life, t, book = 145000, 8, 6, 57000
 
         self.assertAlmostEqual(np.float_(fsolve(
@@ -545,7 +545,7 @@ class PS7TestCase(ExtendedTestCase):
         self.assertAlmostEqual(np.float_(fsolve(
             lambda x: DeclBalDeprec(basis, x, life).book(6) - book, np.array(0))), 41755.1908917986)
 
-    def test_4(self) -> None:
+    def test_4(self):
         basis, salvage, life = 110000, 25000, 4
 
         self.assertIterableAlmostEqual(StrLineDeprec(basis, salvage, life).books, (110000, 88750, 67500, 46250, 25000))
@@ -559,7 +559,7 @@ class PS7TestCase(ExtendedTestCase):
         self.assertIterableAlmostEqual(UPDeprec(basis, salvage, (80000, 65000, 50000, 35000)).books,
                                        (110000, 80434.78260869565, 56413.043478260865, 37934.78260869565, 25000))
 
-    def test_5(self) -> None:
+    def test_5(self):
         basis, salvage, life, t1, t2 = 23000, 4000, 7, 4, 5
 
         self.assertAlmostEqual(StrLineDeprec(basis, salvage, life).book(t1), 12142.857142857143)
@@ -572,7 +572,7 @@ class PS7TestCase(ExtendedTestCase):
         self.assertAlmostEqual(SYDDeprec(basis, salvage, life).amount(t2), 2035.7142857142856)
         self.assertAlmostEqual(UPDeprec(basis, salvage, (50, 60, 40, 20, 10, 15, 5)).amount(t2), 950)
 
-    def test_6(self) -> None:
+    def test_6(self):
         basis, salvage, life, t = 2500000, 200000, 10, 4
 
         self.assertAlmostEqual(StrLineDeprec(basis, salvage, life).book(t), 1580000)
@@ -585,7 +585,7 @@ class PS7TestCase(ExtendedTestCase):
         self.assertAlmostEqual(DblDeclBalDeprec(basis, salvage, life).amount(t), 256000)
         self.assertAlmostEqual(SYDDeprec(basis, salvage, life).amount(t), 292727.2727272727)
 
-    def test_7(self) -> None:
+    def test_7(self):
         deprec = DeclBalDeprec.from_rate(5000, 5, EfInt(0.15))
 
         self.assertAlmostEqual(deprec.cap_gain(3000), 0)

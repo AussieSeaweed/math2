@@ -162,7 +162,7 @@ def link(it):
     :param it: The cash flow sets to chain.
     :return: The chained cash flows.
     """
-    total = list[CashFlow]()
+    total = []
     total_life = 0.0
 
     for cash_flows in map(tuple, it):

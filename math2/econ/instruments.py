@@ -94,7 +94,7 @@ class Mortgage(Instrument):
         )
 
     @classmethod
-    def from_down(cls, value, down, int_: CompInt, freq=12, term=5, amort=25):
+    def from_down(cls, value, down, int_, freq=12, term=5, amort=25):
         """Constructs the mortgage instance from the down payment value.
 
         :param value: The total value.
@@ -108,7 +108,7 @@ class Mortgage(Instrument):
         return cls(value - down, int_, freq, term, amort)
 
     @classmethod
-    def from_dtv(cls, value, dtv, int_: CompInt, freq=12, term=5, amort=25):
+    def from_dtv(cls, value, dtv, int_, freq=12, term=5, amort=25):
         """Constructs the mortgage instance from the down payment to value percentage.
 
         :param value: The total value.
@@ -122,7 +122,7 @@ class Mortgage(Instrument):
         return cls.from_down(value, value * dtv, int_, freq, term, amort)
 
     @classmethod
-    def from_ltv(cls, value, ltv, int_: CompInt, freq=12, term=5, amort=25):
+    def from_ltv(cls, value, ltv, int_, freq=12, term=5, amort=25):
         """Constructs the mortgage instance from the loan payment to value percentage.
 
         :param value: The total value.

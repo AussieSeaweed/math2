@@ -5,7 +5,7 @@ from auxiliary import ExtendedTestCase
 
 
 class MiscTestCase(ExtendedTestCase):
-    def test_series_sum(self) -> None:
+    def test_series_sum(self):
         self.assertEqual(series_sum(-5), -15)
         self.assertEqual(series_sum(-5, 0), -15)
         self.assertEqual(series_sum(0, -5), -15)
