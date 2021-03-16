@@ -14,6 +14,7 @@ class TraversalTestCase(ExtendedTestCase):
 
     def test_monte_carlo(self):
         nodes = range(self.MONTE_CARLO_NODE_COUNT)
+        inserted = set()
 
         directed_graphs = [DirectedGraph(AdjacencyMatrix()), DirectedGraph(AdjacencyLists())]
         undirected_graphs = [UndirectedGraph(AdjacencyMatrix()), UndirectedGraph(AdjacencyLists())]
@@ -21,12 +22,18 @@ class TraversalTestCase(ExtendedTestCase):
         for _ in range(self.MONTE_CARLO_EDGE_COUNT):
             u, v = choice(nodes), choice(nodes)
 
+            inserted.add(u)
+            inserted.add(v)
+
             for graph in directed_graphs:
                 graph.add(Edge(u, v))
                 graph.add(Edge(v, u))
 
             for graph in undirected_graphs:
                 graph.add(Edge(u, v))
+
+        for graph in chain(directed_graphs, undirected_graphs):
+            self.assertSetEqual(inserted, set(graph.nodes))
 
         for source in nodes:
             visited = None

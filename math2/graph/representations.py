@@ -29,6 +29,13 @@ class AdjacencyMatrix(Representation):
                     edges |= set(adj_list)
 
             return iter(edges)
+        elif from_ is None:
+            edges = set()
+
+            for adj_lists in self.__adj_matrix.values():
+                edges |= set(adj_lists[to])
+
+            return iter(edges)
         elif to is None:
             edges = set()
 
@@ -53,6 +60,16 @@ class AdjacencyLists(Representation):
 
             for adj_list in self.__adj_lists.values():
                 edges |= set(adj_list)
+
+            return iter(edges)
+        elif from_ is None:
+            edges = set()
+
+            for node, adj_list in self.__adj_lists.items():
+                if node == to:
+                    edges |= set(edge for edge in adj_list if (to, to) == edge.endpoints)
+                else:
+                    edges |= set(edge for edge in adj_list if to in edge.endpoints)
 
             return iter(edges)
         elif to is None:
