@@ -1,6 +1,5 @@
 auxiliary
 matplotlib
-mypy
 numpy
 scipy
 sphinx

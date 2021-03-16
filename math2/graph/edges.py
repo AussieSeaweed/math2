@@ -1,19 +1,16 @@
 from abc import ABC
-from typing import Generic
-
-from math2.typing import _H, _S
 
 
-class Edge(Generic[_H]):
-    def __init__(self, u: _H, v: _H):
+class Edge:
+    def __init__(self, u, v):
         self.u = u
         self.v = v
 
     @property
-    def endpoints(self) -> tuple[_H, _H]:
+    def endpoints(self):
         return self.u, self.v
 
-    def other(self, vertex: _H) -> _H:
+    def other(self, vertex):
         if vertex is self.u:
             return self.v
         elif vertex is self.v:
@@ -22,32 +19,32 @@ class Edge(Generic[_H]):
             raise ValueError('The vertex is not one of the endpoints')
 
 
-class WeightedMixin(Generic[_S], ABC):
-    weight: _S
+class WeightedMixin(ABC):
+    weight = None
 
 
-class FlowMixin(Generic[_S], ABC):
-    flow: _S
-    capacity: _S
+class FlowMixin(ABC):
+    flow = None
+    capacity = None
 
 
-class WeightedEdge(Edge[_H], WeightedMixin[_S]):
-    def __init__(self, u: _H, v: _H, weight: _S):
+class WeightedEdge(Edge, WeightedMixin):
+    def __init__(self, u, v, weight):
         super().__init__(u, v)
 
         self.weight = weight
 
 
-class FlowEdge(Edge[_H], FlowMixin[_S]):
-    def __init__(self, u: _H, v: _H, flow: _S, capacity: _S):
+class FlowEdge(Edge, FlowMixin):
+    def __init__(self, u, v, flow, capacity):
         super().__init__(u, v)
 
         self.flow = flow
         self.capacity = capacity
 
 
-class WeightedFlowEdge(Edge[_H], WeightedMixin[_S], FlowMixin[_S]):
-    def __init__(self, u: _H, v: _H, weight: _S, flow: _S, capacity: _S):
+class WeightedFlowEdge(Edge, WeightedMixin, FlowMixin):
+    def __init__(self, u, v, weight, flow, capacity):
         super().__init__(u, v)
 
         self.weight = weight

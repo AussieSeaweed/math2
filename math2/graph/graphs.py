@@ -1,39 +1,25 @@
 from abc import ABC, abstractmethod
-from collections.abc import Hashable, Iterator
-from typing import Generic, overload
-
-from math2.graph.representations import Representation
-from math2.graph.typing import _E
 
 
-class Graph(Generic[_E], ABC):
-    def __init__(self, representation: Representation[_E]):
+class Graph(ABC):
+    def __init__(self, representation):
         self._repr = representation
 
-    @overload
-    def edges(self) -> Iterator[_E]: ...
-
-    @overload
-    def edges(self, from_: Hashable) -> Iterator[_E]: ...
-
-    @overload
-    def edges(self, from_: Hashable, to: Hashable) -> Iterator[_E]: ...
-
-    def edges(self, from_: Hashable = None, to: Hashable = None) -> Iterator[_E]:
+    def edges(self, from_=None, to=None):
         return self._repr.edges(from_, to)
 
     @abstractmethod
-    def add(self, edge: _E) -> None:
+    def add(self, edge):
         pass
 
 
-class DirectedGraph(Graph[_E]):
-    def add(self, edge: _E) -> None:
+class DirectedGraph(Graph):
+    def add(self, edge):
         self._repr.add(edge.u, edge.v, edge)
 
 
-class UndirectedGraph(DirectedGraph[_E]):
-    def add(self, edge: _E) -> None:
+class UndirectedGraph(DirectedGraph):
+    def add(self, edge):
         super().add(edge)
 
         self._repr.add(edge.v, edge.u, edge)
