@@ -40,7 +40,7 @@ class AdjacencyMatrix(Representation):
             return iter(self.__adj_matrix[from_][to])
 
 
-class AdjacencyList(Representation):
+class AdjacencyLists(Representation):
     def __init__(self):
         self.__adj_lists = defaultdict(list)
 

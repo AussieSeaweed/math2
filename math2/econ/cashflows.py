@@ -1,5 +1,5 @@
-from functools import total_ordering
 from collections.abc import Iterator
+from functools import total_ordering
 from itertools import accumulate
 
 import numpy as np

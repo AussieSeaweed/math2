@@ -1,4 +1,3 @@
-from collections.abc import Callable
 from itertools import chain
 from unittest import TestCase, main
 
@@ -247,7 +246,7 @@ class PS3TestCase(TestCase):
 
         cur_cr = np.ceil(np.float_(fsolve(lambda cr: 9500000 / 2 - (4400 * b(cr)), np.array(0.1))) / 0.0025) * 0.0025
         self.assertAlmostEqual(cur_cr, 0.0725)
-        self.assertAlmostEqual(np.float_(4400 * b(cur_cr)), 4802235.185695503 )
+        self.assertAlmostEqual(np.float_(4400 * b(cur_cr)), 4802235.185695503)
 
         cur_cr = np.ceil(np.float_(fsolve(lambda cr: 9500000 / 2 / (1 - 0.008) - (4400 * b(cr)), np.array(0.1)))
                          / 0.0025) * 0.0025

@@ -11,9 +11,9 @@ class Edge:
         return self.u, self.v
 
     def other(self, vertex):
-        if vertex is self.u:
+        if vertex == self.u:
             return self.v
-        elif vertex is self.v:
+        elif vertex == self.v:
             return self.u
         else:
             raise ValueError('The vertex is not one of the endpoints')

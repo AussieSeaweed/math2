@@ -1,7 +1,8 @@
 from unittest import main
 
-from math2.misc import series_sum
 from auxiliary import ExtendedTestCase
+
+from math2.misc import series_sum
 
 
 class MiscTestCase(ExtendedTestCase):

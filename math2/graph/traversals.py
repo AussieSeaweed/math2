@@ -6,12 +6,15 @@ class Traverser(ABC):
     def __init__(self, graph, source):
         self.graph = graph
         self.source = source
+        self._dists = {}
 
         self._traverse()
 
-    @abstractmethod
     def visited(self, node):
-        pass
+        return node in self._dists
+
+    def distance(self, node):
+        return self._dists[node] if self.visited(node) else None
 
     @abstractmethod
     def _traverse(self):
@@ -19,42 +22,20 @@ class Traverser(ABC):
 
 
 class DepthFirstSearcher(Traverser):
-    def __init__(self, graph, source):
-        self.__reached = set()
-
-        super().__init__(graph, source)
-
-    def visited(self, node):
-        return node in self.__reached
-
     def _traverse(self):
-        self.__dfs(self.source)
+        self.__dfs(self.source, 0)
 
-    def __dfs(self, node):
-        self.__reached.add(node)
+    def __dfs(self, node, dist):
+        self._dists[node] = dist
 
         for edge in self.graph.edges(node):
             if not self.visited(other := edge.other(node)):
-                self.__dfs(other)
+                self.__dfs(other, dist + 1)
 
 
 class BreadthFirstSearcher(Traverser):
-    def __init__(self, graph, source):
-        self.__dists = {}
-
-        super().__init__(graph, source)
-
-    def visited(self, node):
-        return node in self.__dists
-
-    def distance(self, node):
-        try:
-            return self.__dists[node]
-        except KeyError:
-            raise ValueError('The node not is not reached')
-
     def _traverse(self):
-        self.__dists[self.source] = 0
+        self._dists[self.source] = 0
         queue = deque((self.source,))
 
         while queue:
@@ -62,5 +43,5 @@ class BreadthFirstSearcher(Traverser):
 
             for edge in self.graph.edges(node):
                 if not self.visited(other := edge.other(node)):
-                    self.__dists[other] = self.__dists[node] + 1
+                    self._dists[other] = self._dists[node] + 1
                     queue.append(other)

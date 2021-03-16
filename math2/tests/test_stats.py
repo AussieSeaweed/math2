@@ -1,7 +1,8 @@
 from unittest import main
 
-from math2.stats import range_, trimmed_mean
 from auxiliary import ExtendedTestCase
+
+from math2.stats import range_, trimmed_mean
 
 
 class StatsTestCase(ExtendedTestCase):
