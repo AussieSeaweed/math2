@@ -200,7 +200,7 @@ def rel_combinations(values, budget):
         return iter((iter(()),))
 
 
-def de_facto_marr(projects: Iterable[Project], budget, guess):
+def de_facto_marr(projects, budget, guess):
     """Calculates the de factor marr of the given projects based on costs and irrs.
 
     :param projects: The projects.
@@ -211,7 +211,7 @@ def de_facto_marr(projects: Iterable[Project], budget, guess):
     if isinstance(projects, Sequence):
         irrs = tuple(irr(project.cash_flows, guess) for project in projects)
         indices = sorted(range(len(projects)), key=irrs.__getitem__, reverse=True)
-        marr: CompInt = EfInt(0)
+        marr = EfInt(0)
 
         for i in indices:
             budget += projects[i].initial

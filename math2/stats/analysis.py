@@ -1,21 +1,19 @@
-from collections.abc import Collection, Iterable, Iterator
+from collections.abc import Collection, Iterator
 from math import sqrt
 
 from auxiliary import sum_, trimmed
 
-from math2.typing import _S
 
-
-def mean(values: Iterable[_S]) -> _S:
+def mean(values):
     """Calculates the mean of the values.
 
     :param values: The values.
     :return: The mean.
     """
-    return sum_(values) / len(values) if isinstance(values, Collection) else mean(tuple(values))  # type: ignore
+    return sum_(values) / len(values) if isinstance(values, Collection) else mean(tuple(values))
 
 
-def median(values: Iterable[_S]) -> _S:
+def median(values):
     """Calculates the median of the values.
 
     :param values: The values.
@@ -29,37 +27,26 @@ def median(values: Iterable[_S]) -> _S:
         return (values[len(values) // 2 - 1] + values[len(values) // 2]) / 2
 
 
-def interquartile_range(values: Iterable[_S]) -> _S:
-    """Calculates the interquartile range of the values.
-
-    :param values: The values.
-    :return: The interquartile range.
-    """
-    values = sorted(values)
-
-    return values[3 * len(values) // 4] - values[len(values) // 4]
-
-
-def trimmed_mean(values: Iterable[_S], percentage: float) -> _S:
+def trimmed_mean(values, percentage):
     """Calculates the trimmed mean of the values.
 
     :param values: The values.
     :param percentage: The trimmed percentage.
     :return: The trimmed mean.
     """
-    return mean(trimmed(sorted(values), percentage))
+    return mean(tuple(trimmed(sorted(values), percentage)))
 
 
-def range_(values: Iterable[_S]) -> _S:
+def range_(values):
     """Calculates the range of the values.
 
     :param values: The values.
     :return: The range of the values.
     """
-    return range_(tuple(values)) if isinstance(values, Iterator) else max(values) - min(values)  # type: ignore
+    return range_(tuple(values)) if isinstance(values, Iterator) else max(values) - min(values)
 
 
-def variance(values: Iterable[_S]) -> _S:
+def variance(values):
     """Calculates the variance of the values.
 
     :param values: The values.
@@ -68,15 +55,15 @@ def variance(values: Iterable[_S]) -> _S:
     if isinstance(values, Collection):
         mu = mean(values)
 
-        return sum_((x - mu) ** 2 for x in values) / (len(values) - 1)  # type: ignore
+        return sum_((x - mu) ** 2 for x in values) / (len(values) - 1)
     else:
         return variance(tuple(values))
 
 
-def standard_deviation(values: Iterable[_S]) -> _S:
+def standard_deviation(values):
     """Calculates the standard deviation of the values.
 
     :param values: The values.
     :return: The variance of the values.
     """
-    return sqrt(variance(values))  # type: ignore
+    return sqrt(variance(values))
