@@ -1,3 +1,3 @@
-from math2.stats.utils import range_, shuffled, trimmed_mean
+from math2.stats.analysis import mean, median, range_, standard_deviation, trimmed_mean, variance
 
-__all__ = 'range_', 'shuffled', 'trimmed_mean'
+__all__ = 'mean', 'median', 'range_', 'standard_deviation', 'trimmed_mean', 'variance'
