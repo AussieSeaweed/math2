@@ -7,6 +7,7 @@ class SingleSourceTraverser(ABC):
     def __init__(self, graph, source):
         self.graph = graph
         self.source = source
+
         self._dists = defaultdict(lambda: inf)
         self._preds = defaultdict(lambda: None)
 
@@ -59,7 +60,3 @@ class BreadthFirstSearcher(SingleSourceTraverser):
                 if not self.visited(other := edge.other(node)):
                     self._dists[other] = self._dists[node] + 1
                     queue.append(other)
-
-
-class MultipleSourceTraverser(ABC):
-    pass

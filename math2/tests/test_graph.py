@@ -4,8 +4,7 @@ from unittest import main
 
 from auxiliary import ExtendedTestCase
 
-from math2.graph import (AdjacencyLists, AdjacencyMatrix, BreadthFirstSearcher, DepthFirstSearcher, DirectedGraph, Edge,
-                         UndirectedGraph)
+from math2.graph import AdjacencyLists, AdjacencyMatrix, BreadthFirstSearcher, DepthFirstSearcher, Edge, EdgeList
 
 
 class TraversalTestCase(ExtendedTestCase):
@@ -16,8 +15,8 @@ class TraversalTestCase(ExtendedTestCase):
         nodes = range(self.MONTE_CARLO_NODE_COUNT)
         inserted = set()
 
-        directed_graphs = [DirectedGraph(AdjacencyMatrix()), DirectedGraph(AdjacencyLists())]
-        undirected_graphs = [UndirectedGraph(AdjacencyMatrix()), UndirectedGraph(AdjacencyLists())]
+        directed_graphs = [EdgeList(), AdjacencyMatrix(), AdjacencyLists()]
+        undirected_graphs = [EdgeList(), AdjacencyMatrix(), AdjacencyLists()]
 
         for _ in range(self.MONTE_CARLO_EDGE_COUNT):
             u, v = choice(nodes), choice(nodes)
@@ -55,7 +54,7 @@ class TraversalTestCase(ExtendedTestCase):
                     self.assertIterableEqual(distances, (bfs.distance(node) for node in nodes))
 
     def test_visited(self):
-        graph = UndirectedGraph(AdjacencyLists())
+        graph = AdjacencyLists()
 
         for edge in (Edge(1, 2), Edge(2, 3), Edge(2, 5), Edge(5, 1), Edge(3, 4), Edge(4, 5)):
             graph.add(edge)

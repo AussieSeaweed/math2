@@ -1,7 +1,7 @@
-from math2.graph import AdjacencyLists, BreadthFirstSearcher, Edge, UndirectedGraph
+from math2.graph import AdjacencyLists, BreadthFirstSearcher, Edge
 
 N, M, A, B = map(int, input().split())
-graph = UndirectedGraph(AdjacencyLists())
+graph = AdjacencyLists()
 
 for _ in range(M):
     graph.add(Edge(*map(int, input().split())))
