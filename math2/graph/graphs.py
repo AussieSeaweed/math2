@@ -69,7 +69,7 @@ class EdgeList(Graph):
         self.__edge_list.append(edge)
 
     def edges(self, from_=None, to=None):
-        return iter({edge for edge in self.__edge_list if edge.match(from_, to)})
+        return (edge for edge in self.__edge_list if edge.match(from_, to))
 
 
 class AdjacencyMatrix(Graph):

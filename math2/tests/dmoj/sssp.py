@@ -1,6 +1,6 @@
 from math import isinf
 
-from math2.graph import EdgeList, Edge, BellmanFord
+from math2.graph import BellmanFord, Edge, EdgeList
 
 N, M = map(int, input().split())
 
