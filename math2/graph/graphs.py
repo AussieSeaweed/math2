@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from functools import partial
-from itertools import chain
 
 
 class Edge:
@@ -84,18 +83,16 @@ class AdjacencyMatrix(Graph):
             self.__adj_matrix[edge.v][edge.u].append(edge)
 
     def edges(self, from_=None, to=None):
-        edges = set()
+        edges = []
 
         if from_ is None and to is None:
-            for adj_lists in self.__adj_matrix.values():
-                for adj_list in adj_lists.values():
-                    edges |= set(adj_list)
+            raise NotImplementedError  # TODO
         elif from_ is None:
             for adj_lists in self.__adj_matrix.values():
-                edges |= set(adj_lists[to])
+                edges.extend(adj_lists[to])
         elif to is None:
             for adj_list in self.__adj_matrix[from_].values():
-                edges |= set(adj_list)
+                edges.extend(adj_list)
         else:
             edges = self.__adj_matrix[from_][to]
 
@@ -118,10 +115,10 @@ class AdjacencyLists(Graph):
 
     def edges(self, from_=None, to=None):
         if from_ is None and to is None:
-            return iter(set(chain(*(self.edges(node) for node in self.nodes))))
+            raise NotImplementedError  # TODO
         elif from_ is None:
             return (edge for edge in self.edges() if edge.match(None, to))
         elif to is None:
             return iter(self.__adj_lists[from_])
         else:
-            return (edge for edge in self.__adj_lists[from_] if to in edge.endpoints)
+            return (edge for edge in self.edges(from_) if edge.match(from_, to))
