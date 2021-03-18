@@ -17,7 +17,7 @@ class TraversalTestCase(ExtendedTestCase):
         nodes = range(self.MONTE_CARLO_NODE_COUNT)
         inserted = set()
 
-        directed_graphs = [EdgeList(), AdjacencyMatrix(), AdjacencyLists()]
+        directed_graphs = [EdgeList(True), AdjacencyMatrix(True), AdjacencyLists(True)]
         undirected_graphs = [EdgeList(), AdjacencyMatrix(), AdjacencyLists()]
 
         for _ in range(self.MONTE_CARLO_EDGE_COUNT):

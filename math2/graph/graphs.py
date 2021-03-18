@@ -47,7 +47,8 @@ class Edge:
 
 
 class Graph(ABC):
-    def __init__(self):
+    def __init__(self, directed=False):
+        self.directed = directed
         self.__nodes = set()
 
     @property
@@ -58,91 +59,91 @@ class Graph(ABC):
     def node_count(self):
         return len(self.__nodes)
 
-    def add(self, edge, *, directed=False):
+    def add(self, edge):
         self.__nodes.add(edge.u)
         self.__nodes.add(edge.v)
 
     @abstractmethod
-    def edges(self, from_=None, to=None):
+    def edges(self, u=None, v=None):
         pass
 
 
 class EdgeList(Graph):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, directed=False):
+        super().__init__(directed)
 
         self.__edges = []
 
-    def add(self, edge, *, directed=False):
-        super().add(edge, directed=directed)
+    def add(self, edge):
+        super().add(edge)
 
         self.__edges.append(edge)
 
-        if not directed:
+        if not self.directed:
             self.__edges.append(edge.invert())
 
-    def edges(self, from_=None, to=None):
-        return (edge for edge in self.__edges if edge.match(from_, to))
+    def edges(self, u=None, v=None):
+        return (edge for edge in self.__edges if edge.match(u, v))
 
 
 class AdjacencyMatrix(Graph):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, directed=False):
+        super().__init__(directed)
 
         self.__matrix = defaultdict(partial(defaultdict, list))
 
-    def add(self, edge, *, directed=False):
-        super().add(edge, directed=directed)
+    def add(self, edge):
+        super().add(edge)
 
         self.__matrix[edge.u][edge.v].append(edge)
 
-        if not directed:
+        if not self.directed:
             self.__matrix[edge.v][edge.u].append(edge.invert())
 
-    def edges(self, from_=None, to=None):
+    def edges(self, u=None, v=None):
         edges = []
 
-        if from_ is None and to is None:
+        if u is None and v is None:
             for adj_lists in self.__matrix.values():
                 for adj_list in adj_lists:
                     edges.extend(adj_list)
-        elif from_ is None:
+        elif u is None:
             for adj_lists in self.__matrix.values():
-                edges.extend(adj_lists[to])
-        elif to is None:
-            for adj_list in self.__matrix[from_].values():
+                edges.extend(adj_lists[v])
+        elif v is None:
+            for adj_list in self.__matrix[u].values():
                 edges.extend(adj_list)
         else:
-            edges = self.__matrix[from_][to]
+            edges = self.__matrix[u][v]
 
         return iter(edges)
 
 
 class AdjacencyLists(Graph):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, directed=False):
+        super().__init__(directed)
 
         self.__lists = defaultdict(list)
 
-    def add(self, edge, *, directed=False):
-        super().add(edge, directed=directed)
+    def add(self, edge):
+        super().add(edge)
 
         self.__lists[edge.u].append(edge)
 
-        if not directed:
+        if not self.directed:
             self.__lists[edge.v].append(edge.invert())
 
-    def edges(self, from_=None, to=None):
-        if from_ is None and to is None:
+    def edges(self, u=None, v=None):
+        if u is None and v is None:
             edges = []
 
             for adj_list in self.__lists.values():
                 edges.extend(adj_list)
 
             return iter(edges)
-        elif from_ is None:
-            return (edge for edge in self.edges() if edge.match(None, to))
-        elif to is None:
-            return iter(self.__lists[from_])
+        elif u is None:
+            return (edge for edge in self.edges() if edge.match(None, v))
+        elif v is None:
+            return iter(self.__lists[u])
         else:
-            return (edge for edge in self.edges(from_) if edge.match(from_, to))
+            return (edge for edge in self.edges(u) if edge.match(u, v))
