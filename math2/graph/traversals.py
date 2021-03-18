@@ -108,12 +108,7 @@ class BellmanFord(SingleSourceShortestPath):
                 if self._dists[edge.u] > self._dists[edge.v] + edge.weight:
                     self._dists[edge.u] = self._dists[edge.v] + edge.weight
                     self._preds[edge.u] = edge.v
-
-                if not edge.directed and self._dists[edge.v] > self._dists[edge.u] + edge.weight:
-                    self._dists[edge.v] = self._dists[edge.u] + edge.weight
-                    self._preds[edge.v] = edge.u
         else:
             for edge in self.graph.edges():
-                if self._dists[edge.u] > self._dists[edge.v] + edge.weight or (
-                        not edge.directed and self._dists[edge.v] > self._dists[edge.u] + edge.weight):
+                if self._dists[edge.u] > self._dists[edge.v] + edge.weight:
                     raise NegativeCycleError('The graph contains a negative-weight cycle')
