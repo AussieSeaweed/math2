@@ -11,14 +11,13 @@ class ShortestPathFaster(SingleSourceTraverser):
 
         while queue:
             node = queue.popleft()
-
             queued.remove(node)
 
             for edge in self.graph.edges(node):
                 other = edge.other(node)
 
-                if self._dists[self.source] + edge.weight < self._dists[other]:
+                if self._dists[other] > self._dists[self.source] + edge.weight:
                     self._dists[other] = self._dists[self.source] + edge.weight
 
-                    if other in queued:
+                    if other not in queued:
                         queue.append(other)
