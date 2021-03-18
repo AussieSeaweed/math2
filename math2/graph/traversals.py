@@ -1,23 +1,22 @@
 from abc import ABC, abstractmethod
 from collections import defaultdict, deque
-from math import inf, isfinite
+from math import inf
 
 
-class SingleSourceTraverser(ABC):
+class SingleSourceTraversal(ABC):
     def __init__(self, graph, source):
         self.graph = graph
         self.source = source
 
-        self._dists = defaultdict(lambda: inf)
         self._preds = defaultdict(lambda: None)
 
         self._traverse()
 
-    def visited(self, node):
-        return isfinite(self._dists[node])
+    def predecessor(self, node):
+        return self._preds[node]
 
-    def distance(self, node):
-        return self._dists[node]
+    def visited(self, node):
+        return node == self.source or self._preds[node] is not None
 
     def path(self, node):
         if not self.visited(node):
@@ -36,21 +35,32 @@ class SingleSourceTraverser(ABC):
         pass
 
 
-class DepthFirstSearcher(SingleSourceTraverser):
-    def _traverse(self):
-        self.__dfs(self.source, 0)
-
-    def __dfs(self, node, dist):
-        self._dists[node] = dist
-
+class DepthFirstSearch(SingleSourceTraversal):
+    def _dfs(self, node):
         for edge in self.graph.edges(node):
             if not self.visited(other := edge.other(node)):
-                self.__dfs(other, dist + 1)
+                self._preds[other] = node
+
+                self._dfs(other)
+
+    def _traverse(self):
+        self._dfs(self.source)
 
 
-class BreadthFirstSearcher(SingleSourceTraverser):
+class SingleSourceShortestPath(SingleSourceTraversal, ABC):
+    def __init__(self, graph, source):
+        self._dists = defaultdict(lambda: inf)
+
+        super().__init__(graph, source)
+
+    def distance(self, node):
+        return self._dists[node]
+
+
+class BreadthFirstSearch(SingleSourceShortestPath):
     def _traverse(self):
         self._dists[self.source] = 0
+
         queue = deque((self.source,))
 
         while queue:
@@ -59,12 +69,15 @@ class BreadthFirstSearcher(SingleSourceTraverser):
             for edge in self.graph.edges(node):
                 if not self.visited(other := edge.other(node)):
                     self._dists[other] = self._dists[node] + 1
+                    self._preds[other] = node
+
                     queue.append(other)
 
 
-class ShortestPathFaster(SingleSourceTraverser):
+class ShortestPathFaster(SingleSourceShortestPath):
     def _traverse(self):
         self._dists[self.source] = 0
+
         queue = deque((self.source,))
         queued = {self.source}
 
@@ -77,6 +90,7 @@ class ShortestPathFaster(SingleSourceTraverser):
 
                 if self._dists[other] > self._dists[node] + edge.weight:
                     self._dists[other] = self._dists[node] + edge.weight
+                    self._preds[other] = node
 
                     if other not in queued:
                         queue.append(other)

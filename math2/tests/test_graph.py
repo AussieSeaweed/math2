@@ -5,7 +5,7 @@ from unittest import main
 
 from auxiliary import ExtendedTestCase
 
-from math2.graph import (AdjacencyLists, AdjacencyMatrix, BreadthFirstSearcher, DepthFirstSearcher, Edge, EdgeList,
+from math2.graph import (AdjacencyLists, AdjacencyMatrix, BreadthFirstSearch, DepthFirstSearch, Edge, EdgeList,
                          ShortestPathFaster)
 
 
@@ -41,8 +41,8 @@ class TraversalTestCase(ExtendedTestCase):
             distances = None
 
             for graph in chain(directed_graphs, undirected_graphs):
-                dfs = DepthFirstSearcher(graph, source)
-                bfs = BreadthFirstSearcher(graph, source)
+                dfs = DepthFirstSearch(graph, source)
+                bfs = BreadthFirstSearch(graph, source)
 
                 if visited is None:
                     visited = tuple(dfs.visited(node) for node in nodes)
@@ -61,11 +61,11 @@ class TraversalTestCase(ExtendedTestCase):
         for edge in (Edge(1, 2), Edge(2, 3), Edge(2, 5), Edge(5, 1), Edge(3, 4), Edge(4, 5)):
             graph.add(edge)
 
-        self.assertFalse(DepthFirstSearcher(graph, 1).visited(6))
+        self.assertFalse(DepthFirstSearch(graph, 1).visited(6))
 
         graph.add(Edge(4, 6))
 
-        self.assertTrue(DepthFirstSearcher(graph, 1).visited(6))
+        self.assertTrue(DepthFirstSearch(graph, 1).visited(6))
 
     def test_distance(self):
         graph = AdjacencyLists()
