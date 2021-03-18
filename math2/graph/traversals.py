@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from collections import defaultdict, deque
 from math import inf
 
+from math2.graph.exceptions import NegativeCycleError
+
 
 class SingleSourceTraversal(ABC):
     def __init__(self, graph, source):
@@ -95,3 +97,23 @@ class ShortestPathFaster(SingleSourceShortestPath):
                     if other not in queued:
                         queue.append(other)
                         queued.add(other)
+
+
+class BellmanFord(SingleSourceShortestPath):
+    def _traverse(self):
+        self._dists[self.source] = 0
+
+        for _ in range(self.graph.node_count - 1):
+            for edge in self.graph.edges():
+                if self._dists[edge.u] > self._dists[edge.v] + edge.weight:
+                    self._dists[edge.u] = self._dists[edge.v] + edge.weight
+                    self._preds[edge.u] = edge.v
+
+                if not edge.directed and self._dists[edge.v] > self._dists[edge.u] + edge.weight:
+                    self._dists[edge.v] = self._dists[edge.u] + edge.weight
+                    self._preds[edge.v] = edge.u
+        else:
+            for edge in self.graph.edges():
+                if self._dists[edge.u] > self._dists[edge.v] + edge.weight or (
+                        not edge.directed and self._dists[edge.v] > self._dists[edge.u] + edge.weight):
+                    raise NegativeCycleError('The graph contains a negative-weight cycle')

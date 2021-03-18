@@ -44,6 +44,10 @@ class Graph(ABC):
     def nodes(self):
         return iter(self.__nodes)
 
+    @property
+    def node_count(self):
+        return len(self.__nodes)
+
     def add(self, edge):
         self.__nodes.add(edge.u)
         self.__nodes.add(edge.v)

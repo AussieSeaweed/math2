@@ -1,0 +1,2 @@
+class NegativeCycleError(Exception):
+    pass

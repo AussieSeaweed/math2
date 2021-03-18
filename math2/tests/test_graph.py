@@ -13,7 +13,7 @@ class TraversalTestCase(ExtendedTestCase):
     MONTE_CARLO_NODE_COUNT = 100
     MONTE_CARLO_EDGE_COUNT = 100
 
-    def test_monte_carlo(self):
+    def test_unweighted_monte_carlo(self):
         nodes = range(self.MONTE_CARLO_NODE_COUNT)
         inserted = set()
 
