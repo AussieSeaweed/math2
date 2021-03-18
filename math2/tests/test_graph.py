@@ -5,8 +5,8 @@ from unittest import main
 
 from auxiliary import ExtendedTestCase
 
-from math2.graph import AdjacencyLists, AdjacencyMatrix, BreadthFirstSearcher, DepthFirstSearcher, Edge, EdgeList, \
-    ShortestPathFaster
+from math2.graph import (AdjacencyLists, AdjacencyMatrix, BreadthFirstSearcher, DepthFirstSearcher, Edge, EdgeList,
+                         ShortestPathFaster)
 
 
 class TraversalTestCase(ExtendedTestCase):
