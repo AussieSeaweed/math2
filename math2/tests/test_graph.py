@@ -1,10 +1,12 @@
 from itertools import chain
+from math import inf
 from random import choice
 from unittest import main
 
 from auxiliary import ExtendedTestCase
 
-from math2.graph import AdjacencyLists, AdjacencyMatrix, BreadthFirstSearcher, DepthFirstSearcher, Edge, EdgeList
+from math2.graph import AdjacencyLists, AdjacencyMatrix, BreadthFirstSearcher, DepthFirstSearcher, Edge, EdgeList, \
+    ShortestPathFaster
 
 
 class TraversalTestCase(ExtendedTestCase):
@@ -64,6 +66,16 @@ class TraversalTestCase(ExtendedTestCase):
         graph.add(Edge(4, 6))
 
         self.assertTrue(DepthFirstSearcher(graph, 1).visited(6))
+
+    def test_distance(self):
+        graph = AdjacencyLists()
+
+        for edge in (Edge(1, 2, weight=2), Edge(1, 3, weight=5), Edge(2, 3, weight=2)):
+            graph.add(edge)
+
+        spf = ShortestPathFaster(graph, 1)
+
+        self.assertIterableEqual((spf.distance(i) for i in range(1, 5)), (0, 2, 4, inf))
 
 
 if __name__ == '__main__':
