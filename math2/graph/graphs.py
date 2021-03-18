@@ -96,7 +96,7 @@ class AdjacencyMatrix(Graph):
 
         self.__matrix[edge.u][edge.v].append(edge)
 
-        if not edge.directed:
+        if not directed:
             self.__matrix[edge.v][edge.u].append(edge.invert())
 
     def edges(self, from_=None, to=None):
@@ -129,8 +129,8 @@ class AdjacencyLists(Graph):
 
         self.__lists[edge.u].append(edge)
 
-        if not edge.directed:
-            self.__lists[edge.v].append(edge.inverted)
+        if not directed:
+            self.__lists[edge.v].append(edge.invert())
 
     def edges(self, from_=None, to=None):
         if from_ is None and to is None:
