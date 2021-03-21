@@ -1,5 +1,6 @@
 auxiliary
 matplotlib
+mpmath
 mypy
 numpy
 scipy
