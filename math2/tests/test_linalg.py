@@ -1,11 +1,16 @@
 from functools import partial
 from itertools import repeat
+from math import pi, sqrt
 from operator import add, matmul, mul
 from unittest import main
 
 from auxiliary import ExtendedTestCase
 
-from math2.linalg import DimensionError, Matrix, column, diagonal, identity, ones, row, singleton, zeros
+from math2.linalg import DimensionError, Matrix, angle_between, column, diagonal, i, identity, j, k, norm, ones, \
+    project, \
+    row, \
+    singleton, \
+    unit, zeros
 
 
 class LinAlgTestCase(ExtendedTestCase):
@@ -100,7 +105,7 @@ class LinAlgTestCase(ExtendedTestCase):
         self.assertEqual(column(range(6)) ** 'T', row(range(6)))
 
 
-class UtilsTestCase(ExtendedTestCase):
+class FactoryTestCase(ExtendedTestCase):
     def test_singleton(self):
         self.assertEqual(singleton(5), Matrix(((5,),)))
         self.assertEqual(singleton(0), Matrix(((0,),)))
@@ -159,6 +164,28 @@ class UtilsTestCase(ExtendedTestCase):
         )))
         self.assertEqual(identity(1, 5), row((1, 0, 0, 0, 0)))
         self.assertEqual(identity(5, 1), column((1, 0, 0, 0, 0)))
+
+
+class UtilTestCase(ExtendedTestCase):
+    def test_norm(self):
+        self.assertAlmostEqual(norm(row((1 / sqrt(2), 1 / sqrt(2)))), 1)
+        self.assertAlmostEqual(norm(column((1, 0, 0))), 1)
+        self.assertAlmostEqual(norm(identity(5, 10)), abs(identity(5, 10)))
+
+    def test_angle_between(self):
+        self.assertAlmostEqual(angle_between(row((1, 0)), row((0, 10))), pi / 2)
+        self.assertAlmostEqual(angle_between(row((1, 0)), row((1000, 0))), 0)
+        self.assertAlmostEqual(angle_between(row((1, 0)), row((-1000, 0))), pi)
+
+    def test_unit(self):
+        self.assertIterableAlmostEqual(unit(row((1, 1))), row((1 / sqrt(2), 1 / sqrt(2))))
+        self.assertIterableAlmostEqual(unit(row((100, 0))), row((1, 0)))
+
+    def test_project(self):
+        self.assertIterableAlmostEqual(project(row((1, 1, 1)), i), row((1, 0, 0)))
+        self.assertIterableAlmostEqual(project(row((100, 100, 100)), i), row((100, 0, 0)))
+        self.assertIterableAlmostEqual(project(row((100, 100, 100)), j), row((0, 100, 0)))
+        self.assertIterableAlmostEqual(project(row((100, 100, 100)), k), row((0, 0, 100)))
 
 
 if __name__ == '__main__':
