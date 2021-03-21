@@ -7,7 +7,7 @@ from unittest import main
 from auxiliary import ExtendedTestCase
 
 from math2.linalg import (DimensionError, Matrix, angle_between, column, cross, diagonal, i, identity, j, k, norm, ones,
-                          project, random, row, singleton, unit, zeros)
+                          orthogonal, parallel, project, random, row, singleton, unit, zeros)
 
 
 class LinAlgTestCase(ExtendedTestCase):
@@ -203,6 +203,32 @@ class UtilTestCase(ExtendedTestCase):
             u, v = random(1, 3), random(1, 3)
 
             self.assertAlmostEqual(abs(cross(u, v)), abs(u) * abs(v) * sin(angle_between(u, v)))
+
+    def test_parallel(self):
+        self.assertTrue(parallel(row((1, 0, 0)), row((100, 0, 0))))
+        self.assertTrue(parallel(row((1, 0, 0)), row((-100, 0, 0))))
+        self.assertFalse(parallel(row((1, 0, 0)), row((-100, 1, 0))))
+
+        self.assertTrue(parallel(i, i))
+        self.assertFalse(parallel(i, j))
+        self.assertFalse(parallel(i, k))
+        self.assertFalse(parallel(j, i))
+        self.assertTrue(parallel(j, j))
+        self.assertFalse(parallel(j, k))
+        self.assertFalse(parallel(k, i))
+        self.assertFalse(parallel(k, j))
+        self.assertTrue(parallel(k, k))
+
+    def test_orthogonal(self):
+        self.assertFalse(orthogonal(i, i))
+        self.assertTrue(orthogonal(i, j))
+        self.assertTrue(orthogonal(i, k))
+        self.assertTrue(orthogonal(j, i))
+        self.assertFalse(orthogonal(j, j))
+        self.assertTrue(orthogonal(j, k))
+        self.assertTrue(orthogonal(k, i))
+        self.assertTrue(orthogonal(k, j))
+        self.assertFalse(orthogonal(k, k))
 
 
 if __name__ == '__main__':

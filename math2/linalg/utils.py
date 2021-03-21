@@ -27,3 +27,11 @@ def cross(u, v):
     v = v[0], v[1], (0 if len(u) == 2 else v[2])
 
     return row((u[1] * v[2] - v[1] * u[2], u[2] * v[0] - v[2] * u[0], u[0] * v[1] - v[0] * u[1]))
+
+
+def parallel(u, v):
+    return abs(u @ v) == abs(v) * abs(u)
+
+
+def orthogonal(u, v):
+    return u @ v == 0
