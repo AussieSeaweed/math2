@@ -31,6 +31,12 @@ def identity(m, n=None):
     return Matrix((int(r == c) for c in range(default(n, m))) for r in range(m))
 
 
+def random(m, n=None):
+    from random import random
+
+    return Matrix((random() for _ in range(default(n, m))) for _ in range(m))
+
+
 i = row((1, 0, 0))
 j = row((0, 1, 0))
 k = row((0, 0, 1))

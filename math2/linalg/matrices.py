@@ -86,10 +86,11 @@ class Matrix(Sequence):
             return NotImplemented
 
     def __pow__(self, power, modulo=None):
-        if power == 'T' and modulo is None:
-            return Matrix(self.columns)
-        else:
-            return NotImplemented
+        if modulo is None:
+            if power == 'T':
+                return Matrix(self.columns)
+
+        return NotImplemented
 
     def __abs__(self):
         return sqrt(sum(x ** 2 for x in self))

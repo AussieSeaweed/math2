@@ -1,16 +1,13 @@
 from functools import partial
 from itertools import repeat
-from math import pi, sqrt
+from math import pi, sin, sqrt
 from operator import add, matmul, mul
 from unittest import main
 
 from auxiliary import ExtendedTestCase
 
-from math2.linalg import DimensionError, Matrix, angle_between, column, diagonal, i, identity, j, k, norm, ones, \
-    project, \
-    row, \
-    singleton, \
-    unit, zeros
+from math2.linalg import (DimensionError, Matrix, angle_between, column, cross, diagonal, i, identity, j, k, norm, ones,
+                          project, random, row, singleton, unit, zeros)
 
 
 class LinAlgTestCase(ExtendedTestCase):
@@ -165,8 +162,15 @@ class FactoryTestCase(ExtendedTestCase):
         self.assertEqual(identity(1, 5), row((1, 0, 0, 0, 0)))
         self.assertEqual(identity(5, 1), column((1, 0, 0, 0, 0)))
 
+    def test_random(self):
+        self.assertEqual(random(5).dimensions, (5, 5))
+        self.assertEqual(random(5, 1).dimensions, (5, 1))
+        self.assertEqual(random(1, 5).dimensions, (1, 5))
+
 
 class UtilTestCase(ExtendedTestCase):
+    MONTE_CARLO_TEST_COUNT = 100
+
     def test_norm(self):
         self.assertAlmostEqual(norm(row((1 / sqrt(2), 1 / sqrt(2)))), 1)
         self.assertAlmostEqual(norm(column((1, 0, 0))), 1)
@@ -186,6 +190,19 @@ class UtilTestCase(ExtendedTestCase):
         self.assertIterableAlmostEqual(project(row((100, 100, 100)), i), row((100, 0, 0)))
         self.assertIterableAlmostEqual(project(row((100, 100, 100)), j), row((0, 100, 0)))
         self.assertIterableAlmostEqual(project(row((100, 100, 100)), k), row((0, 0, 100)))
+
+    def test_cross(self):
+        self.assertIterableAlmostEqual(cross(i, j), k)
+        self.assertIterableAlmostEqual(cross(j, i), -k)
+        self.assertIterableAlmostEqual(cross(i, k), -j)
+        self.assertIterableAlmostEqual(cross(k, i), j)
+        self.assertIterableAlmostEqual(cross(j, k), i)
+        self.assertIterableAlmostEqual(cross(k, j), -i)
+
+        for _ in range(self.MONTE_CARLO_TEST_COUNT):
+            u, v = random(1, 3), random(1, 3)
+
+            self.assertAlmostEqual(abs(cross(u, v)), abs(u) * abs(v) * sin(angle_between(u, v)))
 
 
 if __name__ == '__main__':
