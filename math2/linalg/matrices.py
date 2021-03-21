@@ -14,6 +14,9 @@ class Matrix(Sequence):
         if not const(map(len, self.__values)):
             raise DimensionError('The number of columns are not constant')
 
+        if self.column_count == 0:
+            self.__values = ()
+
     @property
     def rows(self):
         return (Matrix((row,)) for row in self.__values)
@@ -80,6 +83,12 @@ class Matrix(Sequence):
         try:
             return self * (1 / other)
         except TypeError:
+            return NotImplemented
+
+    def __pow__(self, power, modulo=None):
+        if power == 'T' and modulo is None:
+            return Matrix(self.columns)
+        else:
             return NotImplemented
 
     def __abs__(self):

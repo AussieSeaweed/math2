@@ -1,10 +1,11 @@
+from functools import partial
 from itertools import repeat
 from operator import add, matmul, mul
 from unittest import main
 
 from auxiliary import ExtendedTestCase
 
-from math2.linalg import DimensionError, Matrix, column, row, singleton, transposed
+from math2.linalg import DimensionError, Matrix, column, diagonal, identity, ones, row, singleton, zeros
 
 
 class LinAlgTestCase(ExtendedTestCase):
@@ -93,12 +94,71 @@ class LinAlgTestCase(ExtendedTestCase):
         self.assertRaises(DimensionError, matmul, row(range(5)), column(range(5)))
         self.assertRaises(DimensionError, matmul, row(range(5)), row(range(6)))
 
+    def test_transposed(self):
+        self.assertEqual(Matrix((range(3), range(3, 6))) ** 'T', Matrix(((0, 3), (1, 4), (2, 5))))
+        self.assertEqual(row(range(6)) ** 'T', column(range(6)))
+        self.assertEqual(column(range(6)) ** 'T', row(range(6)))
+
 
 class UtilsTestCase(ExtendedTestCase):
-    def test_transposed(self):
-        self.assertEqual(transposed(Matrix((range(3), range(3, 6)))), Matrix(((0, 3), (1, 4), (2, 5))))
-        self.assertEqual(transposed(row(range(6))), column(range(6)))
-        self.assertEqual(transposed(column(range(6))), row(range(6)))
+    def test_singleton(self):
+        self.assertEqual(singleton(5), Matrix(((5,),)))
+        self.assertEqual(singleton(0), Matrix(((0,),)))
+        self.assertEqual(singleton(10), Matrix(((10,),)))
+
+    def test_row(self):
+        self.assertEqual(row(()), Matrix())
+        self.assertEqual(row(range(10)), Matrix((range(10),)))
+        self.assertEqual(row(map(partial(pow, 2), range(5))), Matrix(((1, 2, 4, 8, 16),)))
+
+    def test_column(self):
+        self.assertEqual(column(()), Matrix())
+        self.assertEqual(column(range(10)), Matrix((x,) for x in range(10)))
+        self.assertEqual(column(map(partial(pow, 2), range(5))), Matrix(((1,), (2,), (4,), (8,), (16,))))
+
+    def test_diagonal(self):
+        self.assertEqual(diagonal(()), Matrix())
+        self.assertEqual(diagonal((1, 1, 1)), identity(3))
+        self.assertEqual(diagonal(range(5)), Matrix((
+            repeat(0, 5),
+            (0, 1, 0, 0, 0),
+            (0, 0, 2, 0, 0),
+            (0, 0, 0, 3, 0),
+            (0, 0, 0, 0, 4),
+        )))
+
+    def test_zeros(self):
+        self.assertEqual(zeros(0), Matrix())
+        self.assertEqual(zeros(5), Matrix((repeat(0, 5), repeat(0, 5), repeat(0, 5), repeat(0, 5), repeat(0, 5))))
+        self.assertEqual(zeros(5, 5), Matrix((repeat(0, 5), repeat(0, 5), repeat(0, 5), repeat(0, 5), repeat(0, 5))))
+        self.assertEqual(zeros(1, 5), row(repeat(0, 5)))
+        self.assertEqual(zeros(5, 1), column(repeat(0, 5)))
+
+    def test_ones(self):
+        self.assertEqual(ones(0), Matrix())
+        self.assertEqual(ones(5), Matrix((repeat(1, 5), repeat(1, 5), repeat(1, 5), repeat(1, 5), repeat(1, 5))))
+        self.assertEqual(ones(5, 5), Matrix((repeat(1, 5), repeat(1, 5), repeat(1, 5), repeat(1, 5), repeat(1, 5))))
+        self.assertEqual(ones(1, 5), row(repeat(1, 5)))
+        self.assertEqual(ones(5, 1), column(repeat(1, 5)))
+
+    def test_identity(self):
+        self.assertEqual(identity(0), Matrix())
+        self.assertEqual(identity(5), Matrix((
+            (1, 0, 0, 0, 0),
+            (0, 1, 0, 0, 0),
+            (0, 0, 1, 0, 0),
+            (0, 0, 0, 1, 0),
+            (0, 0, 0, 0, 1),
+        )))
+        self.assertEqual(identity(5, 5), Matrix((
+            (1, 0, 0, 0, 0),
+            (0, 1, 0, 0, 0),
+            (0, 0, 1, 0, 0),
+            (0, 0, 0, 1, 0),
+            (0, 0, 0, 0, 1),
+        )))
+        self.assertEqual(identity(1, 5), row((1, 0, 0, 0, 0)))
+        self.assertEqual(identity(5, 1), column((1, 0, 0, 0, 0)))
 
 
 if __name__ == '__main__':
