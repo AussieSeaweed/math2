@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from typing import Optional
 
 from auxiliary import default
@@ -10,16 +10,19 @@ def singleton(s: float) -> Matrix:
     return Matrix(((s,),))
 
 
-def row(seq: Sequence[float]) -> Matrix:
-    return Matrix((seq,))
+def row(it: Iterable[float]) -> Matrix:
+    return Matrix((it,))
 
 
-def column(seq: Sequence[float]) -> Matrix:
-    return Matrix((s,) for s in seq)
+def column(it: Iterable[float]) -> Matrix:
+    return Matrix((s,) for s in it)
 
 
-def diagonal(seq: Sequence[float]) -> Matrix:
-    return Matrix((seq[r] if r == c else 0 for c in range(len(seq))) for r in range(len(seq)))
+def diagonal(it: Iterable[float]) -> Matrix:
+    if isinstance(it, Sequence):
+        return Matrix((it[r] if r == c else 0 for c in range(len(it))) for r in range(len(it)))
+    else:
+        return diagonal(tuple(it))
 
 
 def zeros(m: int, n: Optional[int] = None) -> Matrix:

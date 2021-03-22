@@ -96,29 +96,29 @@ class LinAlgTestCase(ExtendedTestCase):
         self.assertRaises(DimensionError, matmul, row(range(5)), column(range(5)))
         self.assertRaises(DimensionError, matmul, row(range(5)), row(range(6)))
 
-    def test_transposed(self):
+    def test_transposed(self) -> None:
         self.assertEqual(Matrix((range(3), range(3, 6))) ** 'T', Matrix(((0, 3), (1, 4), (2, 5))))
         self.assertEqual(row(range(6)) ** 'T', column(range(6)))
         self.assertEqual(column(range(6)) ** 'T', row(range(6)))
 
 
 class FactoryTestCase(ExtendedTestCase):
-    def test_singleton(self):
+    def test_singleton(self) -> None:
         self.assertEqual(singleton(5), Matrix(((5,),)))
         self.assertEqual(singleton(0), Matrix(((0,),)))
         self.assertEqual(singleton(10), Matrix(((10,),)))
 
-    def test_row(self):
+    def test_row(self) -> None:
         self.assertEqual(row(()), Matrix())
         self.assertEqual(row(range(10)), Matrix((range(10),)))
         self.assertEqual(row(map(partial(pow, 2), range(5))), Matrix(((1, 2, 4, 8, 16),)))
 
-    def test_column(self):
+    def test_column(self) -> None:
         self.assertEqual(column(()), Matrix())
         self.assertEqual(column(range(10)), Matrix((x,) for x in range(10)))
         self.assertEqual(column(map(partial(pow, 2), range(5))), Matrix(((1,), (2,), (4,), (8,), (16,))))
 
-    def test_diagonal(self):
+    def test_diagonal(self) -> None:
         self.assertEqual(diagonal(()), Matrix())
         self.assertEqual(diagonal((1, 1, 1)), identity(3))
         self.assertEqual(diagonal(range(5)), Matrix((
@@ -129,21 +129,21 @@ class FactoryTestCase(ExtendedTestCase):
             (0, 0, 0, 0, 4),
         )))
 
-    def test_zeros(self):
+    def test_zeros(self) -> None:
         self.assertEqual(zeros(0), Matrix())
         self.assertEqual(zeros(5), Matrix((repeat(0, 5), repeat(0, 5), repeat(0, 5), repeat(0, 5), repeat(0, 5))))
         self.assertEqual(zeros(5, 5), Matrix((repeat(0, 5), repeat(0, 5), repeat(0, 5), repeat(0, 5), repeat(0, 5))))
         self.assertEqual(zeros(1, 5), row(repeat(0, 5)))
         self.assertEqual(zeros(5, 1), column(repeat(0, 5)))
 
-    def test_ones(self):
+    def test_ones(self) -> None:
         self.assertEqual(ones(0), Matrix())
         self.assertEqual(ones(5), Matrix((repeat(1, 5), repeat(1, 5), repeat(1, 5), repeat(1, 5), repeat(1, 5))))
         self.assertEqual(ones(5, 5), Matrix((repeat(1, 5), repeat(1, 5), repeat(1, 5), repeat(1, 5), repeat(1, 5))))
         self.assertEqual(ones(1, 5), row(repeat(1, 5)))
         self.assertEqual(ones(5, 1), column(repeat(1, 5)))
 
-    def test_identity(self):
+    def test_identity(self) -> None:
         self.assertEqual(identity(0), Matrix())
         self.assertEqual(identity(5), Matrix((
             (1, 0, 0, 0, 0),
@@ -162,7 +162,7 @@ class FactoryTestCase(ExtendedTestCase):
         self.assertEqual(identity(1, 5), row((1, 0, 0, 0, 0)))
         self.assertEqual(identity(5, 1), column((1, 0, 0, 0, 0)))
 
-    def test_random(self):
+    def test_random(self) -> None:
         self.assertEqual(random(5).dimensions, (5, 5))
         self.assertEqual(random(5, 1).dimensions, (5, 1))
         self.assertEqual(random(1, 5).dimensions, (1, 5))
@@ -171,27 +171,27 @@ class FactoryTestCase(ExtendedTestCase):
 class UtilTestCase(ExtendedTestCase):
     MONTE_CARLO_TEST_COUNT = 100
 
-    def test_norm(self):
+    def test_norm(self) -> None:
         self.assertAlmostEqual(norm(row((1 / sqrt(2), 1 / sqrt(2)))), 1)
         self.assertAlmostEqual(norm(column((1, 0, 0))), 1)
         self.assertAlmostEqual(norm(identity(5, 10)), abs(identity(5, 10)))
 
-    def test_angle_between(self):
+    def test_angle_between(self) -> None:
         self.assertAlmostEqual(angle_between(row((1, 0)), row((0, 10))), pi / 2)
         self.assertAlmostEqual(angle_between(row((1, 0)), row((1000, 0))), 0)
         self.assertAlmostEqual(angle_between(row((1, 0)), row((-1000, 0))), pi)
 
-    def test_unit(self):
+    def test_unit(self) -> None:
         self.assertIterableAlmostEqual(unit(row((1, 1))), row((1 / sqrt(2), 1 / sqrt(2))))
         self.assertIterableAlmostEqual(unit(row((100, 0))), row((1, 0)))
 
-    def test_project(self):
+    def test_project(self) -> None:
         self.assertIterableAlmostEqual(project(row((1, 1, 1)), i), row((1, 0, 0)))
         self.assertIterableAlmostEqual(project(row((100, 100, 100)), i), row((100, 0, 0)))
         self.assertIterableAlmostEqual(project(row((100, 100, 100)), j), row((0, 100, 0)))
         self.assertIterableAlmostEqual(project(row((100, 100, 100)), k), row((0, 0, 100)))
 
-    def test_cross(self):
+    def test_cross(self) -> None:
         self.assertIterableAlmostEqual(cross(i, j), k)
         self.assertIterableAlmostEqual(cross(j, i), -k)
         self.assertIterableAlmostEqual(cross(i, k), -j)
@@ -204,7 +204,7 @@ class UtilTestCase(ExtendedTestCase):
 
             self.assertAlmostEqual(abs(cross(u, v)), abs(u) * abs(v) * sin(angle_between(u, v)))
 
-    def test_parallel(self):
+    def test_parallel(self) -> None:
         self.assertTrue(parallel(row((1, 0, 0)), row((100, 0, 0))))
         self.assertTrue(parallel(row((1, 0, 0)), row((-100, 0, 0))))
         self.assertFalse(parallel(row((1, 0, 0)), row((-100, 1, 0))))
@@ -219,7 +219,7 @@ class UtilTestCase(ExtendedTestCase):
         self.assertFalse(parallel(k, j))
         self.assertTrue(parallel(k, k))
 
-    def test_orthogonal(self):
+    def test_orthogonal(self) -> None:
         self.assertFalse(orthogonal(i, i))
         self.assertTrue(orthogonal(i, j))
         self.assertTrue(orthogonal(i, k))
