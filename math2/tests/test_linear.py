@@ -5,8 +5,8 @@ from unittest import main
 
 from auxiliary import ExtendedTestCase
 
-from math2.linear import (DimensionError, angle, col, cols, cross, diag, empty, eye, i, j, k, norm, ones, orthogonal,
-                          parallel, proj, random, row, rows, singleton, unit, zeros)
+from math2.linear import (DimensionError, angle, col, cols, cross, diag, empty, eye, full, i, j, k, norm, ones,
+                          orthogonal, parallel, proj, random, row, rows, singleton, unit, zeros)
 
 
 class LinAlgTestCase(ExtendedTestCase):
@@ -169,6 +169,10 @@ class FactoryTestCase(ExtendedTestCase):
         )))
         self.assertEqual(eye(1, 5), row((1, 0, 0, 0, 0)))
         self.assertEqual(eye(5, 1), col((1, 0, 0, 0, 0)))
+
+    def test_full(self):
+        self.assertEqual(full(2, 1), cols(((1, 1), (1, 1))))
+        self.assertEqual(full(2, 2, 1), cols(((1, 1), (1, 1))))
 
     def test_random(self):
         self.assertEqual(random(5).dims, (5, 5))

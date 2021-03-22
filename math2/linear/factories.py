@@ -53,6 +53,15 @@ def eye(m, n=None):
     return Matrix((int(r == c) for r in range(m) for c in range(n)), m, n)
 
 
+def full(m, n, scalar=None):
+    if scalar is None:
+        scalar, n = n, scalar
+
+    n = default(n, m)
+
+    return Matrix((scalar for _ in range(m) for _ in range(n)), m, n)
+
+
 def random(m, n=None):
     from random import random as factory
     n = default(n, m)
