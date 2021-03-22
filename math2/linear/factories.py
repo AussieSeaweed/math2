@@ -1,46 +1,63 @@
-from collections.abc import Iterable, Sequence
-from typing import Optional
+from itertools import repeat
 
-from auxiliary import default
+from auxiliary import default, flattened
 
 from math2.linear.matrices import Matrix
 
 
-def singleton(s: float) -> Matrix:
-    return Matrix(((s,),))
+def empty():
+    return Matrix((), 0, 0)
 
 
-def row(it: Iterable[float]) -> Matrix:
-    return Matrix((it,))
+def singleton(s):
+    return Matrix((s,), 1, 1)
 
 
-def column(it: Iterable[float]) -> Matrix:
-    return Matrix((s,) for s in it)
+def row(seq):
+    return Matrix(seq, 1, len(seq))
 
 
-def diagonal(it: Iterable[float]) -> Matrix:
-    if isinstance(it, Sequence):
-        return Matrix((it[r] if r == c else 0 for c in range(len(it))) for r in range(len(it)))
-    else:
-        return diagonal(tuple(it))
+def col(seq):
+    return Matrix(seq, len(seq), 1)
 
 
-def zeros(m: int, n: Optional[int] = None) -> Matrix:
-    return Matrix((0 for _ in range(default(n, m))) for _ in range(m))
+def rows(seqs):
+    return Matrix(flattened(seqs), len(seqs), len(seqs[0]) if seqs else 0)
 
 
-def ones(m: int, n: Optional[int] = None) -> Matrix:
-    return Matrix((1 for _ in range(default(n, m))) for _ in range(m))
+def cols(seqs):
+    return rows(seqs) ** 'T'
 
 
-def identity(m: int, n: Optional[int] = None) -> Matrix:
-    return Matrix((int(r == c) for c in range(default(n, m))) for r in range(m))
+def diag(seq):
+    n = len(seq)
+
+    return Matrix((scalar if r == c else 0 for r, scalar in enumerate(seq) for c in range(n)), n, n)
 
 
-def random(m: int, n: Optional[int] = None) -> Matrix:
+def zeros(m, n=None):
+    n = default(n, m)
+
+    return Matrix(repeat(0, m * n), m, n)
+
+
+def ones(m, n=None):
+    n = default(n, m)
+
+    return Matrix(repeat(1, m * n), m, n)
+
+
+def eye(m, n=None):
+    n = default(n, m)
+
+    return Matrix((int(r == c) for r in range(m) for c in range(n)), m, n)
+
+
+def random(m, n=None):
     from random import random as factory
+    n = default(n, m)
 
-    return Matrix((factory() for _ in range(default(n, m))) for _ in range(m))
+    return Matrix((factory() for _ in range(m) for _ in range(n)), m, n)
 
 
 i = row((1, 0, 0))

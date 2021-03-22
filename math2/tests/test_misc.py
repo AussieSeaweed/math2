@@ -2,7 +2,7 @@ from unittest import main
 
 from auxiliary import ExtendedTestCase
 
-from math2.miscellaneous import series_sum
+from math2.misc import series_sum
 
 
 class MiscTestCase(ExtendedTestCase):

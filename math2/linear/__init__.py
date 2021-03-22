@@ -1,7 +1,7 @@
 from math2.linear.exceptions import DimensionError
-from math2.linear.factories import column, diagonal, i, identity, j, k, ones, random, row, singleton, zeros
+from math2.linear.factories import col, cols, diag, empty, eye, i, j, k, ones, random, row, rows, singleton, zeros
 from math2.linear.matrices import Matrix
-from math2.linear.utils import angle_between, cross, norm, orthogonal, parallel, project, unit
+from math2.linear.utils import angle, cross, norm, orthogonal, parallel, proj, unit
 
-__all__ = ('DimensionError', 'column', 'diagonal', 'i', 'identity', 'j', 'k', 'ones', 'random', 'row', 'singleton',
-           'zeros', 'Matrix', 'angle_between', 'cross', 'norm', 'orthogonal', 'parallel', 'project', 'unit')
+__all__ = ('DimensionError', 'col', 'cols', 'diag', 'empty', 'eye', 'i', 'j', 'k', 'ones', 'random', 'row', 'rows',
+           'singleton', 'zeros', 'Matrix', 'angle', 'cross', 'norm', 'orthogonal', 'parallel', 'proj', 'unit')

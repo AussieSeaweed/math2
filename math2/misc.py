@@ -1,7 +1,7 @@
 def series_sum(*args):
     """Calculates the series sum of the interval.
 
-    :param args: stop or start[, stop[, n]]
+    :param args: stop or start, stop[, n]
     :return: the series sum.
     """
     if not args:
