@@ -9,7 +9,7 @@ from math2.linear import (DimensionError, angle, col, cols, cross, diag, empty, 
                           orthogonal, parallel, proj, random, row, rows, singleton, unit, zeros)
 
 
-class LinAlgTestCase(ExtendedTestCase):
+class MatrixTestCase(ExtendedTestCase):
     def test_abs(self):
         self.assertAlmostEqual(abs(rows((range(3), range(3, 6)))), 7.416198487095663)
         self.assertAlmostEqual(abs(row(range(6))), 7.416198487095663)
