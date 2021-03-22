@@ -1,6 +1,6 @@
 import numpy as np
 
-from math2.econ import EfInt
+from math2.economics import EfInt
 
 
 def fair(bull, bear, m_price, m_bull, m_bear, rf):

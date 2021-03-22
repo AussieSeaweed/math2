@@ -1,4 +1,4 @@
-from math2.linalg import row
+from math2.linear import row
 
 
 def distance(p1, p2):

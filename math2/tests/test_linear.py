@@ -6,7 +6,7 @@ from unittest import main
 
 from auxiliary import ExtendedTestCase
 
-from math2.linalg import (DimensionError, Matrix, angle_between, column, cross, diagonal, i, identity, j, k, norm, ones,
+from math2.linear import (DimensionError, Matrix, angle_between, column, cross, diagonal, i, identity, j, k, norm, ones,
                           orthogonal, parallel, project, random, row, singleton, unit, zeros)
 
 

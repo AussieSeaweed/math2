@@ -6,9 +6,9 @@ from itertools import chain
 import numpy as np
 from auxiliary import default
 
-from math2.econ.cashflows import CashFlow, irr
-from math2.econ.factors import ap, fa
-from math2.econ.ints import EfInt
+from math2.economics.cashflows import CashFlow, irr
+from math2.economics.factors import ap, fa
+from math2.economics.ints import EfInt
 
 
 class Instrument(ABC):
