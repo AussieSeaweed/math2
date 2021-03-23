@@ -11,20 +11,20 @@ from math2.misc import frange
 class Integrator(ABC):
     def dbl_quad(self, f, xlo, xhi, ylo, yhi, steps):
         return self.quad(lambda x: self.quad(
-            lambda y: f(x, y),
+            partial(f, x),
             ylo(x) if isinstance(ylo, Callable) else ylo,
             yhi(x) if isinstance(yhi, Callable) else yhi,
             steps,
         ), xlo, xhi, steps)
 
     def tpl_quad(self, f, xlo, xhi, ylo, yhi, zlo, zhi, steps):
-        return self.quad(lambda x: self.dbl_quad(
-            lambda y, z: f(x, y, z),
+        return self.quad(lambda x: dbl_quad(  # TODO: FOR SOME REASON self.dbl_quad does not work
+            partial(f, x),
             ylo(x) if isinstance(ylo, Callable) else ylo,
             yhi(x) if isinstance(yhi, Callable) else yhi,
             partial(zlo, x) if isinstance(zlo, Callable) else zlo,
             partial(zhi, x) if isinstance(zhi, Callable) else zhi,
-            steps,
+            # steps,
         ), xlo, xhi, steps)
 
     @abstractmethod

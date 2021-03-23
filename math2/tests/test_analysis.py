@@ -35,27 +35,27 @@ class MiscTestCase(ExtendedTestCase):
         self.assertAlmostEqual(dbl_quad(lambda x, y: x ** 2 * y, 0, 1, 0, lambda x: x), 0.1)
 
     def test_tpl_quad(self):
-        # self.assertAlmostEqual(MidpointIntegrator().tpl_quad(
-        #     lambda x, y, z: sin(x) * cos(y) * z,
-        #     -5, 1,
-        #     -10, lambda x: x,
-        #     lambda x, y: -x * y * 2, mul,
-        #     50,
-        # ), 1289.4240604730014)
-        # self.assertAlmostEqual(TrapezoidIntegrator().tpl_quad(
-        #     lambda x, y, z: sin(x) * cos(y) * z,
-        #     -5, 1,
-        #     -10, lambda x: x,
-        #     lambda x, y: -x * y * 2, mul,
-        #     50,
-        # ), 1289.4240604730014)
-        # self.assertAlmostEqual(SimpsonIntegrator().tpl_quad(
-        #     lambda x, y, z: sin(x) * cos(y) * z,
-        #     -5, 1,
-        #     -10, lambda x: x,
-        #     lambda x, y: -x * y * 2, mul,
-        #     50,
-        # ), 1289.4240604730014)
+        self.assertAlmostEqual(MidpointIntegrator().tpl_quad(
+            lambda x, y, z: sin(x) * cos(y) * z,
+            -5, 1,
+            -10, lambda x: x,
+            lambda x, y: -x * y * 2, mul,
+            50,
+        ), 1289.4240604730014, -1)
+        self.assertAlmostEqual(TrapezoidIntegrator().tpl_quad(
+            lambda x, y, z: sin(x) * cos(y) * z,
+            -5, 1,
+            -10, lambda x: x,
+            lambda x, y: -x * y * 2, mul,
+            50,
+        ), 1289.4240604730014, -1)
+        self.assertAlmostEqual(SimpsonIntegrator().tpl_quad(
+            lambda x, y, z: sin(x) * cos(y) * z,
+            -5, 1,
+            -10, lambda x: x,
+            lambda x, y: -x * y * 2, mul,
+            50,
+        ), 1289.4240604730014, 3)
         self.assertAlmostEqual(tpl_quad(
             lambda x, y, z: sin(x) * cos(y) * z,
             -5, 1,
