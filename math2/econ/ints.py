@@ -3,7 +3,7 @@ from functools import total_ordering
 
 import numpy as np
 
-from math2.economics.factors import fp
+from math2.econ.factors import fp
 
 
 class Int(ABC):

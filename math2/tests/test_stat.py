@@ -3,7 +3,7 @@ from unittest import main
 
 from auxiliary import ExtendedTestCase
 
-from math2.statistics import mean, median, range_, standard_deviation, trimmed_mean, variance
+from math2.stat import mean, median, range_, standard_deviation, trimmed_mean, variance
 
 
 class StatsTestCase(ExtendedTestCase):

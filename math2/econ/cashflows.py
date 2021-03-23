@@ -6,8 +6,8 @@ import numpy as np
 from auxiliary import SupportsLessThan, default, windowed
 from scipy.optimize import fsolve
 
-from math2.economics.factors import ap
-from math2.economics.ints import EfInt
+from math2.econ.factors import ap
+from math2.econ.ints import EfInt
 
 
 @total_ordering
