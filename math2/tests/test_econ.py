@@ -12,14 +12,14 @@ from math2.econ import (Bond, CashFlow, CompInt, ContInt, DblDeclBalDeprec, Decl
                         rel_combinations, repeated, ror, rpw, select, yield_)
 
 
-class InterestTestCase(TestCase):
-    def test_difference(self):
+class IntTestCase(TestCase):
+    def test_diff(self):
         r, p, t, s, c = 0.07, 24, 2020 - 1626, 685.92, 9066082143624.828
 
         self.assertAlmostEqual(p * SimpleInt(r).to_factor(t), s)
         self.assertAlmostEqual(p * EfInt(r).to_factor(t), c)
 
-    def test_comparison(self):
+    def test_cmp(self):
         self.assertLess(NomInt(0.06, 12).to_ef().rate, SPInt(0.063, 1).to_ef().rate)
 
     def test_consistency(self):
