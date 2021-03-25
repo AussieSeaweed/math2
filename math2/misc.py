@@ -16,16 +16,14 @@ def series_sum(*args):
         return (start + stop) * n // 2
 
 
-def frange(*args):
-    if not args or len(args) > 3:
-        raise ValueError('Invalid number of arguments')
-    elif len(args) == 1:
-        yield from frange(0, args[0])
-    elif len(args) == 2:
-        yield from frange(args[0], args[1], 1)
-    else:
-        start, stop, step = args
+def linspace(start, end, count):
+    """Constructs an iterator of equally spaced values from start to end.
 
-        while start < stop:
-            yield start
-            start += step
+    :param start: The start value.
+    :param end: The end value.
+    :param count: The number of values.
+    :return: The equally spaced values.
+    """
+    step = (end - start) / (count - 1)
+
+    return (start + step * i for i in range(count))
