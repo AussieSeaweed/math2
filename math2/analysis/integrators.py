@@ -5,7 +5,7 @@ from itertools import chain
 
 from auxiliary import windowed
 
-from math2.misc import frange
+from math2.misc import linspace
 
 
 class Integrator(ABC):
@@ -18,12 +18,13 @@ class Integrator(ABC):
         ), xlo, xhi, steps)
 
     def tpl_quad(self, f, xlo, xhi, ylo, yhi, zlo, zhi, steps):
-        return self.quad(lambda x: dbl_quad(
+        return self.quad(lambda x: self.dbl_quad(
             partial(f, x),
             ylo(x) if isinstance(ylo, Callable) else ylo,
             yhi(x) if isinstance(yhi, Callable) else yhi,
             partial(zlo, x) if isinstance(zlo, Callable) else zlo,
             partial(zhi, x) if isinstance(zhi, Callable) else zhi,
+            steps,
         ), xlo, xhi, steps)
 
     @abstractmethod
@@ -33,26 +34,18 @@ class Integrator(ABC):
 
 class MidpointIntegrator(Integrator):
     def quad(self, f, xlo, xhi, steps):
-        return sum(
-            (b - a) * f((a + b) / 2)
-            for a, b in windowed(chain(frange(xlo, xhi, (xhi - xlo) / steps), (xhi,)), 2)
-        )
+        return sum((b - a) * f((a + b) / 2) for a, b in windowed(chain(linspace(xlo, xhi, steps), (xhi,)), 2))
 
 
 class TrapezoidIntegrator(Integrator):
     def quad(self, f, xlo, xhi, steps):
-        return sum(
-            (b - a) * (f(a) + f(b)) / 2
-            for a, b in windowed(chain(frange(xlo, xhi, (xhi - xlo) / steps), (xhi,)), 2)
-        )
+        return sum((b - a) * (f(a) + f(b)) / 2 for a, b in windowed(chain(linspace(xlo, xhi, steps), (xhi,)), 2))
 
 
 class SimpsonIntegrator(Integrator):
     def quad(self, f, xlo, xhi, steps):
-        return sum(
-            (b - a) * (f(a) + 4 * f((a + b) / 2) + f(b)) / 6
-            for a, b in windowed(chain(frange(xlo, xhi, (xhi - xlo) / steps), (xhi,)), 2)
-        )
+        return sum((b - a) * (f(a) + 4 * f((a + b) / 2) + f(b)) / 6
+                   for a, b in windowed(chain(linspace(xlo, xhi, steps), (xhi,)), 2))
 
 
 def quad(f, xlo, xhi):
