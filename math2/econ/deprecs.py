@@ -122,10 +122,10 @@ class SYDDeprec(Deprec):
         """
         :return: The sum of the years' digits.
         """
-        return series_sum(self.life)
+        return series_sum(0, self.life)
 
     def book(self, t):
-        return self.basis - (self.syd - series_sum(self.life - t)) / self.syd * (self.basis - self.salvage)
+        return self.basis - (self.syd - series_sum(0, self.life - t)) / self.syd * (self.basis - self.salvage)
 
     def amount(self, t):
         return (self.life - t + 1) / self.syd * (self.basis - self.salvage)
