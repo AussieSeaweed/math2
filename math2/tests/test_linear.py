@@ -5,7 +5,9 @@ from unittest import main
 
 from auxiliary import ExtendedTestCase
 
-from math2.linear import (DimensionError, Matrix, column, columns, diagonal_matrix, empty_matrix, empty_vector,
+from math2.linear import (DimensionError, Matrix, column, columns, diagonal_matrix, empty_column, empty_matrix,
+                          empty_row,
+                          empty_vector,
                           full_matrix, full_vector, i,
                           identity_matrix, j, k, norm, one_matrix, one_vector, random_matrix, random_vector, row, rows,
                           singleton_matrix, singleton_vector, vector,
@@ -170,6 +172,38 @@ class VectorTestCase(ExtendedTestCase):
         self.assertIterableAlmostEqual(vector((100, 0)).unit, vector((1, 0)))
         self.assertIterableAlmostEqual(vector((0, 100, 0)).unit, j)
 
+    def test_x(self) -> None:
+        self.assertEqual(vector(range(1, 1)).x, 0)
+        self.assertEqual(vector(range(1, 2)).x, 1)
+        self.assertEqual(vector(range(1, 3)).x, 1)
+        self.assertEqual(vector(range(1, 4)).x, 1)
+        self.assertEqual(vector(range(1, 5)).x, 1)
+        self.assertEqual(vector(range(1, 6)).x, 1)
+
+    def test_y(self) -> None:
+        self.assertEqual(vector(range(1, 1)).y, 0)
+        self.assertEqual(vector(range(1, 2)).y, 0)
+        self.assertEqual(vector(range(1, 3)).y, 2)
+        self.assertEqual(vector(range(1, 4)).y, 2)
+        self.assertEqual(vector(range(1, 5)).y, 2)
+        self.assertEqual(vector(range(1, 6)).y, 2)
+
+    def test_z(self) -> None:
+        self.assertEqual(vector(range(1, 1)).z, 0)
+        self.assertEqual(vector(range(1, 2)).z, 0)
+        self.assertEqual(vector(range(1, 3)).z, 0)
+        self.assertEqual(vector(range(1, 4)).z, 3)
+        self.assertEqual(vector(range(1, 5)).z, 3)
+        self.assertEqual(vector(range(1, 6)).z, 3)
+
+    def test_w(self) -> None:
+        self.assertEqual(vector(range(1, 1)).w, 0)
+        self.assertEqual(vector(range(1, 2)).w, 0)
+        self.assertEqual(vector(range(1, 3)).w, 0)
+        self.assertEqual(vector(range(1, 4)).w, 0)
+        self.assertEqual(vector(range(1, 5)).w, 4)
+        self.assertEqual(vector(range(1, 6)).w, 4)
+
     def test_parallel_to(self) -> None:
         self.assertTrue(vector((1, 0, 0)).parallel_to(vector((100, 0, 0))))
         self.assertTrue(vector((1, 0, 0)).parallel_to(vector((-100, 0, 0))))
@@ -244,32 +278,34 @@ class FactoryTestCase(ExtendedTestCase):
     def test_vector(self) -> None:
         self.assertEqual(vector(range(5)).dimensions, (5,))
 
-    def test_empty_vector(self) -> None:
-        self.assertEqual(empty_vector().dimensions, (0,))
-
     def test_empty_matrix(self) -> None:
         self.assertEqual(empty_matrix().dimensions, (0, 0))
 
-    def test_singleton_vector(self) -> None:
-        self.assertEqual(singleton_vector(5), vector((5,)))
-        self.assertEqual(singleton_vector(0), vector((0,)))
-        self.assertEqual(singleton_vector(10), vector((10,)))
+    def test_empty_row(self) -> None:
+        self.assertEqual(empty_row().dimensions, (1, 0))
+
+    def test_empty_column(self) -> None:
+        self.assertEqual(empty_column().dimensions, (0, 1))
+
+    def test_empty_vector(self) -> None:
+        self.assertEqual(empty_vector().dimensions, (0,))
 
     def test_singleton_matrix(self) -> None:
         self.assertEqual(singleton_matrix(5), rows(((5,),)))
         self.assertEqual(singleton_matrix(0), rows(((0,),)))
         self.assertEqual(singleton_matrix(10), rows(((10,),)))
 
-    def test_full_vector(self) -> None:
-        self.assertEqual(full_vector(int, 5), vector(range(5)))
+    def test_singleton_vector(self) -> None:
+        self.assertEqual(singleton_vector(5), vector((5,)))
+        self.assertEqual(singleton_vector(0), vector((0,)))
+        self.assertEqual(singleton_vector(10), vector((10,)))
 
     def test_full_matrix(self) -> None:
         self.assertEqual(full_matrix(lambda r, c: 1, 2), columns(((1, 1), (1, 1))))
         self.assertEqual(full_matrix(lambda r, c: 1, 2, 2), columns(((1, 1), (1, 1))))
 
-    def test_zero_vector(self) -> None:
-        self.assertEqual(zero_vector(0), empty_vector())
-        self.assertEqual(zero_vector(5), vector((0,) * 5))
+    def test_full_vector(self) -> None:
+        self.assertEqual(full_vector(int, 5), vector(range(5)))
 
     def test_zero_matrix(self) -> None:
         self.assertEqual(zero_matrix(0), empty_matrix())
@@ -278,9 +314,9 @@ class FactoryTestCase(ExtendedTestCase):
         self.assertEqual(zero_matrix(1, 5), row((0,) * 5))
         self.assertEqual(zero_matrix(5, 1), column((0,) * 5))
 
-    def test_one_vector(self) -> None:
-        self.assertEqual(one_vector(0), empty_vector())
-        self.assertEqual(one_vector(5), vector((1,) * 5))
+    def test_zero_vector(self) -> None:
+        self.assertEqual(zero_vector(0), empty_vector())
+        self.assertEqual(zero_vector(5), vector((0,) * 5))
 
     def test_one_matrix(self) -> None:
         self.assertEqual(one_matrix(0), empty_matrix())
@@ -289,13 +325,17 @@ class FactoryTestCase(ExtendedTestCase):
         self.assertEqual(one_matrix(1, 5), row((1,) * 5))
         self.assertEqual(one_matrix(5, 1), column((1,) * 5))
 
-    def test_random_vector(self) -> None:
-        self.assertEqual(random_vector(5).dimensions, (5,))
+    def test_one_vector(self) -> None:
+        self.assertEqual(one_vector(0), empty_vector())
+        self.assertEqual(one_vector(5), vector((1,) * 5))
 
     def test_random_matrix(self) -> None:
         self.assertEqual(random_matrix(5).dimensions, (5, 5))
         self.assertEqual(random_matrix(5, 1).dimensions, (5, 1))
         self.assertEqual(random_matrix(1, 5).dimensions, (1, 5))
+
+    def test_random_vector(self) -> None:
+        self.assertEqual(random_vector(5).dimensions, (5,))
 
     def test_diagonal_matrix(self) -> None:
         self.assertEqual(diagonal_matrix(()), empty_matrix())

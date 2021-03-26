@@ -28,24 +28,28 @@ def vector(scalars: Sequence[float]) -> Vector:
     return Vector(scalars, (len(scalars),))
 
 
-def empty_vector() -> Vector:
-    return Vector((), (0,))
-
-
 def empty_matrix() -> Matrix:
     return Matrix((), (0, 0))
 
 
-def singleton_vector(scalar: float) -> Vector:
-    return Vector((scalar,), (1,))
+def empty_row() -> Matrix:
+    return Matrix((), (1, 0))
+
+
+def empty_column() -> Matrix:
+    return Matrix((), (0, 1))
+
+
+def empty_vector() -> Vector:
+    return Vector((), (0,))
 
 
 def singleton_matrix(scalar: float) -> Matrix:
     return Matrix((scalar,), (1, 1))
 
 
-def full_vector(func: Callable[[int], float], dimension: int) -> Vector:
-    return Vector(map(func, range(dimension)), (dimension,))
+def singleton_vector(scalar: float) -> Vector:
+    return Vector((scalar,), (1,))
 
 
 def full_matrix(
@@ -59,32 +63,36 @@ def full_matrix(
     )
 
 
-def zero_vector(dimension: int) -> Vector:
-    return full_vector(lambda i: 0, dimension)
+def full_vector(func: Callable[[int], float], dimension: int) -> Vector:
+    return Vector(map(func, range(dimension)), (dimension,))
 
 
 def zero_matrix(row_dimension: int, column_dimension: Optional[int] = None) -> Matrix:
     return full_matrix(lambda r, c: 0, row_dimension, column_dimension)
 
 
-def one_vector(dimension: int) -> Vector:
-    return full_vector(lambda i: 1, dimension)
+def zero_vector(dimension: int) -> Vector:
+    return full_vector(lambda i: 0, dimension)
 
 
 def one_matrix(row_dimension: int, column_dimension: Optional[int] = None) -> Matrix:
     return full_matrix(lambda r, c: 1, row_dimension, column_dimension)
 
 
-def random_vector(dimension: int) -> Vector:
-    from random import random
-
-    return full_vector(lambda i: random(), dimension)
+def one_vector(dimension: int) -> Vector:
+    return full_vector(lambda i: 1, dimension)
 
 
 def random_matrix(row_dimension: int, column_dimension: Optional[int] = None) -> Matrix:
     from random import random
 
     return full_matrix(lambda r, c: random(), row_dimension, column_dimension)
+
+
+def random_vector(dimension: int) -> Vector:
+    from random import random
+
+    return full_vector(lambda i: random(), dimension)
 
 
 def diagonal_matrix(scalars: Sequence[float]) -> Matrix:

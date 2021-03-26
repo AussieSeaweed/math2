@@ -22,6 +22,22 @@ class Vector(Tensor):
     def unit(self) -> Vector:
         return self / abs(self)
 
+    @property
+    def x(self) -> float:
+        return self[0] if len(self) else 0
+
+    @property
+    def y(self) -> float:
+        return self[1] if len(self) > 1 else 0
+
+    @property
+    def z(self) -> float:
+        return self[2] if len(self) > 2 else 0
+
+    @property
+    def w(self) -> float:
+        return self[3] if len(self) > 3 else 0
+
     def parallel_to(self, other: Vector) -> bool:
         return isclose(abs(self @ other), abs(self) * abs(other))
 
@@ -32,10 +48,11 @@ class Vector(Tensor):
         if not (2 <= len(self) <= 3 and 2 <= len(other) <= 3):
             raise DimensionError('Calculating the cross product requires all vectors to have a length of 2 or 3')
 
-        a = self[0], self[1], self[2] if len(self) == 3 else 0
-        b = other[0], other[1], other[2] if len(other) == 3 else 0
-
-        return Vector((a[1] * b[2] - b[1] * a[2], a[2] * b[0] - b[2] * a[0], a[0] * b[1] - b[0] * a[1]), (3,))
+        return Vector((
+            self.y * other.z - other.y * self.z,
+            self.z * other.x - other.z * self.x,
+            self.x * other.y - other.x * self.y,
+        ), (3,))
 
     def angle_between(self, other: Vector) -> float:
         return acos(self @ other / (abs(self) * abs(other)))
