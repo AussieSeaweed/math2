@@ -2,10 +2,10 @@ from unittest import main
 
 from auxiliary import ExtendedTestCase
 
-from math2.misc import linspace, series_sum
+from math2.utils import linspace, series_sum
 
 
-class MiscTestCase(ExtendedTestCase):
+class UtilsTestCase(ExtendedTestCase):
     def test_series_sum(self) -> None:
         self.assertEqual(series_sum(-5, 0), -15)
         self.assertEqual(series_sum(-5, 0), -15)

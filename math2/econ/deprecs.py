@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from math2.econ.ints import EfInt
-from math2.misc import series_sum
+from math2.utils import series_sum
 
 
 class Deprec(ABC):

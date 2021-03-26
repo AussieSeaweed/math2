@@ -4,7 +4,7 @@ from unittest import main
 
 from auxiliary import ExtendedTestCase
 
-from math2.analysis import (MidpointIntegrator, SimpsonIntegrator, TrapezoidIntegrator, double_integrate, integrate,
+from math2.calculus import (MidpointIntegrator, SimpsonIntegrator, TrapezoidIntegrator, double_integrate, integrate,
                             triple_integrate)
 from math2.linear import vector
 

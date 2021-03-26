@@ -5,7 +5,7 @@ from typing import TypeVar
 from auxiliary import sum_, windowed
 
 from math2.linear import Tensor
-from math2.misc import linspace
+from math2.utils import linspace
 
 _T = TypeVar('_T', float, Tensor)
 
