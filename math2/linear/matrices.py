@@ -103,14 +103,13 @@ class Matrix(Tensor):
         ...
 
     def __getitem__(
-            self,
-            i: Union[int, slice, tuple[int, int], tuple[int, slice], tuple[slice, int], tuple[slice, slice]],
+            self, i: Union[int, slice, tuple[int, int], tuple[int, slice], tuple[slice, int], tuple[slice, slice]],
     ) -> Union[float, Sequence[float], float, Matrix]:
         if isinstance(i, tuple):
             try:
                 i, j = i
             except ValueError:
-                return NotImplemented
+                raise ValueError('Matrices only support two indices, one each for row and column')
 
             if isinstance(i, int) and isinstance(j, int):
                 return self[i * self.column_dimension + j]
@@ -127,6 +126,6 @@ class Matrix(Tensor):
 
                 return Matrix(flattened(rows), (len(rows), len(rows[0]) if rows else 0))
             else:
-                return NotImplemented
+                raise ValueError('Indices must be of instance int or slice')
         else:
             return super().__getitem__(i)

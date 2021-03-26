@@ -17,9 +17,6 @@ def column(scalars: Sequence[float]) -> Matrix:
 
 
 def rows(scalars: Sequence[Sequence[float]]) -> Matrix:
-    if not isinstance(scalars, Sequence):
-        scalars = tuple(scalars)
-
     return Matrix(flattened(scalars), (len(scalars), len(scalars[0]) if scalars else 0))
 
 
@@ -94,5 +91,5 @@ def diagonal_matrix(scalars: Sequence[float]) -> Matrix:
     return full_matrix(lambda r, c: scalars[r] if r == c else 0, len(scalars))
 
 
-def identity_matrix(row_dimension: int, column_dimension: Optional[int] = None) -> Matrix:
-    return full_matrix(lambda r, c: 1 if r == c else 0, row_dimension, column_dimension)
+def identity_matrix(dimension: int) -> Matrix:
+    return diagonal_matrix((1,) * dimension)

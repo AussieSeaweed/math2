@@ -317,15 +317,7 @@ class FactoryTestCase(ExtendedTestCase):
             (0, 0, 0, 1, 0),
             (0, 0, 0, 0, 1),
         )))
-        self.assertEqual(identity_matrix(5, 5), rows((
-            (1, 0, 0, 0, 0),
-            (0, 1, 0, 0, 0),
-            (0, 0, 1, 0, 0),
-            (0, 0, 0, 1, 0),
-            (0, 0, 0, 0, 1),
-        )))
-        self.assertEqual(identity_matrix(1, 5), row((1, 0, 0, 0, 0)))
-        self.assertEqual(identity_matrix(5, 1), column((1, 0, 0, 0, 0)))
+        self.assertEqual(identity_matrix(1), singleton_matrix(1))
 
 
 class UtilTestCase(ExtendedTestCase):
@@ -333,7 +325,7 @@ class UtilTestCase(ExtendedTestCase):
         self.assertAlmostEqual(norm(row((1 / sqrt(2), 1 / sqrt(2)))), 1)
         self.assertAlmostEqual(norm(column((1, 0, 0))), 1)
         self.assertAlmostEqual(norm(vector(range(5))), abs(vector(range(5))))
-        self.assertAlmostEqual(norm(identity_matrix(5, 10)), abs(identity_matrix(5, 10)))
+        self.assertAlmostEqual(norm(identity_matrix(2)), sqrt(2))
 
 
 if __name__ == '__main__':
