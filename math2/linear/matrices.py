@@ -55,7 +55,19 @@ class Matrix(Tensor):
     def is_square(self) -> bool:
         return self.row_dimension == self.column_dimension
 
-    def __mul__(self, other: Union[float, Matrix, Vector]) -> Matrix:
+    @overload  # type: ignore
+    def __mul__(self, other: float) -> Matrix:
+        ...
+
+    @overload
+    def __mul__(self, other: Matrix) -> Matrix:
+        ...
+
+    @overload
+    def __mul__(self, other: Vector) -> Vector:
+        ...
+
+    def __mul__(self, other: Union[float, Matrix, Vector]) -> Tensor:
         if isinstance(other, Matrix):
             if self.column_dimension == other.row_dimension:
                 return Matrix(
@@ -65,7 +77,13 @@ class Matrix(Tensor):
             else:
                 raise DimensionError('The matrices do not have valid dimensions for multiplication')
         elif isinstance(other, Vector):
-            return self * Matrix(other, (other.dimension, 1))
+            if self.column_dimension == other.dimension:
+                return Vector(
+                    (Vector(row, (self.column_dimension,)) @ other for row in self.rows),
+                    (self.row_dimension,),
+                )
+            else:
+                raise DimensionError('The matrix and the vector do not have valid dimensions for multiplication')
         else:
             return super().__mul__(other)
 

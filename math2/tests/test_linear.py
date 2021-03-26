@@ -133,7 +133,7 @@ class MatrixTestCase(ExtendedTestCase):
         self.assertEqual(column(range(6)) * row(range(6)), rows((
             (0,) * 6, range(6), range(0, 12, 2), range(0, 18, 3), range(0, 24, 4), range(0, 30, 5),
         )))
-        self.assertEqual(row(range(5, -1, -1)) * vector(range(6)), singleton_matrix(20))
+        self.assertEqual(row(range(5, -1, -1)) * vector(range(6)), singleton_vector(20))
         self.assertRaises(DimensionError, mul, row(range(5)), row(range(5)))
         self.assertRaises(DimensionError, mul, row(range(5)), column(range(6)))
 

@@ -20,13 +20,13 @@ class Tensor(Sequence[float], Hashable):
         if len(self) != product(self.dimensions, 1):
             raise DimensionError('The dimensions do not fit the values')
 
-    def __pos__(self: T) -> T:
+    def __pos__(self: _T) -> _T:
         return self
 
-    def __neg__(self: T) -> T:
+    def __neg__(self: _T) -> _T:
         return type(self)(map(neg, self), self.dimensions)
 
-    def __add__(self: T, other: Tensor) -> T:
+    def __add__(self: _T, other: Tensor) -> _T:
         if not isinstance(other, Tensor):
             return NotImplemented
         elif self.dimensions == other.dimensions:
@@ -34,22 +34,22 @@ class Tensor(Sequence[float], Hashable):
         else:
             raise DimensionError('Adding two tensors requires identical dimensions')
 
-    def __sub__(self: T, other: Tensor) -> T:
+    def __sub__(self: _T, other: Tensor) -> _T:
         try:
             return self + -other
         except TypeError:
             return NotImplemented
 
-    def __mul__(self: T, other: float) -> T:
+    def __mul__(self: _T, other: float) -> _T:
         try:
             return type(self)(map(partial(mul, other), self), self.dimensions)
         except TypeError:
             return NotImplemented
 
-    def __rmul__(self: T, other: float) -> T:
+    def __rmul__(self: _T, other: float) -> _T:
         return self * other
 
-    def __truediv__(self: T, other: float) -> T:
+    def __truediv__(self: _T, other: float) -> _T:
         try:
             return self * (1 / other)
         except TypeError:
@@ -93,4 +93,4 @@ class Tensor(Sequence[float], Hashable):
         return hash(self.dimensions) ^ hash(self._values)
 
 
-T = TypeVar('T', bound=Tensor)
+_T = TypeVar('_T', bound=Tensor)

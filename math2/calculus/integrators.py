@@ -1,10 +1,13 @@
 from abc import ABC, abstractmethod
 from collections.abc import Callable
+from typing import TypeVar
 
 from auxiliary import sum_, windowed
 
-from math2.calculus.typing import _I
+from math2.linear import Tensor
 from math2.utils import linspace
+
+_I = TypeVar('_I', float, Tensor)
 
 
 class Integrator(ABC):
