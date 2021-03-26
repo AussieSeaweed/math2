@@ -1,49 +1,46 @@
 from abc import ABC, abstractmethod
 from collections.abc import Callable
-from typing import TypeVar
 
 from auxiliary import sum_, windowed
 
-from math2.linear import Tensor
+from math2.calculus.typing import _I
 from math2.utils import linspace
-
-_T = TypeVar('_T', float, Tensor)
 
 
 class Integrator(ABC):
     @abstractmethod
-    def approx(self, f: Callable[[float], _T], a: float, b: float) -> _T:
+    def approx(self, f: Callable[[float], _I], a: float, b: float) -> _I:
         pass
 
 
 class MidpointIntegrator(Integrator):
-    def approx(self, f: Callable[[float], _T], a: float, b: float) -> _T:
+    def approx(self, f: Callable[[float], _I], a: float, b: float) -> _I:
         return (b - a) * f((a + b) / 2)
 
 
 class TrapezoidIntegrator(Integrator):
-    def approx(self, f: Callable[[float], _T], a: float, b: float) -> _T:
+    def approx(self, f: Callable[[float], _I], a: float, b: float) -> _I:
         return (b - a) * (f(a) + f(b)) / 2
 
 
 class SimpsonIntegrator(Integrator):
-    def approx(self, f: Callable[[float], _T], a: float, b: float) -> _T:
+    def approx(self, f: Callable[[float], _I], a: float, b: float) -> _I:
         return (b - a) * (f(a) + 4 * f((a + b) / 2) + f(b)) / 6
 
 
 def integrate(
-        f: Callable[[float], _T],
+        f: Callable[[float], _I],
         xlo: float,
         xhi: float,
         *,
         steps: int,
         integrator: Integrator = SimpsonIntegrator(),
-) -> _T:
+) -> _I:
     return sum_(integrator.approx(f, a, b) for a, b in windowed(linspace(xlo, xhi, steps), 2))
 
 
 def double_integrate(
-        f: Callable[[float, float], _T],
+        f: Callable[[float, float], _I],
         xlo: float,
         xhi: float,
         ylo: Callable[[float], float],
@@ -51,7 +48,7 @@ def double_integrate(
         *,
         steps: int,
         integrator: Integrator = SimpsonIntegrator(),
-) -> _T:
+) -> _I:
     return integrate(lambda x: integrate(
         lambda y: f(x, y),
         ylo(x),
@@ -62,7 +59,7 @@ def double_integrate(
 
 
 def triple_integrate(
-        f: Callable[[float, float, float], _T],
+        f: Callable[[float, float, float], _I],
         xlo: float,
         xhi: float,
         ylo: Callable[[float], float],
@@ -72,7 +69,7 @@ def triple_integrate(
         *,
         steps: int,
         integrator: Integrator = SimpsonIntegrator(),
-) -> _T:
+) -> _I:
     return integrate(lambda x: double_integrate(
         lambda y, z: f(x, y, z),
         ylo(x),
