@@ -1,74 +1,98 @@
-from itertools import repeat
+from collections.abc import Callable, Sequence
+from itertools import product, starmap
+from typing import Optional
 
 from auxiliary import default, flattened
 
 from math2.linear.matrices import Matrix
+from math2.linear.vectors import Vector
 
 
-def empty():
-    return Matrix((), 0, 0)
+def row(scalars: Sequence[float]) -> Matrix:
+    return Matrix(scalars, (1, len(scalars)))
 
 
-def singleton(s):
-    return Matrix((s,), 1, 1)
+def column(scalars: Sequence[float]) -> Matrix:
+    return Matrix(scalars, (len(scalars), 1))
 
 
-def row(seq):
-    return Matrix(seq, 1, len(seq))
+def rows(scalars: Sequence[Sequence[float]]) -> Matrix:
+    if not isinstance(scalars, Sequence):
+        scalars = tuple(scalars)
+
+    return Matrix(flattened(scalars), (len(scalars), len(scalars[0]) if scalars else 0))
 
 
-def col(seq):
-    return Matrix(seq, len(seq), 1)
+def columns(scalars: Sequence[Sequence[float]]) -> Matrix:
+    return rows(scalars) ** 'T'
 
 
-def rows(seqs):
-    return Matrix(flattened(seqs), len(seqs), len(seqs[0]) if seqs else 0)
+def vector(scalars: Sequence[float]) -> Vector:
+    return Vector(scalars, (len(scalars),))
 
 
-def cols(seqs):
-    return rows(seqs) ** 'T'
+def empty_vector() -> Vector:
+    return Vector((), (0,))
 
 
-def diag(seq):
-    n = len(seq)
-
-    return Matrix((scalar if r == c else 0 for r, scalar in enumerate(seq) for c in range(n)), n, n)
+def empty_matrix() -> Matrix:
+    return Matrix((), (0, 0))
 
 
-def zeros(m, n=None):
-    n = default(n, m)
-
-    return Matrix(repeat(0, m * n), m, n)
+def singleton_vector(scalar: float) -> Vector:
+    return Vector((scalar,), (1,))
 
 
-def ones(m, n=None):
-    n = default(n, m)
-
-    return Matrix(repeat(1, m * n), m, n)
+def singleton_matrix(scalar: float) -> Matrix:
+    return Matrix((scalar,), (1, 1))
 
 
-def eye(m, n=None):
-    n = default(n, m)
-
-    return Matrix((int(r == c) for r in range(m) for c in range(n)), m, n)
+def full_vector(func: Callable[[int], float], dimension: int) -> Vector:
+    return Vector(map(func, range(dimension)), (dimension,))
 
 
-def full(m, n, scalar=None):
-    if scalar is None:
-        scalar, n = n, scalar
-
-    n = default(n, m)
-
-    return Matrix((scalar for _ in range(m) for _ in range(n)), m, n)
-
-
-def random(m, n=None):
-    from random import random as factory
-    n = default(n, m)
-
-    return Matrix((factory() for _ in range(m) for _ in range(n)), m, n)
+def full_matrix(
+        func: Callable[[int, int], float],
+        row_dimension: int,
+        column_dimension: Optional[int] = None,
+) -> Matrix:
+    return Matrix(
+        starmap(func, product(range(row_dimension), range(default(column_dimension, row_dimension)))),
+        (row_dimension, default(column_dimension, row_dimension)),
+    )
 
 
-i = row((1, 0, 0))
-j = row((0, 1, 0))
-k = row((0, 0, 1))
+def zero_vector(dimension: int) -> Vector:
+    return full_vector(lambda i: 0, dimension)
+
+
+def zero_matrix(row_dimension: int, column_dimension: Optional[int] = None) -> Matrix:
+    return full_matrix(lambda r, c: 0, row_dimension, column_dimension)
+
+
+def one_vector(dimension: int) -> Vector:
+    return full_vector(lambda i: 1, dimension)
+
+
+def one_matrix(row_dimension: int, column_dimension: Optional[int] = None) -> Matrix:
+    return full_matrix(lambda r, c: 1, row_dimension, column_dimension)
+
+
+def random_vector(dimension: int) -> Vector:
+    from random import random
+
+    return full_vector(lambda i: random(), dimension)
+
+
+def random_matrix(row_dimension: int, column_dimension: Optional[int] = None) -> Matrix:
+    from random import random
+
+    return full_matrix(lambda r, c: random(), row_dimension, column_dimension)
+
+
+def diagonal_matrix(scalars: Sequence[float]) -> Matrix:
+    return full_matrix(lambda r, c: scalars[r] if r == c else 0, len(scalars))
+
+
+def identity_matrix(row_dimension: int, column_dimension: Optional[int] = None) -> Matrix:
+    return full_matrix(lambda r, c: 1 if r == c else 0, row_dimension, column_dimension)
