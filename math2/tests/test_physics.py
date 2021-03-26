@@ -5,7 +5,7 @@ from unittest import main
 from auxiliary import ExtendedTestCase
 
 from math2.linear import vector, zero_vector
-from math2.phys import DiscreteCharge, ElectrostaticField
+from math2.physics import DiscreteCharge, ElectrostaticField
 
 
 class PS1TestCase(ExtendedTestCase):

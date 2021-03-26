@@ -8,7 +8,7 @@ from auxiliary import sum_
 
 from math2.calculus import Region
 from math2.linear import Vector
-from math2.phys.consts import e0
+from math2.physics.consts import e0
 
 
 class ElectrostaticField:
