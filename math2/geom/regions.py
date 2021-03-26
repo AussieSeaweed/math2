@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from math2.analysis import dbl_quad, quad, tpl_quad
+from math2.analysis import integrate
 
 
 class Region(ABC):
@@ -16,7 +16,7 @@ class Line(Region):
         self.xhi = xhi
 
     def integral(self, f):
-        return quad(lambda x: f(self.c(x)), self.xlo, self.xhi)
+        return integrate(lambda x: f(self.c(x)), self.xlo, self.xhi)
 
 
 class Surface(Region):
@@ -28,7 +28,7 @@ class Surface(Region):
         self.yhi = yhi
 
     def integral(self, f):
-        return dbl_quad(lambda x, y: f(self.s(x, y)), self.xlo, self.xhi, self.ylo, self.yhi)
+        return integrate(lambda x, y: f(self.s(x, y)), self.xlo, self.xhi, self.ylo, self.yhi)
 
 
 class Volume(Region):
@@ -42,4 +42,4 @@ class Volume(Region):
         self.zhi = zhi
 
     def integral(self, f):
-        return tpl_quad(lambda x, y, z: f(self.v(x, y, z)), self.xlo, self.xhi, self.ylo, self.yhi, self.zlo, self.zhi)
+        return integrate(lambda x, y, z: f(self.v(x, y, z)), self.xlo, self.xhi, self.ylo, self.yhi, self.zlo, self.zhi)

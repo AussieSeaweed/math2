@@ -1,66 +1,80 @@
 from abc import ABC, abstractmethod
 from collections.abc import Callable
-from functools import partial
-from itertools import chain
 
-from auxiliary import windowed
+from auxiliary import sum_, windowed
 
 from math2.misc import linspace
 
 
 class Integrator(ABC):
-    def dbl_quad(self, f, xlo, xhi, ylo, yhi, steps):
-        return self.quad(lambda x: self.quad(
-            partial(f, x),
-            ylo(x) if isinstance(ylo, Callable) else ylo,
-            yhi(x) if isinstance(yhi, Callable) else yhi,
-            steps,
-        ), xlo, xhi, steps)
-
-    def tpl_quad(self, f, xlo, xhi, ylo, yhi, zlo, zhi, steps):
-        return self.quad(lambda x: self.dbl_quad(
-            partial(f, x),
-            ylo(x) if isinstance(ylo, Callable) else ylo,
-            yhi(x) if isinstance(yhi, Callable) else yhi,
-            partial(zlo, x) if isinstance(zlo, Callable) else zlo,
-            partial(zhi, x) if isinstance(zhi, Callable) else zhi,
-            steps,
-        ), xlo, xhi, steps)
-
     @abstractmethod
-    def quad(self, f, xlo, xhi, steps):
+    def approx(self, f: Callable[[float], float], a: float, b: float) -> float:
         pass
 
 
 class MidpointIntegrator(Integrator):
-    def quad(self, f, xlo, xhi, steps):
-        return sum((b - a) * f((a + b) / 2) for a, b in windowed(chain(linspace(xlo, xhi, steps), (xhi,)), 2))
+    def approx(self, f: Callable[[float], float], a: float, b: float) -> float:
+        return (b - a) * f((a + b) / 2)
 
 
 class TrapezoidIntegrator(Integrator):
-    def quad(self, f, xlo, xhi, steps):
-        return sum((b - a) * (f(a) + f(b)) / 2 for a, b in windowed(chain(linspace(xlo, xhi, steps), (xhi,)), 2))
+    def approx(self, f: Callable[[float], float], a: float, b: float) -> float:
+        return (b - a) * (f(a) + f(b)) / 2
 
 
 class SimpsonIntegrator(Integrator):
-    def quad(self, f, xlo, xhi, steps):
-        return sum((b - a) * (f(a) + 4 * f((a + b) / 2) + f(b)) / 6
-                   for a, b in windowed(chain(linspace(xlo, xhi, steps), (xhi,)), 2))
+    def approx(self, f: Callable[[float], float], a: float, b: float) -> float:
+        return (b - a) * (f(a) + 4 * f((a + b) / 2) + f(b)) / 6
 
 
-def quad(f, xlo, xhi):
-    import scipy.integrate
+def integrate(
+        f: Callable[[float], float],
+        xlo: float,
+        xhi: float,
+        *,
+        steps: int,
+        integrator: Integrator = SimpsonIntegrator(),
+) -> float:
+    return sum_(integrator.approx(f, a, b) for a, b in windowed(linspace(xlo, xhi, steps), 2))
 
-    return scipy.integrate.quad(f, xlo, xhi)[0]
+
+def double_integrate(
+        f: Callable[[float, float], float],
+        xlo: float,
+        xhi: float,
+        ylo: Callable[[float], float],
+        yhi: Callable[[float], float],
+        *,
+        steps: int,
+        integrator: Integrator = SimpsonIntegrator(),
+) -> float:
+    return integrate(lambda x: integrate(
+        lambda y: f(x, y),
+        ylo(x),
+        yhi(x),
+        steps=steps,
+        integrator=integrator,
+    ), xlo, xhi, steps=steps, integrator=integrator)
 
 
-def dbl_quad(f, xlo, xhi, ylo, yhi):
-    import scipy.integrate
-
-    return scipy.integrate.dblquad(lambda x, y: f(y, x), xlo, xhi, ylo, yhi)[0]
-
-
-def tpl_quad(f, xlo, xhi, ylo, yhi, zlo, zhi):
-    import scipy.integrate
-
-    return scipy.integrate.tplquad(lambda x, y, z: f(z, y, x), xlo, xhi, ylo, yhi, zlo, zhi)[0]
+def triple_integrate(
+        f: Callable[[float, float, float], float],
+        xlo: float,
+        xhi: float,
+        ylo: Callable[[float], float],
+        yhi: Callable[[float], float],
+        zlo: Callable[[float, float], float],
+        zhi: Callable[[float, float], float],
+        *,
+        steps: int,
+        integrator: Integrator = SimpsonIntegrator(),
+) -> float:
+    return integrate(lambda x: double_integrate(
+        lambda y, z: f(x, y, z),
+        ylo(x),
+        yhi(x),
+        lambda y: zlo(x, y),
+        lambda y: zhi(x, y),
+        steps=steps,
+        integrator=integrator,
+    ), xlo, xhi, steps=steps, integrator=integrator)
